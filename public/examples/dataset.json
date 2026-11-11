@@ -1,0 +1,28 @@
+{
+  "id": "example-fictional-1",
+  "patch": "Demo",
+  "tier": "Fictif",
+  "source": "Exemple synthétique — aucun résultat réel",
+  "importedAt": "2026-11-11T00:00:00Z",
+  "fictional": true,
+  "pairs": [
+    {
+      "relation": "vs",
+      "candidateChampionId": "58",
+      "candidateRole": "Top",
+      "otherChampionId": "202",
+      "otherRole": "ADC",
+      "delta2": 1.25,
+      "games": 100
+    },
+    {
+      "relation": "with",
+      "candidateChampionId": "58",
+      "candidateRole": "Top",
+      "otherChampionId": "64",
+      "otherRole": "Jungle",
+      "delta2": -0.5,
+      "games": 100
+    }
+  ]
+}

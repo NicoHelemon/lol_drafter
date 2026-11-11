@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+[build.environment]
+  NODE_VERSION = "24"
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    X-Frame-Options = "DENY"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https://raw.communitydragon.org https://ddragon.leagueoflegends.com data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; base-uri 'self'; frame-ancestors 'none'"

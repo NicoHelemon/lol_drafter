@@ -1,0 +1,3 @@
+relation,candidateChampionId,candidateRole,otherChampionId,otherRole,delta2,games
+vs,58,Top,202,ADC,1.25,100
+with,58,Top,64,Jungle,-0.5,100
