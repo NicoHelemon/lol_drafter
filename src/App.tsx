@@ -1,3 +1,4 @@
+import Participants from "./components/Participants";
 import SwapPrompt from "./components/SwapPrompt";
 import { roleName } from "./domain/roles";
 import { errorMessage } from "./lib/errors";
@@ -45,7 +46,6 @@ export default function App() {
     [busy, setBusy] = useState(false),
     [picker, setPicker] = useState<Picker | null>(null),
     [swaps, setSwaps] = useState<RoleSwapRequest[]>([]),
-    [mode, setMode] = useState<"replace" | "unassign">("replace"),
     [online, setOnline] = useState<string[]>([]);
   const [invite, setInvite] = useState(() => location.hash.slice(1));
   const [inviteRoom] = useState(
@@ -240,7 +240,7 @@ export default function App() {
     const p = picker;
     setPicker(null);
     void change((s) => {
-      if (p.kind === "pick") return place(s, p.team, p.role, id, mode);
+      if (p.kind === "pick") return place(s, p.team, p.role, id);
       s.bans[p.team][p.slot] = id;
       return record(s, `Ban · ${names[id]}`);
     });
@@ -357,18 +357,11 @@ export default function App() {
               </button>
             </div>
           </div>
-          {
-            <div className="room-summary">
-              {state!.players.map((p) => (
-                <span key={p.id}>
-                  <i className={online.includes(p.id) ? "dot" : "dot off"} />
-                  {p.name}{" "}
-                  {p.id === room.host_id && <b className="host-badge">HOST</b>}
-                  {p.role && ` · ${roleName(p.role)}`}
-                </span>
-              ))}
-            </div>
-          }
+          <Participants
+            players={state!.players}
+            hostId={room.host_id}
+            online={online}
+          />
           <p className="dataset-note">
             {state!.dataset.fictional
               ? "Fictional demo data"
@@ -393,28 +386,31 @@ export default function App() {
             <DraftPage
               state={state!}
               uid={uid}
-              host={host}
-              editPool={(id) => setPicker({ kind: "pool", player: id })}
               busy={busy}
               change={change}
               setPicker={setPicker}
-              setMode={setMode}
             />
           )}
         </main>
       )}
       {state?.phase === "setup" &&
         swaps
-          .filter((r) => r.target_id === uid)
+          .filter((r) => r.target_id === uid || r.requester_id === uid)
           .slice(0, 1)
           .map((request) => (
             <SwapPrompt
               key={request.id}
               request={request}
               name={
-                state.players.find((p) => p.id === request.requester_id)
-                  ?.name ?? "Player"
+                state.players.find(
+                  (p) =>
+                    p.id ===
+                    (request.requester_id === uid
+                      ? request.target_id
+                      : request.requester_id),
+                )?.name ?? "Player"
               }
+              outgoing={request.requester_id === uid}
               busy={busy}
               onRespond={(accept) => void swapAction(request.id, accept)}
             />
@@ -450,21 +446,6 @@ export default function App() {
                 ×
               </button>
             </div>
-            {picker.kind === "pick" &&
-              state?.picks[picker.team].some((p) => p.role === picker.role) && (
-                <label>
-                  Occupied role
-                  <select
-                    value={mode}
-                    onChange={(e) => setMode(e.target.value as typeof mode)}
-                  >
-                    <option value="replace">Replace current pick</option>
-                    <option value="unassign">
-                      Keep current pick unassigned
-                    </option>
-                  </select>
-                </label>
-              )}
             {picker.kind === "pool" && (
               <div className="pool-tiles">
                 {state?.players

@@ -2,22 +2,22 @@
 
 Application de draft League of Legends pour une équipe de cinq joueurs. React + TypeScript + Vite, frontend Netlify et salles partagées sur Supabase.
 
-## Installation existante
+## Base de données
 
-Exécuter [202611110004_ephemeral_rooms.sql](supabase/migrations/202611110004_ephemeral_rooms.sql) dans **Supabase → SQL Editor → New query → Run**, après les migrations précédentes.
+Le schéma courant comprend les migrations `202611110001` à `202611110005` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
 
-**Cette migration supprime les salles temporaires existantes**, leurs invitations et demandes d’échange. Les salles sont éphémères ; aucun chemin de compatibilité avec les anciennes versions n’est maintenu. Aucune variable Netlify supplémentaire n’est nécessaire.
+La migration **005** interdit les picks sans rôle et ne supprime aucune donnée. Sur une installation existante, appliquer uniquement les nouvelles migrations. **Ne pas rejouer 004** : elle réinitialise les salles temporaires.
 
 ## Fonctionnement
 
 - L’interface est en anglais. Une salle porte le nom de son créateur, par exemple **Nico’s room**, avec une URL `/rooms/nicos-room/setup`. Les doublons de noms reçoivent un suffixe numérique ; le UUID reste une clé interne.
-- Un badge **HOST** identifie l’hôte, y compris avant qu’il ait choisi un rôle. L’hôte peut démarrer immédiatement, sans Ready ni obligation de remplir les rôles ou pools.
+- Le panneau des participants indique le nombre de joueurs (`2/5`) et leurs noms, sans leurs rôles. Un badge **HOST** identifie l’hôte, y compris avant qu’il ait choisi un rôle. L’hôte peut démarrer immédiatement, sans Ready ni obligation de remplir les rôles ou pools.
 - **Join** réserve un rôle libre. Les pools commencent vides. Ajouter un portrait avec [+] ou le retirer avec × enregistre directement la modification.
 - Survoler le panneau d’un autre joueur fait apparaître les flèches d’échange ; le bouton reste accessible au clavier et visible sur écran tactile.
-- Le destinataire reçoit un popup qui expire après **cinq secondes**. Sans réponse, la demande est refusée. Le serveur vérifie aussi l’expiration : un clic tardif ne change aucun rôle. Le demandeur voit un message d’attente.
+- Les deux joueurs voient un popup pendant la demande, avec une barre de temps qui se vide. Le destinataire dispose de Accept / Decline, le demandeur de Cancel. La demande expire après **cinq secondes**. Sans réponse, elle est refusée ; le serveur rejette aussi les acceptations tardives.
 - Les pools restent liés à leur joueur lors d’un échange. L’hôte peut démarrer pendant une demande : le passage en draft la supprime.
 - **Quit** libère le siège. Si l’hôte part, le premier participant restant devient hôte. La dernière sortie supprime la salle, ses membres, son invitation et ses demandes d’échange. Fermer un onglet conserve le siège pour permettre la reconnexion ; il faut utiliser Quit pour partir.
-- La préparation et la draft sont deux pages distinctes. La base est la source de vérité ; Realtime déclenche une relecture canonique, avec reprise après reconnexion.
+- La préparation et la draft sont deux pages distinctes. Le draft board occupe toute la largeur, avec les bans en haut. Les candidats du pool apparaissent directement dans chaque case alliée ; un clic sur le portrait sélectionne le champion et [+] permet de choisir dans le catalogue. Les champions pris ailleurs ou bannis restent visibles en gris. Chaque portrait porte son score en surimpression ; cliquer le score ouvre les contributions détaillées. Chaque pick doit avoir un rôle ; les menus permettent toujours de déplacer ou échanger des picks. La base est la source de vérité ; Realtime déclenche une relecture canonique, avec reprise après reconnexion.
 
 ## Développer
 
@@ -38,7 +38,7 @@ Sans variables Supabase, le site fonctionne en démo locale sur un seul navigate
 
 ## Créer Supabase et déployer sur Netlify
 
-1. Créer un projet Supabase neuf. Exécuter les quatre fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611110004`.
+1. Créer un projet Supabase neuf. Appliquer les cinq fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611110005`.
 2. Activer **Authentication → Sign In / Providers → Anonymous Sign-Ins**.
 3. Vérifier que `rooms` appartient à la publication `supabase_realtime` dans **Database → Replication**.
 4. Copier `.env.example` vers `.env.local` pour le développement. Renseigner `VITE_SUPABASE_URL` et la clé publique `VITE_SUPABASE_ANON_KEY` (anon ou publishable). Ne jamais utiliser de clé `service_role` ou secrète dans une variable `VITE_*`.
@@ -77,10 +77,12 @@ Le dataset est stocké une fois par salle et figé quand la draft démarre. Les 
 ## Structure
 
 - `src/pages` : préparation et draft ; `src/components` : portraits, icônes et popup de demande.
-- `src/domain` : types, invariants, poids et score.
+- `src/domain` : types, invariants, poids, score et candidats intégrés au board.
 - `src/lib/rooms.ts` : Auth anonyme, RPC, Realtime et reprise canonique.
 - `src/data` : catalogue, fixture synthétique et validation des imports.
 - `supabase/migrations` : schéma, RLS et fonctions serveur.
 - `tests` : domaine, assets, base multi-identités et parcours navigateur.
 
 Projet communautaire non affilié à Riot Games. Les assets League of Legends appartiennent à Riot Games.
+
+Pour les scores des picks adverses, le contexte est orienté depuis le candidat adverse (ses coéquipiers et ses adversaires). Aucune symétrie ou inversion artificielle d’un score allié n’est supposée. Le candidat lui-même est exclu des paires.

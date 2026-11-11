@@ -40,15 +40,6 @@ export default function SetupPage({
   }
   return (
     <section aria-label="Room preparation" className="setup-page">
-      {swaps
-        .filter((r) => r.requester_id === uid)
-        .map((r) => (
-          <p className="swap-wait" role="status" key={r.id}>
-            Waiting for{" "}
-            {state.players.find((p) => p.id === r.target_id)?.name ?? "player"}{" "}
-            to accept the role swap…
-          </p>
-        ))}
       <section className="roster">
         {ROLES.map((role) => {
           const p = state.players.find((p) => p.role === role),
