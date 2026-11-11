@@ -17,6 +17,8 @@ export default function DraftChampion({
   blocked,
   busy,
   onPick,
+  pickLabel,
+  toggle = true,
   onDetails,
 }: {
   id: string;
@@ -27,6 +29,8 @@ export default function DraftChampion({
   blocked: boolean;
   busy: boolean;
   onPick: () => void;
+  pickLabel?: string;
+  toggle?: boolean;
   onDetails: () => void;
 }) {
   const label = scoreLabel(result.value);
@@ -38,8 +42,8 @@ export default function DraftChampion({
     >
       <button
         className="champion-choice"
-        aria-label={`Pick ${names[id]} ${roleName(role)} ${team}`}
-        aria-pressed={selected}
+        aria-label={pickLabel ?? `Pick ${names[id]} ${roleName(role)} ${team}`}
+        aria-pressed={toggle ? selected : undefined}
         disabled={busy || blocked}
         onClick={onPick}
       >

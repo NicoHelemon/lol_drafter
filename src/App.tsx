@@ -32,11 +32,13 @@ import {
   readSwaps,
   requestRoleSwap,
   respondRoleSwap,
+  addCandidate,
 } from "./lib/rooms";
 export type Picker =
   | { kind: "pick"; team: Team; role: Role }
   | { kind: "ban"; team: Team; slot: number }
-  | { kind: "pool"; player: string };
+  | { kind: "pool"; player: string }
+  | { kind: "candidates"; player: string; role: Role };
 export default function App() {
   const [room, setRoom] = useState<Room | null>(null),
     [uid, setUid] = useState(""),
@@ -226,6 +228,19 @@ export default function App() {
   }
   function choose(id: string) {
     if (!picker) return;
+    if (picker.kind === "candidates") {
+      const playerId = picker.player;
+      void run(async () => {
+        if (!room) return;
+        try {
+          setRoom(await addCandidate(room, playerId, id));
+        } catch (e) {
+          setRoom(await readRoom(room.id));
+          throw e;
+        }
+      });
+      return;
+    }
     if (picker.kind === "pool") {
       const playerId = picker.player;
       void change((s) => {
@@ -430,7 +445,11 @@ export default function App() {
             role="dialog"
             aria-modal="true"
             aria-label={
-              picker.kind === "pool" ? "Edit pool" : "Choose champion"
+              picker.kind === "pool"
+                ? "Edit pool"
+                : picker.kind === "candidates"
+                  ? "Add candidates"
+                  : "Choose champion"
             }
             onClick={(e) => e.stopPropagation()}
           >
@@ -438,9 +457,11 @@ export default function App() {
               <h2>
                 {picker.kind === "pool"
                   ? "Champion pool"
-                  : picker.kind === "pick"
-                    ? `${roleName(picker.role)} · ${picker.team === "ally" ? "Our team" : "Opponents"}`
-                    : "Choose ban"}
+                  : picker.kind === "candidates"
+                    ? `${roleName(picker.role)} candidates`
+                    : picker.kind === "pick"
+                      ? `${roleName(picker.role)} · ${picker.team === "ally" ? "Our team" : "Opponents"}`
+                      : "Choose ban"}
               </h2>
               <button aria-label="Close" onClick={() => setPicker(null)}>
                 ×
@@ -474,13 +495,13 @@ export default function App() {
             )}
             <Search
               selected={
-                picker.kind === "pool"
+                picker.kind === "pool" || picker.kind === "candidates"
                   ? (state?.players.find((p) => p.id === picker.player)?.pool ??
                     [])
                   : []
               }
               blocked={
-                picker.kind === "pool"
+                picker.kind === "pool" || picker.kind === "candidates"
                   ? new Set(
                       state?.players.find((p) => p.id === picker.player)
                         ?.pool ?? [],

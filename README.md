@@ -4,9 +4,9 @@ Application de draft League of Legends pour une équipe de cinq joueurs. React +
 
 ## Base de données
 
-Le schéma courant comprend les migrations `202611110001` à `202611110005` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
+Le schéma courant comprend les migrations `202611110001` à `202611110006` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
 
-La migration **005** interdit les picks sans rôle et ne supprime aucune donnée. Sur une installation existante, appliquer uniquement les nouvelles migrations. **Ne pas rejouer 004** : elle réinitialise les salles temporaires.
+La migration **005** interdit les picks sans rôle. La migration **006** ajoute une opération transactionnelle pour enrichir les candidats pendant la draft sans modifier le pick. Ces deux migrations ne suppriment aucune donnée. Sur une installation existante, appliquer uniquement les nouvelles migrations. **Ne pas rejouer 004** : elle réinitialise les salles temporaires.
 
 ## Fonctionnement
 
@@ -17,7 +17,7 @@ La migration **005** interdit les picks sans rôle et ne supprime aucune donnée
 - Les deux joueurs voient un popup pendant la demande, avec une barre de temps qui se vide. Le destinataire dispose de Accept / Decline, le demandeur de Cancel. La demande expire après **cinq secondes**. Sans réponse, elle est refusée ; le serveur rejette aussi les acceptations tardives.
 - Les pools restent liés à leur joueur lors d’un échange. L’hôte peut démarrer pendant une demande : le passage en draft la supprime.
 - **Quit** libère le siège. Si l’hôte part, le premier participant restant devient hôte. La dernière sortie supprime la salle, ses membres, son invitation et ses demandes d’échange. Fermer un onglet conserve le siège pour permettre la reconnexion ; il faut utiliser Quit pour partir.
-- La préparation et la draft sont deux pages distinctes. Le draft board occupe toute la largeur, avec les bans en haut. Les candidats du pool apparaissent directement dans chaque case alliée ; un clic sur le portrait sélectionne le champion et [+] permet de choisir dans le catalogue. Les champions pris ailleurs ou bannis restent visibles en gris. Chaque portrait porte son score en surimpression ; cliquer le score ouvre les contributions détaillées. Chaque pick doit avoir un rôle ; les menus permettent toujours de déplacer ou échanger des picks. La base est la source de vérité ; Realtime déclenche une relecture canonique, avec reprise après reconnexion.
+- La préparation et la draft sont deux pages distinctes. Le draft board occupe toute la largeur, avec les bans en haut. Les postes ennemis et les postes alliés sans joueur associé affichent [+] tant qu’ils sont vides ; un premier pick remplace [+], puis un clic sur le portrait ouvre son remplacement. Pour un poste allié associé à un joueur, [+] ajoute uniquement des candidats depuis le catalogue, sans sélectionner de pick. Un clic sur un candidat le sélectionne ou, s’il est déjà sélectionné, le désélectionne. Cliquer un autre candidat remplace le pick. Le candidat sélectionné reste toujours en première position, quel que soit son score. Le nom du joueur est affiché sous son rôle. Les champions pris ailleurs ou bannis restent visibles en gris. Chaque portrait porte son score en surimpression ; cliquer le score ouvre les contributions détaillées. Chaque pick doit avoir un rôle ; les menus permettent toujours de déplacer ou échanger des picks. La base est la source de vérité ; Realtime déclenche une relecture canonique, avec reprise après reconnexion.
 
 ## Développer
 
@@ -38,7 +38,7 @@ Sans variables Supabase, le site fonctionne en démo locale sur un seul navigate
 
 ## Créer Supabase et déployer sur Netlify
 
-1. Créer un projet Supabase neuf. Appliquer les cinq fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611110005`.
+1. Créer un projet Supabase neuf. Appliquer les six fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611110006`.
 2. Activer **Authentication → Sign In / Providers → Anonymous Sign-Ins**.
 3. Vérifier que `rooms` appartient à la publication `supabase_realtime` dans **Database → Replication**.
 4. Copier `.env.example` vers `.env.local` pour le développement. Renseigner `VITE_SUPABASE_URL` et la clé publique `VITE_SUPABASE_ANON_KEY` (anon ou publishable). Ne jamais utiliser de clé `service_role` ou secrète dans une variable `VITE_*`.
@@ -77,7 +77,7 @@ Le dataset est stocké une fois par salle et figé quand la draft démarre. Les 
 ## Structure
 
 - `src/pages` : préparation et draft ; `src/components` : portraits, icônes et popup de demande.
-- `src/domain` : types, invariants, poids, score et candidats intégrés au board.
+- `src/domain` : types, invariants, poids, score et actions distinctes d’ajout de candidat / sélection de pick.
 - `src/lib/rooms.ts` : Auth anonyme, RPC, Realtime et reprise canonique.
 - `src/data` : catalogue, fixture synthétique et validation des imports.
 - `supabase/migrations` : schéma, RLS et fonctions serveur.
@@ -86,3 +86,5 @@ Le dataset est stocké une fois par salle et figé quand la draft démarre. Les 
 Projet communautaire non affilié à Riot Games. Les assets League of Legends appartiennent à Riot Games.
 
 Pour les scores des picks adverses, le contexte est orienté depuis le candidat adverse (ses coéquipiers et ses adversaires). Aucune symétrie ou inversion artificielle d’un score allié n’est supposée. Le candidat lui-même est exclu des paires.
+
+Pendant la draft, tous les membres peuvent ajouter un candidat à un poste incarné via `add_draft_candidate`. Cette RPC ne modifie que le pool ciblé et vérifie la version de la salle ; les permissions générales de suppression/remplacement des pools ne sont pas élargies.

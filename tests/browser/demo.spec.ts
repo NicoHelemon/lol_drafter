@@ -376,3 +376,140 @@ test("requester also sees a popup with a draining timer and the other player’s
   await page.clock.fastForward(2600);
   await expect(dialog).toHaveCount(0);
 });
+
+test("anonymous ally and enemy slots replace their plus button with a clickable pick", async ({
+  page,
+}) => {
+  await openDemo(page);
+  await page.getByRole("button", { name: "Start draft" }).click();
+  for (const [role, team, first, second] of [
+    ["Jungle", "ally", "Akshan", "Elise"],
+    ["Top", "enemy", "Darius", "Camille"],
+  ] as const) {
+    const cell = page.getByRole("region", { name: `${role} ${team} picks` });
+    await cell
+      .getByRole("button", { name: `Choose ${role} ${team}`, exact: true })
+      .click();
+    await page.getByRole("textbox", { name: "Search champions" }).fill(first);
+    await page.getByRole("button", { name: first, exact: true }).click();
+    await expect(cell.locator(".board-add")).toHaveCount(0);
+    await expect(cell.locator(".draft-champion-tile")).toHaveCount(1);
+    await cell
+      .getByRole("button", {
+        name: `Change ${first} ${role} ${team}`,
+        exact: true,
+      })
+      .click();
+    await page.getByRole("textbox", { name: "Search champions" }).fill(second);
+    await page.getByRole("button", { name: second, exact: true }).click();
+    await expect(
+      cell.getByRole("button", {
+        name: `Change ${second} ${role} ${team}`,
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(cell.locator(".draft-champion-tile")).toHaveCount(1);
+    await expect(cell.locator(".board-add")).toHaveCount(0);
+    await cell
+      .getByRole("button", { name: `Remove ${second} ${team}`, exact: true })
+      .click();
+    await expect(
+      cell.getByRole("button", { name: `Choose ${role} ${team}`, exact: true }),
+    ).toBeVisible();
+  }
+});
+test("represented allies add candidates without picking, toggle selections, and keep the selected champion first", async ({
+  page,
+}) => {
+  await openDemo(page);
+  await page
+    .getByRole("group", { name: "Top role" })
+    .getByRole("button", { name: "Join", exact: true })
+    .click();
+  await addPool(page, ["Renekton", "Camille"]);
+  await page.getByRole("button", { name: "Start draft" }).click();
+  const cell = page.getByRole("region", { name: "Top ally picks" });
+  await cell
+    .getByRole("button", { name: "Add Top candidates", exact: true })
+    .click();
+  await page.getByRole("textbox", { name: "Search champions" }).fill("Darius");
+  await page.getByRole("button", { name: "Darius", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Darius", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(cell.locator(".tile-selected")).toHaveCount(0);
+  await expect(
+    cell.getByRole("button", { name: "Pick Darius Top ally", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
+  await cell
+    .getByRole("button", { name: "Pick Renekton Top ally", exact: true })
+    .click();
+  await expect(cell.locator(".draft-champion-tile").first()).toHaveAttribute(
+    "data-champion",
+    "58",
+  );
+  await cell
+    .getByRole("button", { name: "Add Top candidates", exact: true })
+    .click();
+  await page.getByRole("textbox", { name: "Search champions" }).fill("Aatrox");
+  await page.getByRole("button", { name: "Aatrox", exact: true }).click();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(
+    cell.getByRole("button", { name: "Pick Renekton Top ally", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await cell
+    .getByRole("button", { name: "Pick Camille Top ally", exact: true })
+    .click();
+  await expect(cell.locator(".draft-champion-tile").first()).toHaveAttribute(
+    "data-champion",
+    "164",
+  );
+  await expect(
+    cell.getByRole("button", { name: "Pick Renekton Top ally", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
+  await cell
+    .getByRole("button", { name: "Pick Camille Top ally", exact: true })
+    .click();
+  await expect(cell.locator(".tile-selected")).toHaveCount(0);
+  await expect(
+    cell.getByRole("button", { name: "Pick Camille Top ally", exact: true }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem("draftroom-demo")!).state.picks.ally,
+    ),
+  ).toEqual([]);
+  await page.reload();
+  await expect(
+    cell.getByRole("button", { name: "Pick Darius Top ally", exact: true }),
+  ).toBeVisible();
+  await expect(
+    cell.getByRole("button", { name: "Pick Aatrox Top ally", exact: true }),
+  ).toBeVisible();
+  await expect(cell.locator(".tile-selected")).toHaveCount(0);
+  await expect(
+    page
+      .locator(".role-label")
+      .filter({ hasText: "Top" })
+      .locator(".role-player"),
+  ).toHaveText("Nico");
+  await cell
+    .getByRole("button", { name: "Pick Darius Top ally", exact: true })
+    .click();
+  await page.screenshot({
+    path: "test-results/draft-candidates-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+  await page.screenshot({
+    path: "test-results/draft-candidates-mobile.png",
+    fullPage: true,
+  });
+});

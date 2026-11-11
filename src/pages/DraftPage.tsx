@@ -1,3 +1,4 @@
+import { toggleDraftCandidate } from "../domain/draft";
 import { useState } from "react";
 import { ROLES, type State, type Team, type Role } from "../domain/types";
 import { roleName } from "../domain/roles";
@@ -23,6 +24,9 @@ export default function DraftPage({
   change,
   setPicker,
 }: Props) {
+  const associatedPlayers = new Map(
+    state.players.map((player) => [player.role, player]),
+  );
   const [details, setDetails] = useState<ScoreSelection | null>(null);
   const detailScore = details
     ? scoreForTeam(details.id, details.role, details.team, state)
@@ -83,12 +87,18 @@ export default function DraftPage({
             <span className="role-label">
               <RoleIcon role={role} />
               {roleName(role)}
+              {associatedPlayers.get(role) && (
+                <small
+                  className="role-player"
+                  title={associatedPlayers.get(role)!.name}
+                >
+                  {associatedPlayers.get(role)!.name}
+                </small>
+              )}
             </span>
             {(["ally", "enemy"] as Team[]).map((team) => {
               const player =
-                  team === "ally"
-                    ? state.players.find((p) => p.role === role)
-                    : undefined,
+                  team === "ally" ? associatedPlayers.get(role) : undefined,
                 pick = state.picks[team].find((p) => p.role === role),
                 options = candidates(
                   player?.pool ?? [],
@@ -104,9 +114,7 @@ export default function DraftPage({
                   key={team}
                 >
                   <div className="draft-cell-heading">
-                    <span>
-                      {pick ? names[pick.championId] : (player?.name ?? "")}
-                    </span>
+                    <span>{pick ? names[pick.championId] : ""}</span>
                     {pick && (
                       <div className="pick-actions">
                         <select
@@ -161,23 +169,44 @@ export default function DraftPage({
                         selected={option.selected}
                         blocked={option.blocked}
                         busy={busy}
+                        toggle={!!player}
+                        pickLabel={
+                          player
+                            ? undefined
+                            : `Change ${names[option.id]} ${roleName(role)} ${team}`
+                        }
                         onPick={() => {
-                          if (!option.selected)
-                            void change((s) => place(s, team, role, option.id));
+                          if (player)
+                            void change((s) =>
+                              toggleDraftCandidate(s, role, option.id),
+                            );
+                          else setPicker({ kind: "pick", team, role });
                         }}
                         onDetails={() =>
                           setDetails({ id: option.id, role, team })
                         }
                       />
                     ))}
-                    <button
-                      className="add-champion board-add"
-                      aria-label={`Choose ${roleName(role)} ${team}`}
-                      disabled={busy}
-                      onClick={() => setPicker({ kind: "pick", team, role })}
-                    >
-                      +
-                    </button>
+                    {(player || !pick) && (
+                      <button
+                        className="add-champion board-add"
+                        aria-label={
+                          player
+                            ? `Add ${roleName(role)} candidates`
+                            : `Choose ${roleName(role)} ${team}`
+                        }
+                        disabled={busy}
+                        onClick={() =>
+                          setPicker(
+                            player
+                              ? { kind: "candidates", player: player.id, role }
+                              : { kind: "pick", team, role },
+                          )
+                        }
+                      >
+                        +
+                      </button>
+                    )}
                   </div>
                 </section>
               );

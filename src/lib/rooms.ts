@@ -1,3 +1,4 @@
+import { addDraftCandidate } from "../domain/draft";
 import { createClient } from "@supabase/supabase-js";
 import type { Room, State, RoleSwapRequest } from "../domain/types";
 import { initialState, DemoProvider } from "../data/provider";
@@ -215,6 +216,23 @@ export async function respondRoleSwap(
     room_id: room.id,
     request_id: requestId,
     accept,
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function addCandidate(
+  room: Room,
+  playerId: string,
+  championId: string,
+): Promise<Room> {
+  if (!supabase)
+    return saveRoom(room, addDraftCandidate(room.state, playerId, championId));
+  const { data, error } = await supabase.rpc("add_draft_candidate", {
+    room_id: room.id,
+    player_id: playerId,
+    champion_id: championId,
+    expected_version: room.version,
   });
   if (error) throw error;
   return data;
