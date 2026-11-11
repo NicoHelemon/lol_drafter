@@ -18,6 +18,6 @@ export function demoDataset():Dataset {
   if(seed%11===0)continue;
   pairs.push({relation,candidateChampionId:c,candidateRole,otherChampionId:o,otherRole,delta2:((seed%61)-30)/10,games:100+seed%900});
  }
- return {id:'fictional-v1',patch:'Démo',tier:'Fictif',source:'Fixture synthétique — aucune statistique Lolalytics',importedAt:'2026-11-11T00:00:00Z',fictional:true,pairs};
+ return {id:'fictional-v1',patch:'Demo',tier:'Synthetic',source:'Synthetic demo data',importedAt:'2026-11-11T00:00:00Z',fictional:true,pairs};
 }
 export function initialState(id:string,name:string):State{return {phase:'setup',side:'blue',dataset:demoDataset(),players:[{id,name,role:'Top',pool:defaultPools.Top,ready:false}],picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},history:[]};}

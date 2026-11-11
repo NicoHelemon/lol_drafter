@@ -13,3 +13,10 @@
 9. Contrôler desktop et mobile, contributions détaillées, valeurs N/A, absence de faux classement sans contexte et label fictif permanent pour la démo.
 
 Tests automatisés déjà disponibles : `npm test` (SQL/Postgres avec cinq identités et permissions) et `npm run test:e2e` (parcours réel de navigateur en mode local). Ne pas les présenter comme une validation de Supabase Realtime en production.
+
+## Préparation et fin de salle
+
+- La préparation n’affiche ni tableau de picks/bans ni classements. Le démarrage attend que tous les participants présents aient un rôle, un pool et soient prêts ; un seul joueur peut aussi lancer sa draft.
+- Le démarrage ouvre `/rooms/:id/draft` sur tous les appareils ; le rechargement garde le bon écran.
+- Quitter pendant la préparation libère le siège et autorise un remplaçant. Quitter comme hôte transfère les droits au prochain participant.
+- Terminer depuis la préparation ou le live fige la salle pour tous. Seul l’hôte dispose de cette action. Chacun peut quitter une salle terminée.

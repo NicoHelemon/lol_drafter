@@ -1,43 +1,469 @@
-import {useEffect,useMemo,useState} from 'react';
-import {ROLES,type Room,type Role,type State,type Team} from './domain/types';
-import {rank,coverage,unavailable} from './domain/scoring';
-import {place,record} from './domain/state';
-import {byId,champions,championIds,defaultPools} from './data/provider';
-import {importDataset} from './data/import';
-import catalogueMeta from './data/catalogue-meta.json';
-import {createRoom,joinRoom,readRoom,saveRoom,watchRoom,identity,presence,supabase} from './lib/rooms';
-const names=Object.fromEntries(champions.map(c=>[c.id,c.name]));
-function Portrait({id}:{id:string}){const [failed,setFailed]=useState(false);return failed?<span aria-hidden="true" className="portrait fallback">{(names[id]??'?').slice(0,2)}</span>:<img className="portrait" alt="" src={byId[id]?.portrait} loading="lazy" onError={()=>setFailed(true)}/>;}
-function Search({selected=[],blocked=new Set(),onChoose}:{selected?:string[];blocked?:Set<string>;onChoose:(id:string)=>void}){const [q,setQ]=useState('');return <><input autoFocus aria-label="Rechercher un champion" placeholder="Rechercher un champion…" value={q} onChange={e=>setQ(e.target.value)}/><div className="champion-grid">{champions.filter(c=>c.name.toLocaleLowerCase().includes(q.toLocaleLowerCase())).map(c=><button key={c.id} disabled={blocked.has(c.id)} className={selected.includes(c.id)?'champion selected':'champion'} onClick={()=>onChoose(c.id)}><Portrait id={c.id}/><span>{c.name}</span>{selected.includes(c.id)&&<b>✓</b>}</button>)}</div></>;}
-type Picker={kind:'pick';team:Team;role:Role}|{kind:'ban';team:Team;slot:number}|{kind:'pool';player:string};
-export default function App(){
- const [room,setRoom]=useState<Room|null>(null),[uid,setUid]=useState(''),[nickname,setNickname]=useState(''),[error,setError]=useState(''),[sync,setSync]=useState('Hors salle'),[busy,setBusy]=useState(false),[picker,setPicker]=useState<Picker|null>(null),[poolDraft,setPoolDraft]=useState<string[]>([]),[mode,setMode]=useState<'replace'|'unassign'>('replace'),[online,setOnline]=useState<string[]>([]);
- const [invite,setInvite]=useState(()=>location.hash.slice(1)),[view,setView]=useState('board');
- const params=new URLSearchParams(location.search),inviteRoom=params.get('room');
- useEffect(()=>{identity().then(setUid).catch(e=>setError(e.message));if(!inviteRoom){const saved=localStorage.getItem(supabase?'draftroom-current':'draftroom-demo');if(saved){const id=supabase?saved:JSON.parse(saved).id;readRoom(id).then(setRoom).catch(()=>{});}}},[]);
- useEffect(()=>{if(!room)return;localStorage.setItem('draftroom-current',room.id);const stop=watchRoom(room.id,r=>setRoom(old=>!old||r.version>=old.version?r:old),setSync);const update=()=>presence(room.id).then(setOnline);void update();const t=setInterval(update,15000);return()=>{stop();clearInterval(t);};},[room?.id]);
- async function run(fn:()=>Promise<void>){setError('');setBusy(true);try{await fn();}catch(e){setError(e instanceof Error?e.message:String(e));}finally{setBusy(false);}}
- async function change(fn:(s:State)=>State){if(!room||busy)return;await run(async()=>{try{setRoom(await saveRoom(room,fn(structuredClone(room.state))));}catch(e){setRoom(await readRoom(room.id));throw e;}});}
- const state=room?.state,host=room?.host_id===uid,me=state?.players.find(p=>p.id===uid),used=state?unavailable(state):new Set<string>();
- const readiness=useMemo(()=>state?coverage(state.dataset,state.players,champions.map(c=>c.id)):{known:0,total:0},[state?.dataset,state?.players]);
- function choose(id:string){if(!picker)return;if(picker.kind==='pool'){setPoolDraft(old=>old.includes(id)?old.filter(x=>x!==id):[...old,id]);return;}
- const p=picker;setPicker(null);void change(s=>{if(p.kind==='pick')return place(s,p.team,p.role,id,mode);s.bans[p.team][p.slot]=id;return record(s,`Ban · ${names[id]}`);});}
- const link=room&&invite?`${location.origin}/?room=${room.id}#${invite}`:'';
- return <div className="app"><header><a className="brand" href="/">◈ <span>DRAFT<span className="gold">ROOM</span></span></a><span className="subtitle">LEAGUE OF LEGENDS · TEAM DRAFT</span><span className="connection"><i className={supabase?'dot':'dot amber'}/>{sync}</span></header>
- {!room?<main className="welcome"><div className="eyebrow">CINQ JOUEURS. UNE MÊME DRAFT.</div><h1>Le bon pick.<br/><span>Dans le bon contexte.</span></h1><p>Préparez vos pools, suivez les deux équipes et comparez les contributions Delta 2. Aucun winrate inventé.</p><section className="card entry"><h2>{inviteRoom?'Rejoindre votre équipe':'Votre prochaine draft commence ici'}</h2><label>Votre pseudonyme<input maxLength={32} value={nickname} onChange={e=>setNickname(e.target.value)} placeholder="Ex. Invocateur"/></label><button className="primary" disabled={busy||!nickname.trim()} onClick={()=>void run(async()=>{if(inviteRoom){setRoom(await joinRoom(inviteRoom,invite,nickname.trim()));}else{const result=await createRoom(nickname.trim());setRoom(result.room);setInvite(result.token);if(result.token)history.replaceState(null,'',`/?room=${result.room.id}#${result.token}`);}})}>{inviteRoom?'Rejoindre la salle':supabase?'Créer une salle privée':'Ouvrir la démo locale'} →</button><p className="muted">{supabase?'Connexion anonyme · cinq sièges · invitation privée':'Supabase non configuré. La démo reste sur cet appareil et ne synchronise pas plusieurs joueurs.'}</p></section><p className="notice">Démo : Delta 2 fictifs. Les statistiques Lolalytics ne sont pas collectées.</p></main>:<main>
- <div className="title-row"><div><div className="eyebrow">ESPACE ÉQUIPE / {room.id.slice(0,8)}</div><h1>{state!.phase==='setup'?'Préparer la draft':'La draft, ensemble.'}</h1></div><div className="actions">{link&&<button onClick={()=>void run(async()=>{await navigator.clipboard.writeText(link);setSync('Invitation copiée');})}>Copier l’invitation ↗</button>}{host&&state!.phase==='setup'&&<button className="primary" disabled={busy||state!.players.some(p=>!p.role||!p.pool.length||!p.ready)} onClick={()=>void change(s=>{s.phase='live';return record(s,'Draft démarrée · dataset figé');})}>Démarrer la draft →</button>}{host&&state!.phase==='live'&&<button onClick={()=>void change(s=>{s.phase='finished';return record(s,'Draft terminée');})}>Terminer</button>}{host&&state!.phase!=='setup'&&<button onClick={()=>{if(confirm('Réinitialiser les picks et bans ? Les pools et le dataset sont conservés.'))void change(s=>{s.phase='setup';s.picks={ally:[],enemy:[]};s.bans={ally:Array(5).fill(null),enemy:Array(5).fill(null)};s.players.forEach(p=>p.ready=false);return record(s,'Nouvelle préparation');});}}>Nouvelle draft</button>}</div></div>
- <div className="notice"><b>{state!.dataset.fictional?'DONNÉES FICTIVES':'DONNÉES IMPORTÉES'}</b> · {state!.dataset.source} · {state!.dataset.patch} / {state!.dataset.tier} · {new Date(state!.dataset.importedAt).toLocaleDateString('fr-CH')}<span>Score Delta 2 ≠ probabilité de victoire</span></div>
- <section className="roster">{ROLES.map(role=>{const p=state!.players.find(p=>p.role===role);return <div className={'seat '+(p?.id===uid?'mine':'')} key={role}><div className="seat-top"><span className="role-icon">{role.slice(0,1)}</span><b>{role}</b><span className="muted">{p?.ready?'Prêt ✓':'À préparer'}</span></div><div className="seat-name"><i className={online.includes(p?.id??'')?'dot':'dot off'}/>{p?.name??'Siège libre'}{p?.id===uid&&<small>vous</small>}</div>{p?<><div className="mini-pool">{p.pool.slice(0,6).map(id=><Portrait key={id} id={id}/>)}{p.pool.length>6&&<span>+{p.pool.length-6}</span>}</div><button disabled={busy||(!host&&p.id!==uid)||(state!.phase!=='setup'&&!host)} onClick={()=>{setPicker({kind:'pool',player:p.id});setPoolDraft(p.pool);}}>Pool · {p.pool.length} champions</button></>:<button disabled={busy||state!.phase!=='setup'} onClick={()=>void change(s=>{let player=s.players.find(p=>p.id===uid);if(!supabase&&player?.role){s.players.push({id:`demo-${role}`,name:`Démo ${role}`,role,pool:defaultPools[role],ready:true});}else if(player){player.role=role;player.pool=defaultPools[role];player.ready=false;}return s;})}>{!supabase?'Remplir la démo':'Prendre ce siège'}</button>}</div>;})}</section>
- {me&&state!.phase==='setup'&&<div className="preparation"><label>Mon poste<select aria-label="Mon poste" value={me.role??''} onChange={e=>void change(s=>{const p=s.players.find(p=>p.id===uid)!;p.role=e.target.value as Role;p.pool=defaultPools[p.role];p.ready=false;return s;})}><option value="" disabled>Choisir</option>{ROLES.map(r=><option disabled={state!.players.some(p=>p.id!==uid&&p.role===r)} key={r}>{r}</option>)}</select></label><button disabled={busy||!me.pool.length} onClick={()=>void change(s=>{const p=s.players.find(p=>p.id===uid)!;p.ready=!p.ready;return s;})}>{me.ready?'Annuler ma préparation':'Je suis prêt ✓'}</button>{host&&<><label>Côté<select value={state!.side} onChange={e=>void change(s=>{s.side=e.target.value as 'blue'|'red';return s;})}><option value="blue">Bleu</option><option value="red">Rouge</option></select></label><label className="file-button">Importer JSON / CSV<input type="file" accept=".json,.csv" onChange={e=>{const file=e.target.files?.[0];if(!file)return;void run(async()=>{if(file.size>12000000)throw Error('Fichier limité à 12 Mo');const text=await file.text();let metadata;if(file.name.endsWith('.csv')){const raw=prompt('Métadonnées JSON : id, patch, tier, source, importedAt (ISO), fictional (booléen)');if(!raw)return;metadata=JSON.parse(raw);}const dataset=importDataset(text,file.name.endsWith('.csv')?'csv':'json',championIds,metadata);setRoom(await saveRoom(room,{...state!,dataset}));});e.target.value='';}}/></label></>}</div>}
- <div className="data-status"><i className="dot amber"/><b>{readiness.total&&readiness.known===readiness.total?'Données prêtes':readiness.known?'Données partielles':'Données indisponibles'}</b><span>{readiness.known.toLocaleString('fr')} / {readiness.total.toLocaleString('fr')} paires potentielles disponibles · cache partagé figé au démarrage</span></div>
- <nav className="mobile-tabs"><button onClick={()=>setView('board')}>Tableau</button><button onClick={()=>setView('rankings')}>Recommandations</button></nav>
- <div className="workspace"><section className={'card board '+(view!=='board'?'mobile-hidden':'')}><div className="section-heading"><h2>Tableau de draft</h2><span className="badge">{state!.phase==='setup'?'PRÉPARATION':state!.phase==='live'?'EN DIRECT':'TERMINÉE'}</span></div><div className="board-head"><span>POSTE</span><b className="blue">NOTRE ÉQUIPE</b><b className="red">ADVERSAIRES</b></div>{ROLES.map(role=><div className="board-row" key={role}><span className="role-label">{role}</span>{(['ally','enemy'] as Team[]).map(team=>{const pick=state!.picks[team].find(p=>p.role===role);return <div key={team} className={'pick '+team}>{pick?<><Portrait id={pick.championId}/><div className="pick-info"><b>{names[pick.championId]}</b><select aria-label={`Déplacer ${names[pick.championId]} ${team}`} disabled={busy||state!.phase==='finished'} value={role} onChange={e=>void change(s=>{const p=s.picks[team].find(p=>p.championId===pick.championId)!;if(e.target.value==='unknown'){p.role=null;return record(s,`${names[p.championId]} · rôle à confirmer`);}return place(s,team,e.target.value as Role,p.championId);})}>{ROLES.map(r=><option key={r}>{r}</option>)}<option value="unknown">Rôle à confirmer</option></select></div><button className="icon-button" aria-label={`Retirer ${names[pick.championId]} ${team}`} disabled={busy||state!.phase==='finished'} onClick={()=>void change(s=>{s.picks[team]=s.picks[team].filter(p=>p.championId!==pick.championId);return record(s,`Pick retiré · ${names[pick.championId]}`);})}>×</button></>:null}<button className={pick?'edit-button':'empty-pick'} aria-label={`${pick?'Modifier':'Choisir'} ${role} ${team}`} disabled={busy||state!.phase==='finished'} onClick={()=>{setMode('replace');setPicker({kind:'pick',team,role});}}>{pick?'✎':<><span>＋</span> Choisir un champion</>}</button></div>;})}</div>)}
- <div className="ban-row"><span>BANS</span>{(['ally','enemy'] as Team[]).map(team=><div className="bans" key={team}>{state!.bans[team].map((id,slot)=><div key={slot}><button aria-label={`Ban ${slot+1} ${team}`} disabled={busy||state!.phase==='finished'} onClick={()=>setPicker({kind:'ban',team,slot})}>{id?<Portrait id={id}/>:<span>＋</span>}</button>{id&&<button className="remove-ban" aria-label={`Retirer ban ${names[id]}`} disabled={busy||state!.phase==='finished'} onClick={()=>void change(s=>{s.bans[team][slot]=null;return record(s,`Ban retiré · ${names[id]}`);})}>×</button>}</div>)}</div>)}</div>
- {(['ally','enemy'] as Team[]).map(team=>{const unknown=state!.picks[team].filter(p=>!p.role);return unknown.length?<div className="unknown" key={team}><b>{team==='ally'?'Alliés':'Adversaires'} · rôle à confirmer</b>{unknown.map(p=><div className="unknown-pick" key={p.championId}><Portrait id={p.championId}/>{names[p.championId]}<select aria-label={`Attribuer ${names[p.championId]}`} value="" disabled={busy||state!.phase==='finished'} onChange={e=>void change(s=>place(s,team,e.target.value as Role,p.championId))}><option value="" disabled>Attribuer / échanger</option>{ROLES.map(r=><option key={r}>{r}</option>)}</select><button disabled={busy||state!.phase==='finished'} onClick={()=>void change(s=>{s.picks[team]=s.picks[team].filter(x=>x.championId!==p.championId);return s;})}>Retirer</button></div>)}</div>:null;})}
- <p className="muted board-hint">Les postes sont des hypothèses. Le menu d’un pick le déplace ou l’échange avec le poste occupé.</p><details className="history"><summary>Historique · {state!.history.length} événements</summary>{state!.history.map((h,i)=><p key={i}>{h}</p>)}</details></section>
- <aside className={'rankings '+(view!=='rankings'?'mobile-hidden':'')}><div className="section-heading"><h2>Vos options</h2><span className="muted">SCORE DELTA 2</span></div><p className="muted">Seulement votre pool. Seulement le contexte.</p>{ROLES.map(role=>{const p=state!.players.find(p=>p.role===role),locked=state!.picks.ally.find(p=>p.role===role),ranking=rank(p?.pool??[],role,state!,names);return <section className={'card ranking '+(p?.id===uid?'mine':'')} key={role}><div className="ranking-heading"><b>{role}</b><span>{p?.name??'Siège libre'}</span>{locked&&<span className="badge">PICK</span>}</div>{locked?<div className="locked"><Portrait id={locked.championId}/><b>{names[locked.championId]}</b></div>:<>{ranking.every(r=>r.value===null)&&<p className="muted">Pas encore de données contextuelles</p>}{ranking.map((r,i)=><details className="recommendation" key={r.id}><summary><span className="position">{r.value===null?'—':String(i+1).padStart(2,'0')}</span><Portrait id={r.id}/><b>{names[r.id]}</b><span className="score-block"><strong className={r.value!==null&&r.value<0?'negative':'positive'}>{r.value===null?'N/A':`${r.value>=0?'+':''}${r.value.toFixed(2)}`}</strong><small>{r.known}/{r.total} paires</small></span></summary><div className="contributions">{r.contributions.length?r.contributions.map((c,j)=><div key={j}><span>{c.relation==='vs'?'Contre':'Avec'} {names[c.championId]} · {c.role}</span><b>{c.delta2===null?'Manquant':`${c.delta2>0?'+':''}${c.delta2.toFixed(2)} × ${c.weight.toFixed(3)}`}</b></div>):<p>Aucun pick attribué. Aucun score calculable.</p>}</div></details>)}{!ranking.length&&<p className="muted">{p?'Aucun champion disponible dans le pool.':'Choisissez un siège et préparez un pool.'}</p>}</>}</section>;})}<p className="muted">Moyenne pondérée des paires disponibles, en points de pourcentage. Jungle, Mid, ADC : coefficients provisoires 2/9.</p></aside></div>
- <footer>Catalogue Riot Data Dragon {catalogueMeta.patch} · {champions.length} champions · vérifiez la version du catalogue <span>Draftroom · V1</span></footer></main>}
- {error&&<div className="error" role="alert">{error}<button onClick={()=>setError('')} aria-label="Fermer l’erreur">×</button></div>}
- {picker&&<div className="modal-backdrop" onClick={()=>setPicker(null)}><section className="modal" role="dialog" aria-modal="true" aria-label={picker.kind==='pool'?'Modifier le pool':'Choisir un champion'} onClick={e=>e.stopPropagation()}><div className="section-heading"><h2>{picker.kind==='pool'?'Votre pool de champions':picker.kind==='pick'?`${picker.role} · ${picker.team==='ally'?'Notre équipe':'Adversaires'}`:'Choisir un ban'}</h2><button aria-label="Fermer" onClick={()=>setPicker(null)}>×</button></div>{picker.kind==='pick'&&state?.picks[picker.team].some(p=>p.role===picker.role)&&<label>Poste occupé<select value={mode} onChange={e=>setMode(e.target.value as typeof mode)}><option value="replace">Remplacer l’ancien pick</option><option value="unassign">Conserver l’ancien : rôle à confirmer</option></select></label>}<Search selected={picker.kind==='pool'?poolDraft:[]} blocked={picker.kind==='pool'?new Set():used} onChoose={choose}/>{picker.kind==='pool'&&<div className="modal-actions"><span>{poolDraft.length} champions sélectionnés</span><button className="primary" disabled={!poolDraft.length||busy} onClick={()=>{const p=picker;void change(s=>{const player=s.players.find(x=>x.id===p.player)!;player.pool=poolDraft;player.ready=false;return record(s,`Pool mis à jour · ${player.name}`);});setPicker(null);}}>Enregistrer le pool</button></div>}</section></div>}
- </div>;
+import { errorMessage } from "./lib/errors";
+import SetupPage from "./pages/SetupPage";
+import DraftPage from "./pages/DraftPage";
+import { Search, names } from "./components/Champions";
+import { useEffect, useMemo, useState } from "react";
+import {
+  type Room,
+  type Role,
+  type State,
+  type Team,
+} from "./domain/types";
+import { coverage, unavailable } from "./domain/scoring";
+import { place, record } from "./domain/state";
+import { champions, championIds } from "./data/provider";
+import { importDataset } from "./data/import";
+import catalogueMeta from "./data/catalogue-meta.json";
+import {
+  createRoom,
+  joinRoom,
+  readRoom,
+  saveRoom,
+  watchRoom,
+  identity,
+  presence,
+  supabase,
+  leaveRoom,
+  endRoom,
+} from "./lib/rooms";
+export type Picker =
+  | { kind: "pick"; team: Team; role: Role }
+  | { kind: "ban"; team: Team; slot: number }
+  | { kind: "pool"; player: string };
+export default function App() {
+  const [room, setRoom] = useState<Room | null>(null),
+    [uid, setUid] = useState(""),
+    [nickname, setNickname] = useState(""),
+    [error, setError] = useState(""),
+    [sync, setSync] = useState("Not connected"),
+    [busy, setBusy] = useState(false),
+    [picker, setPicker] = useState<Picker | null>(null),
+    [poolDraft, setPoolDraft] = useState<string[]>([]),
+    [mode, setMode] = useState<"replace" | "unassign">("replace"),
+    [online, setOnline] = useState<string[]>([]);
+  const [invite, setInvite] = useState(() => location.hash.slice(1));
+  const [inviteRoom] = useState(
+    () =>
+      new URLSearchParams(location.search).get("room") ??
+      location.pathname.match(/^\/rooms\/([^/]+)/)?.[1] ??
+      null,
+  );
+  useEffect(() => {
+    void run(async () => {
+      setUid(await identity());
+      const id = inviteRoom ?? localStorage.getItem("draftroom-current");
+      if (id) {
+        try {
+          setRoom(await readRoom(id));
+        } catch {
+          localStorage.removeItem("draftroom-current");
+        }
+      }
+    });
+  }, []);
+  useEffect(() => {
+    if (!room) return;
+    localStorage.setItem("draftroom-current", room.id);
+    const stop = watchRoom(
+      room.id,
+      (r) =>
+        setRoom((old) =>
+          old && r.id === old.id && r.version >= old.version ? r : old,
+        ),
+      setSync,
+    );
+    const update = () => presence(room.id).then(setOnline);
+    void update();
+    const t = setInterval(update, 15000);
+    return () => {
+      stop();
+      clearInterval(t);
+    };
+  }, [room?.id]);
+  useEffect(() => {
+    setPicker(null);
+  }, [room?.state.phase]);
+  useEffect(() => {
+    if (!room) return;
+    const path = `/rooms/${room.id}/${room.state.phase === "setup" ? "setup" : "draft"}${invite ? "#" + invite : ""}`;
+    history.replaceState(null, "", path);
+    document.title =
+      room.state.phase === "setup"
+        ? "Preparation · Draftroom"
+        : "Draft · Draftroom";
+  }, [room?.id, room?.state.phase, invite]);
+  async function run(fn: () => Promise<void>) {
+    setError("");
+    setBusy(true);
+    try {
+      await fn();
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function change(fn: (s: State) => State) {
+    if (!room || busy) return;
+    await run(async () => {
+      try {
+        setRoom(await saveRoom(room, fn(structuredClone(room.state))));
+      } catch (e) {
+        setRoom(await readRoom(room.id));
+        throw e;
+      }
+    });
+  }
+  const state = room?.state,
+    host = room?.host_id === uid,
+    used = state ? unavailable(state) : new Set<string>();
+  const readiness = useMemo(
+    () =>
+      state
+        ? coverage(
+            state.dataset,
+            state.players,
+            champions.map((c) => c.id),
+          )
+        : { known: 0, total: 0 },
+    [state?.dataset, state?.players],
+  );
+  function clearRoom() {
+    localStorage.removeItem("draftroom-current");
+    setRoom(null);
+    setPicker(null);
+    setInvite("");
+    setSync("Not connected");
+    history.replaceState(null, "", "/");
+    location.assign("/");
+  }
+  async function exitRoom() {
+    if (
+      !room ||
+      !confirm(
+        !supabase
+          ? "Leave this local demo?"
+          : host
+            ? "Leave this room? Host controls pass to the next player. An empty room is deleted."
+            : "Leave this room and release your seat?",
+      )
+    )
+      return;
+    await run(async () => {
+      try {
+        await leaveRoom(room);
+        clearRoom();
+      } catch (e) {
+        setRoom(await readRoom(room.id));
+        throw e;
+      }
+    });
+  }
+  async function finishRoom() {
+    if (
+      !room ||
+      !confirm("End this room for everyone? The draft will become read-only.")
+    )
+      return;
+    await run(async () => {
+      try {
+        setRoom(await endRoom(room));
+        setPicker(null);
+      } catch (e) {
+        setRoom(await readRoom(room.id));
+        throw e;
+      }
+    });
+  }
+  function importFile(file?: File) {
+    if (!file || !room) return;
+    void run(async () => {
+      if (file.size > 12000000) throw Error("File limit: 12 MB");
+      const text = await file.text();
+      let metadata;
+      if (file.name.endsWith(".csv")) {
+        const raw = prompt(
+          "Dataset metadata JSON: id, patch, tier, source, importedAt (ISO), fictional (boolean)",
+        );
+        if (!raw) return;
+        metadata = JSON.parse(raw);
+      }
+      const dataset = importDataset(
+        text,
+        file.name.endsWith(".csv") ? "csv" : "json",
+        championIds,
+        metadata,
+      );
+      setRoom(await saveRoom(room, { ...room.state, dataset }));
+    });
+  }
+  function choose(id: string) {
+    if (!picker) return;
+    if (picker.kind === "pool") {
+      setPoolDraft((old) =>
+        old.includes(id) ? old.filter((x) => x !== id) : [...old, id],
+      );
+      return;
+    }
+    const p = picker;
+    setPicker(null);
+    void change((s) => {
+      if (p.kind === "pick") return place(s, p.team, p.role, id, mode);
+      s.bans[p.team][p.slot] = id;
+      return record(s, `Ban · ${names[id]}`);
+    });
+  }
+  const link =
+    room && invite ? `${location.origin}/?room=${room.id}#${invite}` : "";
+  return (
+    <div className="app">
+      <header>
+        <a className="brand" href="/">
+          ◈{" "}
+          <span>
+            DRAFT<span className="gold">ROOM</span>
+          </span>
+        </a>
+        <span className="subtitle">LEAGUE OF LEGENDS · TEAM DRAFT</span>
+        <span className="connection">
+          <i className={supabase ? "dot" : "dot amber"} />
+          {sync}
+        </span>
+      </header>
+      {!room ? (
+        <main className="welcome">
+          <h1>Draftroom</h1>
+          <section className="card entry">
+            <h2>{inviteRoom ? "Join room" : "Create room"}</h2>
+            <label>
+              Display name
+              <input
+                maxLength={32}
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="Your name"
+              />
+            </label>
+            <button
+              className="primary"
+              disabled={busy || !nickname.trim()}
+              onClick={() =>
+                void run(async () => {
+                  if (inviteRoom) {
+                    setRoom(
+                      await joinRoom(inviteRoom, invite, nickname.trim()),
+                    );
+                  } else {
+                    const result = await createRoom(nickname.trim());
+                    setRoom(result.room);
+                    setInvite(result.token);
+                    if (result.token)
+                      history.replaceState(
+                        null,
+                        "",
+                        `/?room=${result.room.id}#${result.token}`,
+                      );
+                  }
+                })
+              }
+            >
+              {inviteRoom
+                ? "Join room"
+                : supabase
+                  ? "Create private room"
+                  : "Open local demo"}{" "}
+              →
+            </button>
+            <p className="muted">
+              {supabase
+                ? "No account required · up to five players"
+                : "Local demo · saved on this browser only."}
+            </p>
+          </section>
+          <p className="notice">Demo statistics are fictional.</p>
+        </main>
+      ) : (
+        <main>
+          <div className="title-row">
+            <div>
+              <div className="eyebrow">ROOM / {room.id.slice(0, 8)}</div>
+              <h1>
+                {state!.phase === "setup"
+                  ? "Preparation"
+                  : state!.phase === "finished"
+                    ? "Room ended"
+                    : "Draft"}
+              </h1>
+            </div>
+            <div className="actions">
+              {link && (
+                <button
+                  onClick={() =>
+                    void run(async () => {
+                      await navigator.clipboard.writeText(link);
+                      setSync("Invitation copied");
+                    })
+                  }
+                >
+                  Copy invitation ↗
+                </button>
+              )}
+              {host && state!.phase === "setup" && (
+                <button
+                  className="primary"
+                  disabled={
+                    busy ||
+                    state!.players.some(
+                      (p) => !p.role || !p.pool.length || !p.ready,
+                    )
+                  }
+                  onClick={() =>
+                    void change((s) => {
+                      s.phase = "live";
+                      return record(s, "Draft started");
+                    })
+                  }
+                >
+                  Start draft →
+                </button>
+              )}
+              {host && state!.phase !== "finished" && (
+                <button disabled={busy} onClick={() => void finishRoom()}>
+                  End room
+                </button>
+              )}
+              <button disabled={busy} onClick={() => void exitRoom()}>
+                Leave room
+              </button>
+            </div>
+          </div>
+          {state!.phase !== "setup" && (
+            <div className="room-summary">
+              {state!.players.map((p) => (
+                <span key={p.id}>
+                  <i className={online.includes(p.id) ? "dot" : "dot off"} />
+                  {p.name} · {p.role ?? "No role"}
+                </span>
+              ))}
+            </div>
+          )}
+          <p className="dataset-note">
+            {state!.dataset.fictional
+              ? "Fictional demo data"
+              : `${state!.dataset.source} · ${state!.dataset.patch} / ${state!.dataset.tier}`}{" "}
+            · Delta 2 score
+          </p>
+          {state!.phase === "setup" ? (
+            <SetupPage
+              state={state!}
+              uid={uid}
+              host={host}
+              busy={busy}
+              online={online}
+              readiness={readiness}
+              change={change}
+              editPool={(id, pool) => {
+                setPicker({ kind: "pool", player: id });
+                setPoolDraft(pool);
+              }}
+              onImport={importFile}
+            />
+          ) : (
+            <DraftPage
+              state={state!}
+              uid={uid}
+              host={host}
+              editPool={(id, pool) => {
+                setPicker({ kind: "pool", player: id });
+                setPoolDraft(pool);
+              }}
+              busy={busy}
+              change={change}
+              setPicker={setPicker}
+              setMode={setMode}
+            />
+          )}
+          <footer>
+            Riot Data Dragon {catalogueMeta.patch} · {champions.length}{" "}
+            champions · champion catalogue <span>Draftroom</span>
+          </footer>
+        </main>
+      )}
+      {error && (
+        <div className="error" role="alert">
+          {error}
+          <button onClick={() => setError("")} aria-label="Dismiss error">
+            ×
+          </button>
+        </div>
+      )}
+      {picker && (
+        <div className="modal-backdrop" onClick={() => setPicker(null)}>
+          <section
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={
+              picker.kind === "pool" ? "Edit pool" : "Choose champion"
+            }
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="section-heading">
+              <h2>
+                {picker.kind === "pool"
+                  ? "Champion pool"
+                  : picker.kind === "pick"
+                    ? `${picker.role} · ${picker.team === "ally" ? "Our team" : "Opponents"}`
+                    : "Choose ban"}
+              </h2>
+              <button aria-label="Close" onClick={() => setPicker(null)}>
+                ×
+              </button>
+            </div>
+            {picker.kind === "pick" &&
+              state?.picks[picker.team].some((p) => p.role === picker.role) && (
+                <label>
+                  Occupied role
+                  <select
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value as typeof mode)}
+                  >
+                    <option value="replace">Replace current pick</option>
+                    <option value="unassign">
+                      Keep current pick unassigned
+                    </option>
+                  </select>
+                </label>
+              )}
+            <Search
+              selected={picker.kind === "pool" ? poolDraft : []}
+              blocked={picker.kind === "pool" ? new Set() : used}
+              onChoose={choose}
+            />
+            {picker.kind === "pool" && (
+              <div className="modal-actions">
+                <span>{poolDraft.length} champions selected</span>
+                <button
+                  className="primary"
+                  disabled={!poolDraft.length || busy}
+                  onClick={() => {
+                    const p = picker;
+                    void change((s) => {
+                      const player = s.players.find((x) => x.id === p.player)!;
+                      player.pool = poolDraft;
+                      player.ready = false;
+                      return record(s, `Pool updated · ${player.name}`);
+                    });
+                    setPicker(null);
+                  }}
+                >
+                  Save pool
+                </button>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+    </div>
+  );
 }

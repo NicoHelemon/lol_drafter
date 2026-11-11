@@ -4,6 +4,14 @@ Assistant de draft manuel pour une équipe de cinq joueurs : pools par poste, pi
 
 **État de livraison :** démo locale opérationnelle ; backend SQL testé sur Postgres embarqué ; connexion Supabase et publication Netlify à effectuer. Aucune statistique Lolalytics réelle n'est intégrée. Aucun déploiement ou test du service Realtime hébergé n'est implicitement acquis.
 
+## Mise à jour d’une installation existante
+
+L’interface est en anglais. La préparation (`/rooms/:id/setup`) et la draft (`/rooms/:id/draft`) sont séparées ; tous les joueurs passent à la draft quand l’hôte la lance après préparation. Les anciens liens d’invitation restent valides.
+
+Pour activer **Leave room** et **End room**, exécuter uniquement la nouvelle migration [202611110002_room_lifecycle.sql](supabase/migrations/202611110002_room_lifecycle.sql) dans **Supabase → SQL Editor → New query → Run**. Elle préserve les salles et datasets existants ; ne pas rejouer la migration initiale. Aucun secret ni changement de variable Netlify n’est nécessaire.
+
+**Leave room** libère le siège et révoque l’accès du joueur. Si l’hôte part, le premier joueur restant devient hôte. Une salle vide est supprimée. **End room**, réservé à l’hôte, ferme la salle depuis la préparation ou la draft : elle reste visible en lecture seule, et chacun peut ensuite la quitter. Fermer simplement l’onglet conserve le siège pour la reconnexion.
+
 ## Démarrer
 
 Node 24 et npm 11. Utiliser le checkout existant : chaque tâche cloud est isolée, aucun worktree supplémentaire n'est nécessaire.
@@ -13,7 +21,7 @@ npm ci
 npm run dev
 ```
 
-Sans variables, le bouton ouvre une **démo locale** persistée dans ce navigateur. Ce mode ne partage pas la salle avec d'autres personnes. Remplir les sièges libres via « Remplir la démo », choisir son pool et cliquer « Je suis prêt » pour démarrer. Les autres sièges de démonstration sont prêts par défaut.
+Sans variables, le bouton ouvre une **démo locale** persistée dans ce navigateur. Ce mode ne partage pas la salle avec d'autres personnes. Remplir les sièges libres via « Add demo player », choisir son pool et cliquer « Ready » pour démarrer. Les autres sièges de démonstration sont prêts par défaut.
 
 ```sh
 npm test                 # scoring, imports, invariants, SQL/RLS à cinq identités
@@ -28,13 +36,13 @@ Le test SQL utilise PGlite (vrai moteur PostgreSQL WASM) et cinq identités Auth
 
 ## Créer Supabase (mode cinq joueurs)
 
-1. Créer un projet sur Supabase et ouvrir **SQL Editor**. Exécuter le fichier complet [supabase/migrations/202611110001_draftroom.sql](supabase/migrations/202611110001_draftroom.sql) une seule fois sur un projet neuf. Le schéma `auth` et les rôles sont fournis par Supabase.
+1. Créer un projet sur Supabase et ouvrir **SQL Editor**. Exécuter les fichiers de `supabase/migrations` dans l’ordre, `202611110001_draftroom.sql` puis `202611110002_room_lifecycle.sql`, sur un projet neuf. Le schéma `auth` et les rôles sont fournis par Supabase.
 2. Dans **Authentication → Providers**, activer les connexions anonymes. Les utilisateurs n'ont pas de compte à créer. Conserver les limites Auth du projet ; configurer la protection contre l'abus avant une large diffusion publique.
 3. La migration ajoute `rooms` à la publication `supabase_realtime` si elle existe. Vérifier **Database → Replication** : `rooms` doit être activée.
 4. Copier `.env.example` vers `.env.local`, renseigner l'URL du projet et la clé **publique anon / publishable**. Ne jamais utiliser `service_role`, une clé secrète ou un mot de passe dans une variable `VITE_*`.
 5. Relancer `npm run dev`. Créer la salle, copier l'invitation, l'ouvrir dans quatre autres profils/navigateurs. Chaque participant choisit son poste puis son pool. Un profil de navigateur conserve son identité anonyme et son siège au rechargement.
 
-Le lien d'invitation est un secret de salle ; ne le publier qu'aux participants. Son token aléatoire est dans le fragment URL, qui n'est pas envoyé à l'hébergeur. La base conserve uniquement son SHA-256 dans une table inaccessible aux clients. Les membres lisent la salle via RLS ; les écritures passent exclusivement par des RPC `security definer` avec `search_path` fixe et validation serveur. La salle est verrouillée pendant la mutation : version obsolète = conflit explicite et rafraîchissement, jamais écrasement silencieux. Le host configure/démarre/réinitialise ; tous les membres éditent picks et bans.
+Le lien d'invitation est un secret de salle ; ne le publier qu'aux participants. Son token aléatoire est dans le fragment URL, qui n'est pas envoyé à l'hébergeur. La base conserve uniquement son SHA-256 dans une table inaccessible aux clients. Les membres lisent la salle via RLS ; les écritures passent exclusivement par des RPC `security definer` avec `search_path` fixe et validation serveur. La salle est verrouillée pendant la mutation : version obsolète = conflit explicite et rafraîchissement, jamais écrasement silencieux. L’hôte configure, démarre et termine la salle ; tous les membres éditent picks et bans.
 
 Le Realtime déclenche une relecture canonique. Une relecture de secours et un heartbeat toutes les 20 secondes permettent de récupérer les mises à jour après reconnexion. L'indicateur de présence est approximatif (heartbeat expiré après 65 s). Les joueurs sans rôle ont déjà réservé l'un des cinq sièges participants.
 
@@ -91,7 +99,7 @@ Aucun scraper ni appel à l'API privée n'est intégré. Le déploiement ne dép
 - `src/domain` : types, coefficients, score, invariants de draft.
 - `src/data` : catalogue versionné, provider démo/import, validation JSON/CSV.
 - `src/lib/rooms.ts` : Auth anonyme, RPC, Realtime et reprise canonique.
-- `src/App.tsx` / `style.css` : lobby, pools, board, bans, swaps, recommandations et contributions.
+- `src/App.tsx` : entrée, suivi de salle et actions communes. `src/pages/SetupPage.tsx` : préparation. `src/pages/DraftPage.tsx` : board, bans, swaps et recommandations. `src/components` : sélecteur partagé de champions.
 - `supabase/migrations` : schéma, permissions, fonctions atomiques et Realtime.
 - `tests` : tests de domaine, SQL multi-identités et navigateur ; CI GitHub Actions.
 
