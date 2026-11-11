@@ -21,4 +21,4 @@ describe('authorized imports',()=>{
  it('rejects duplicates, unknown champions and nonfinite deltas',()=>{const d=demoDataset();d.pairs=[d.pairs[0],d.pairs[0]];expect(()=>importDataset(JSON.stringify(d),'json',championIds)).toThrow('Duplicate');d.pairs=[{...d.pairs[0],candidateChampionId:'invalid'}];expect(()=>importDataset(JSON.stringify(d),'json',championIds)).toThrow('Invalid');d.pairs=[{...demoDataset().pairs[0],delta2:101}];expect(()=>importDataset(JSON.stringify(d),'json',championIds)).toThrow('Invalid');});
 });
 
-it('starts new players without a role or champion preset',()=>{const s=initialState('player','Player');expect(s.players[0].role).toBeNull();expect(s.players[0].pool).toEqual([]);expect(s.players[0].ready).toBe(false);});
+it('starts new players without a role or champion preset',()=>{const s=initialState('player','Player');expect(s.players[0].role).toBeNull();expect(s.players[0].pool).toEqual([]);expect(s.players[0]).not.toHaveProperty('ready');});

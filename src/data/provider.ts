@@ -20,4 +20,4 @@ export function demoDataset():Dataset {
  }
  return {id:'fictional-v1',patch:'Demo',tier:'Synthetic',source:'Synthetic demo data',importedAt:'2026-11-11T00:00:00Z',fictional:true,pairs};
 }
-export function initialState(id:string,name:string):State{return {phase:'setup',side:'blue',dataset:demoDataset(),players:[{id,name,role:null,pool:[],ready:false}],picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},history:[]};}
+export function initialState(id:string,name:string):State{return {phase:'setup',side:'blue',dataset:demoDataset(),players:[{id,name,role:null,pool:[]}],picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},history:[]};}

@@ -1,3 +1,4 @@
+import SwapPrompt from "./components/SwapPrompt";
 import { roleName } from "./domain/roles";
 import { errorMessage } from "./lib/errors";
 import SetupPage from "./pages/SetupPage";
@@ -15,7 +16,7 @@ import { coverage, unavailable } from "./domain/scoring";
 import { place, record } from "./domain/state";
 import { champions, championIds } from "./data/provider";
 import { importDataset } from "./data/import";
-import catalogueMeta from "./data/catalogue-meta.json";
+
 import {
   createRoom,
   joinRoom,
@@ -26,7 +27,7 @@ import {
   presence,
   supabase,
   leaveRoom,
-  endRoom,
+  resolveRoom,
   readSwaps,
   requestRoleSwap,
   respondRoleSwap,
@@ -48,10 +49,7 @@ export default function App() {
     [online, setOnline] = useState<string[]>([]);
   const [invite, setInvite] = useState(() => location.hash.slice(1));
   const [inviteRoom] = useState(
-    () =>
-      new URLSearchParams(location.search).get("room") ??
-      location.pathname.match(/^\/rooms\/([^/]+)/)?.[1] ??
-      null,
+    () => location.pathname.match(/^\/rooms\/([^/]+)/)?.[1] ?? null,
   );
   useEffect(() => {
     void run(async () => {
@@ -59,7 +57,7 @@ export default function App() {
       const id = inviteRoom ?? localStorage.getItem("draftroom-current");
       if (id) {
         try {
-          setRoom(await readRoom(id));
+          setRoom(await resolveRoom(id));
         } catch {
           localStorage.removeItem("draftroom-current");
         }
@@ -68,7 +66,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     if (!room) return;
-    localStorage.setItem("draftroom-current", room.id);
+    localStorage.setItem("draftroom-current", room.slug);
     const stop = watchRoom(
       room.id,
       (r) =>
@@ -90,12 +88,9 @@ export default function App() {
   }, [room?.state.phase]);
   useEffect(() => {
     if (!room) return;
-    const path = `/rooms/${room.id}/${room.state.phase === "setup" ? "setup" : "draft"}${invite ? "#" + invite : ""}`;
+    const path = `/rooms/${room.slug}/${room.state.phase === "setup" ? "setup" : "draft"}${invite ? "#" + invite : ""}`;
     history.replaceState(null, "", path);
-    document.title =
-      room.state.phase === "setup"
-        ? "Preparation · Draftroom"
-        : "Draft · Draftroom";
+    document.title = `${room.name} · ${room.state.phase === "setup" ? "Preparation" : "Draft"}`;
   }, [room?.id, room?.state.phase, invite]);
   useEffect(() => {
     if (!room) return;
@@ -109,12 +104,37 @@ export default function App() {
           if (active) setSwaps([]);
         });
     void refresh();
-    const timer = setInterval(refresh, 20000);
+    const timer = setInterval(refresh, 1000);
     return () => {
       active = false;
       clearInterval(timer);
     };
   }, [room?.id, room?.version]);
+  useEffect(() => {
+    if (!room) return;
+    const timers = swaps
+      .filter((r) => r.requester_id === uid || r.target_id === uid)
+      .map((request) =>
+        setTimeout(
+          () => {
+            setSwaps((current) => current.filter((r) => r.id !== request.id));
+            void respondRoleSwap(room, request.id, false)
+              .then((next) =>
+                setRoom((current) =>
+                  current &&
+                  current.id === next.id &&
+                  next.version >= current.version
+                    ? next
+                    : current,
+                ),
+              )
+              .catch(() => {});
+          },
+          Math.max(0, Date.parse(request.expires_at) - Date.now()),
+        ),
+      );
+    return () => timers.forEach(clearTimeout);
+  }, [swaps, uid, room?.id]);
   async function swapAction(targetOrRequest: string, accept?: boolean) {
     if (!room) return;
     await run(async () => {
@@ -176,41 +196,10 @@ export default function App() {
     location.assign("/");
   }
   async function exitRoom() {
-    if (
-      !room ||
-      !confirm(
-        !supabase
-          ? "Leave this local demo?"
-          : host
-            ? "Leave this room? Host controls pass to the next player. An empty room is deleted."
-            : "Leave this room and release your seat?",
-      )
-    )
-      return;
+    if (!room || !confirm("Quit this room?")) return;
     await run(async () => {
-      try {
-        await leaveRoom(room);
-        clearRoom();
-      } catch (e) {
-        setRoom(await readRoom(room.id));
-        throw e;
-      }
-    });
-  }
-  async function finishRoom() {
-    if (
-      !room ||
-      !confirm("End this room for everyone? The draft will become read-only.")
-    )
-      return;
-    await run(async () => {
-      try {
-        setRoom(await endRoom(room));
-        setPicker(null);
-      } catch (e) {
-        setRoom(await readRoom(room.id));
-        throw e;
-      }
+      await leaveRoom(room);
+      clearRoom();
     });
   }
   function importFile(file?: File) {
@@ -243,7 +232,6 @@ export default function App() {
         const p = s.players.find((p) => p.id === playerId)!;
         if (!p.pool.includes(id)) {
           p.pool = [...p.pool, id];
-          p.ready = false;
         }
         return s;
       });
@@ -258,7 +246,9 @@ export default function App() {
     });
   }
   const link =
-    room && invite ? `${location.origin}/?room=${room.id}#${invite}` : "";
+    room && invite
+      ? `${location.origin}/rooms/${room.slug}/setup#${invite}`
+      : "";
   return (
     <div className="app">
       <header>
@@ -305,7 +295,7 @@ export default function App() {
                       history.replaceState(
                         null,
                         "",
-                        `/?room=${result.room.id}#${result.token}`,
+                        `/rooms/${result.room.slug}/setup#${result.token}`,
                       );
                   }
                 })
@@ -330,14 +320,10 @@ export default function App() {
         <main>
           <div className="title-row">
             <div>
-              <div className="eyebrow">ROOM / {room.id.slice(0, 8)}</div>
-              <h1>
-                {state!.phase === "setup"
-                  ? "Preparation"
-                  : state!.phase === "finished"
-                    ? "Room ended"
-                    : "Draft"}
-              </h1>
+              <div className="eyebrow">
+                {state!.phase === "setup" ? "Preparation" : "Draft"}
+              </div>
+              <h1>{room.name}</h1>
             </div>
             <div className="actions">
               {link && (
@@ -355,13 +341,7 @@ export default function App() {
               {host && state!.phase === "setup" && (
                 <button
                   className="primary"
-                  disabled={
-                    busy ||
-                    swaps.length > 0 ||
-                    state!.players.some(
-                      (p) => !p.role || !p.pool.length || !p.ready,
-                    )
-                  }
+                  disabled={busy}
                   onClick={() =>
                     void change((s) => {
                       s.phase = "live";
@@ -372,26 +352,23 @@ export default function App() {
                   Start draft →
                 </button>
               )}
-              {host && state!.phase !== "finished" && (
-                <button disabled={busy} onClick={() => void finishRoom()}>
-                  End room
-                </button>
-              )}
               <button disabled={busy} onClick={() => void exitRoom()}>
-                Leave room
+                Quit
               </button>
             </div>
           </div>
-          {state!.phase !== "setup" && (
+          {
             <div className="room-summary">
               {state!.players.map((p) => (
                 <span key={p.id}>
                   <i className={online.includes(p.id) ? "dot" : "dot off"} />
-                  {p.name} · {p.role ? roleName(p.role) : "No role"}
+                  {p.name}{" "}
+                  {p.id === room.host_id && <b className="host-badge">HOST</b>}
+                  {p.role && ` · ${roleName(p.role)}`}
                 </span>
               ))}
             </div>
-          )}
+          }
           <p className="dataset-note">
             {state!.dataset.fictional
               ? "Fictional demo data"
@@ -402,12 +379,12 @@ export default function App() {
               state={state!}
               uid={uid}
               host={host}
+              hostId={room.host_id}
               busy={busy}
               online={online}
               readiness={readiness}
               swaps={swaps}
               requestSwap={(id) => void swapAction(id)}
-              respondSwap={(id, accept) => void swapAction(id, accept)}
               change={change}
               editPool={(id) => setPicker({ kind: "pool", player: id })}
               onImport={importFile}
@@ -424,12 +401,24 @@ export default function App() {
               setMode={setMode}
             />
           )}
-          <footer>
-            Riot Data Dragon {catalogueMeta.patch} · {champions.length}{" "}
-            champions · champion catalogue <span>Draftroom</span>
-          </footer>
         </main>
       )}
+      {state?.phase === "setup" &&
+        swaps
+          .filter((r) => r.target_id === uid)
+          .slice(0, 1)
+          .map((request) => (
+            <SwapPrompt
+              key={request.id}
+              request={request}
+              name={
+                state.players.find((p) => p.id === request.requester_id)
+                  ?.name ?? "Player"
+              }
+              busy={busy}
+              onRespond={(accept) => void swapAction(request.id, accept)}
+            />
+          ))}
       {error && (
         <div className="error" role="alert">
           {error}
@@ -492,7 +481,6 @@ export default function App() {
                           void change((s) => {
                             const p = s.players.find((p) => p.id === playerId)!;
                             p.pool = p.pool.filter((c) => c !== id);
-                            p.ready = false;
                             return s;
                           });
                         }}

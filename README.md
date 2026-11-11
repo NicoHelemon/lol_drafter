@@ -1,114 +1,86 @@
-# Draftroom · League Draft Assistant
+# Draftroom
 
-Assistant de draft manuel pour une équipe de cinq joueurs : pools par poste, picks et bans des deux côtés, swaps, rôles indéterminés et classement contextuel Delta 2. React 19 + TypeScript + Vite, frontend statique Netlify, backend Supabase optionnel pour le mode partagé.
+Application de draft League of Legends pour une équipe de cinq joueurs. React + TypeScript + Vite, frontend Netlify et salles partagées sur Supabase.
 
-**État de livraison :** démo locale opérationnelle ; backend SQL testé sur Postgres embarqué ; connexion Supabase et publication Netlify à effectuer. Aucune statistique Lolalytics réelle n'est intégrée. Aucun déploiement ou test du service Realtime hébergé n'est implicitement acquis.
+## Installation existante
 
-## Mise à jour d’une installation existante
+Exécuter [202611110004_ephemeral_rooms.sql](supabase/migrations/202611110004_ephemeral_rooms.sql) dans **Supabase → SQL Editor → New query → Run**, après les migrations précédentes.
 
-L’interface est en anglais. La préparation (`/rooms/:id/setup`) et la draft (`/rooms/:id/draft`) sont séparées ; tous les joueurs passent à la draft quand l’hôte la lance après préparation. Les anciens liens d’invitation restent valides.
+**Cette migration supprime les salles temporaires existantes**, leurs invitations et demandes d’échange. Les salles sont éphémères ; aucun chemin de compatibilité avec les anciennes versions n’est maintenu. Aucune variable Netlify supplémentaire n’est nécessaire.
 
-Pour activer **Leave room** et **End room**, exécuter uniquement la nouvelle migration [202611110002_room_lifecycle.sql](supabase/migrations/202611110002_room_lifecycle.sql) dans **Supabase → SQL Editor → New query → Run**. Elle préserve les salles et datasets existants ; ne pas rejouer la migration initiale. Aucun secret ni changement de variable Netlify n’est nécessaire.
+## Fonctionnement
 
-Pour activer **Swap role**, exécuter ensuite [202611110003_role_swaps.sql](supabase/migrations/202611110003_role_swaps.sql). Chaque demande doit être acceptée par le joueur ciblé. Refus et annulation ne modifient aucun rôle ; une acceptation conserve les pools de chacun et annule leur état prêt. Changer de rôle, quitter ou terminer la salle invalide les demandes concernées. Les droits de l’hôte ne permettent pas de forcer un échange via `save_room`.
+- L’interface est en anglais. Une salle porte le nom de son créateur, par exemple **Nico’s room**, avec une URL `/rooms/nicos-room/setup`. Les doublons de noms reçoivent un suffixe numérique ; le UUID reste une clé interne.
+- Un badge **HOST** identifie l’hôte, y compris avant qu’il ait choisi un rôle. L’hôte peut démarrer immédiatement, sans Ready ni obligation de remplir les rôles ou pools.
+- **Join** réserve un rôle libre. Les pools commencent vides. Ajouter un portrait avec [+] ou le retirer avec × enregistre directement la modification.
+- Survoler le panneau d’un autre joueur fait apparaître les flèches d’échange ; le bouton reste accessible au clavier et visible sur écran tactile.
+- Le destinataire reçoit un popup qui expire après **cinq secondes**. Sans réponse, la demande est refusée. Le serveur vérifie aussi l’expiration : un clic tardif ne change aucun rôle. Le demandeur voit un message d’attente.
+- Les pools restent liés à leur joueur lors d’un échange. L’hôte peut démarrer pendant une demande : le passage en draft la supprime.
+- **Quit** libère le siège. Si l’hôte part, le premier participant restant devient hôte. La dernière sortie supprime la salle, ses membres, son invitation et ses demandes d’échange. Fermer un onglet conserve le siège pour permettre la reconnexion ; il faut utiliser Quit pour partir.
+- La préparation et la draft sont deux pages distinctes. La base est la source de vérité ; Realtime déclenche une relecture canonique, avec reprise après reconnexion.
 
-**Leave room** libère le siège et révoque l’accès du joueur. Si l’hôte part, le premier joueur restant devient hôte. Une salle vide est supprimée. **End room**, réservé à l’hôte, ferme la salle depuis la préparation ou la draft : elle reste visible en lecture seule, et chacun peut ensuite la quitter. Fermer simplement l’onglet conserve le siège pour la reconnexion.
+## Développer
 
-## Démarrer
-
-Node 24 et npm 11. Utiliser le checkout existant : chaque tâche cloud est isolée, aucun worktree supplémentaire n'est nécessaire.
+Node 24 et npm 11. Utiliser le checkout existant ; chaque tâche cloud est isolée, sans nécessité de créer un worktree.
 
 ```sh
 npm ci
 npm run dev
-```
-
-Sans variables, le bouton ouvre une **démo locale** persistée dans ce navigateur. Ce mode ne partage pas la salle avec d'autres personnes. Choisir un rôle dans sa case, ajouter des champions avec **[+]** puis cliquer **Ready** pour démarrer. Les nouveaux joueurs n’ont aucun rôle ni champion présélectionné. Ajout et retrait du pool sont enregistrés immédiatement ; les anciennes sélections restent conservées. Le mode local permet de tester seul ; les propositions d’échange nécessitent une salle partagée avec un autre joueur.
-
-```sh
-npm test                 # scoring, imports, invariants, SQL/RLS à cinq identités
-npm run build            # vérification TypeScript + production
+npm test
+npm run build
 npx playwright install chromium
-npm run test:e2e         # navigateur : Jhin/Caitlyn, ban, reload, desktop/mobile
-# Si Chromium est déjà installé :
+npm run test:e2e
+# Si Chromium est installé sur le système :
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-Le test SQL utilise PGlite (vrai moteur PostgreSQL WASM) et cinq identités Auth simulées. Il vérifie les RPC, droits RLS, invitations, reconnexion, capacité, doublons, conflits de versions et gel du dataset. Il ne remplace pas une validation Supabase Realtime sur cinq navigateurs ; voir [la procédure de recette](docs/ACCEPTANCE.md).
+Sans variables Supabase, le site fonctionne en démo locale sur un seul navigateur. Cette démo ne synchronise pas plusieurs appareils. Les tests SQL utilisent PGlite (PostgreSQL WASM) avec plusieurs identités Auth ; ils ne constituent pas une validation du service Realtime hébergé.
 
-## Créer Supabase (mode cinq joueurs)
+## Créer Supabase et déployer sur Netlify
 
-1. Créer un projet sur Supabase et ouvrir **SQL Editor**. Exécuter les fichiers de `supabase/migrations` dans l’ordre, `202611110001_draftroom.sql`, `202611110002_room_lifecycle.sql` puis `202611110003_role_swaps.sql`, sur un projet neuf. Le schéma `auth` et les rôles sont fournis par Supabase.
-2. Dans **Authentication → Providers**, activer les connexions anonymes. Les utilisateurs n'ont pas de compte à créer. Conserver les limites Auth du projet ; configurer la protection contre l'abus avant une large diffusion publique.
-3. La migration ajoute `rooms` à la publication `supabase_realtime` si elle existe. Vérifier **Database → Replication** : `rooms` doit être activée.
-4. Copier `.env.example` vers `.env.local`, renseigner l'URL du projet et la clé **publique anon / publishable**. Ne jamais utiliser `service_role`, une clé secrète ou un mot de passe dans une variable `VITE_*`.
-5. Relancer `npm run dev`. Créer la salle, copier l'invitation, l'ouvrir dans quatre autres profils/navigateurs. Chaque participant choisit son poste puis son pool. Un profil de navigateur conserve son identité anonyme et son siège au rechargement.
+1. Créer un projet Supabase neuf. Exécuter les quatre fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611110004`.
+2. Activer **Authentication → Sign In / Providers → Anonymous Sign-Ins**.
+3. Vérifier que `rooms` appartient à la publication `supabase_realtime` dans **Database → Replication**.
+4. Copier `.env.example` vers `.env.local` pour le développement. Renseigner `VITE_SUPABASE_URL` et la clé publique `VITE_SUPABASE_ANON_KEY` (anon ou publishable). Ne jamais utiliser de clé `service_role` ou secrète dans une variable `VITE_*`.
+5. Dans Netlify, importer le dépôt GitHub sur `main`. `netlify.toml` définit le build `npm run build`, la publication `dist`, Node 24, le fallback SPA et les en-têtes de sécurité.
+6. Ajouter les deux variables publiques dans Netlify, puis déployer. Si les visiteurs doivent accéder sans compte Netlify, régler **Production visibility** sur **Public**.
+7. Créer une salle et tester l’invitation dans un autre profil de navigateur. Une identité anonyme est conservée entre les rechargements dans ce profil.
 
-Le lien d'invitation est un secret de salle ; ne le publier qu'aux participants. Son token aléatoire est dans le fragment URL, qui n'est pas envoyé à l'hébergeur. La base conserve uniquement son SHA-256 dans une table inaccessible aux clients. Les membres lisent la salle via RLS ; les écritures passent exclusivement par des RPC `security definer` avec `search_path` fixe et validation serveur. La salle est verrouillée pendant la mutation : version obsolète = conflit explicite et rafraîchissement, jamais écrasement silencieux. L’hôte configure, démarre et termine la salle ; tous les membres éditent picks et bans.
+Le token d’invitation est un secret de salle, placé dans le fragment URL, qui n’est pas envoyé à Netlify. Son SHA-256 est conservé dans une table inaccessible aux clients. Les membres lisent via RLS ; les écritures passent par des RPC validées et transactionnelles. Une mutation de draft obsolète est refusée explicitement. Quit n’exige pas de version exacte pour ne pas bloquer une sortie sur une modification concurrente.
 
-Le Realtime déclenche une relecture canonique. Une relecture de secours et un heartbeat toutes les 20 secondes permettent de récupérer les mises à jour après reconnexion. L'indicateur de présence est approximatif (heartbeat expiré après 65 s). Les joueurs sans rôle ont déjà réservé l'un des cinq sièges participants.
+## Champions et portraits
 
-## Déployer sur Netlify
+Le site embarque **173 champions et leurs portraits**, issus de **Riot Data Dragon 16.22.1** via le miroir public `InFinity54/LoL_DDragon`, commit `dc04342110a9e0d7f76ffc844475070317015216`. Les portraits sont des PNG locaux : aucune requête tierce n’est requise pour les afficher. Le numéro de catalogue n’est pas affiché dans l’interface.
 
-1. Importer le dépôt GitHub dans **Netlify → Add new project → Import an existing project**. Choisir la branche `main`.
-2. `netlify.toml` définit `npm run build`, `dist`, Node 24, le fallback SPA et les en-têtes de sécurité. Aucun serveur WebSocket Netlify n'est requis.
-3. Pour le mode partagé, ajouter `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` dans les variables Netlify **avant** le build. Ces valeurs publiques sont incorporées au bundle. Déclencher un nouveau déploiement après modification.
-4. Sans ces variables, le site déployé reste en démo locale clairement identifiée.
-5. Vérifier création/join, partage à cinq et reconnexion selon `docs/ACCEPTANCE.md`.
-
-Alternative CLI après authentification de votre compte : `npx netlify-cli login`, `npx netlify-cli init`, puis `npm run build` et `npx netlify-cli deploy --prod --dir=dist`. Le dépôt ne contient ni token Netlify ni identifiant de site préexistant.
-
-## Interface
-
-Les rôles affichés sont Top, Jungle, Mid, **Bottom**, Support. La clé persistée `ADC` reste conservée dans les salles, imports et coefficients pour compatibilité ; l’interface la présente comme Bottom. Le résultat est nommé **Score** ; la formule mathématique reste identique.
-
-Les icônes de rôles PNG sont téléchargées et embarquées dans `public/icons`. Leur provenance et la référence à l’icône d’échange du client League sont documentées dans [docs/ASSETS.md](docs/ASSETS.md).
-
-## Données et scoring
-
-- Le moteur pur dans `src/domain/scoring.ts` utilise uniquement la moyenne des Delta 2 pondérée par `src/domain/weights.ts`. Top et Support suivent les coefficients de la spec. Jungle, Mid et ADC utilisent provisoirement `2/9` par paire.
-- Un Delta 2 est en points de pourcentage. Il ne s'agit pas d'une probabilité de victoire. Aucun winrate brut, prior, métagame ou heuristique n'est ajouté.
-- Une paire manquante reste manquante, ne compte pas dans le dénominateur et réduit la couverture. Aucun contexte calculable = `N/A`. Les égalités sont triées par nom.
-- Les relations sont directionnelles et conditionnées par les deux postes. Un pick sans poste bloque le champion mais ne contribue pas au score.
-- `PairwiseDataProvider` sépare les données du moteur. La fixture synthétique contient uniquement un sous-ensemble de rôles et de champions : la couverture partielle est intentionnelle. Les cinq clients lisent le même snapshot durable en base ; le score est calculé en mémoire, sans aucune requête statistique après un pick.
-- Le dataset complet, ses métadonnées et ses paires sont conservés une seule fois par salle dans `rooms.state`. Il est figé pendant la draft, y compris si l'on prépare d'autres salles. Pas de cache global qui remplace silencieusement les données. Cette V1 n'offre pas encore de déduplication inter-salles ou de gros entrepôt de statistiques.
-
-### Import autorisé
-
-L'hôte importe un JSON ou CSV en préparation. Exemples : [JSON](public/examples/dataset.json), [CSV](public/examples/pairs.csv). Pour CSV, fournir les métadonnées dans la fenêtre JSON demandée, par exemple :
-
-```json
-{"id":"mon-dataset-v1","patch":"16.1","tier":"diamond_plus","source":"Ma source autorisée","importedAt":"2026-11-11T00:00:00Z","fictional":false}
-```
-
-Ne marquer `fictional:false` que pour des données réelles dont vous avez les droits. Le JSON contient ces métadonnées et `pairs`. Chaque paire contient `relation`, `candidateChampionId`, `candidateRole`, `otherChampionId`, `otherRole`, `delta2` (nombre ou null), `games` optionnel. IDs numériques Riot **sous forme de chaînes**. Postes : `Top`, `Jungle`, `Mid`, `ADC`, `Support`. CSV UTF-8 à virgules, guillemets doubles supportés ; delta vide = manquant. Les doublons directionnels, postes/IDs inconnus et nombres invalides sont rejetés. Limites V1 : 12 Mo et 100 000 paires/import.
-
-### Catalogue et portraits
-
-Le catalogue embarqué de 152 champions provient de Riot Data Dragon **10.23.1**, via le miroir public `ngryman/lol-champions` ; les URLs de portraits viennent directement du catalogue et utilisent HTTPS. Il est ancien et n'inclut pas les sorties ultérieures. Les portraits sont servis par Riot ; initiales de secours en cas d'indisponibilité. La source récente était bloquée par la politique réseau de l'environnement lors du développement.
-
-Pour le mettre à jour depuis **Riot officiel**, avec accès réseau à `ddragon.leagueoflegends.com` :
+Pour actualiser le catalogue depuis le miroir et télécharger les images :
 
 ```sh
-npm run catalogue:update -- 16.1.1  # exemple de version explicite ; choisir la version voulue
-# ou npm run catalogue:update pour prendre la version courante annoncée par Riot
+npm run catalogue:update
+# Ou reproduire exactement la version livrée :
+npm run catalogue:update -- dc04342110a9e0d7f76ffc844475070317015216
 npm test
 npm run build
 ```
 
-Le script valide IDs/noms, conserve les chemins fournis par Riot et inscrit la version dans `catalogue-meta.json`. Revoir et committer les changements. Les classes de champions ne sont jamais utilisées comme restrictions de poste.
+Le script valide les IDs, noms de fichiers et images PNG carrées avant de remplacer le catalogue. Revoir puis committer les JSON et `public/champions`. Provenance des assets : [docs/ASSETS.md](docs/ASSETS.md).
 
-### Lolalytics
+## Statistiques et score
 
-Aucun scraper ni appel à l'API privée n'est intégré. Le déploiement ne dépend pas de Lolalytics. L'accès programmatique complet aux Delta 2 `vs` **et** `with`, ainsi que les droits d'utilisation, restent à établir séparément avant tout collecteur. Un simple winrate n'est jamais converti en Delta 2.
+Le score conserve la moyenne pondérée des deltas normalisés définie dans `src/domain/scoring.ts`, avec les coefficients centralisés dans `weights.ts`. Top et Support suivent les coefficients choisis ; Jungle, Mid et Bottom utilisent provisoirement `2/9` par paire. Il ne s’agit pas d’une probabilité de victoire. Les paires manquantes restent manquantes, sans faux zéro ; aucune paire connue donne N/A. Aucun winrate global, prior ou heuristique de composition n’est ajouté.
+
+Les **statistiques de démonstration restent fictives**. Le nouveau catalogue de portraits n’ajoute aucune vraie statistique. Aucun scraping ni appel à l’API privée Lolalytics n’est intégré.
+
+L’hôte peut importer des données autorisées JSON ou CSV en préparation : [exemple JSON](public/examples/dataset.json), [exemple CSV](public/examples/pairs.csv). Métadonnées requises : `id`, `patch`, `tier`, `source`, `importedAt` (ISO), `fictional` (booléen). Chaque paire contient `relation`, `candidateChampionId`, `candidateRole`, `otherChampionId`, `otherRole`, `delta2` et éventuellement `games`. Les IDs Riot sont des chaînes ; les clés de rôles dans les données sont `Top`, `Jungle`, `Mid`, `ADC`, `Support` (ADC est affiché Bottom).
+
+Le dataset est stocké une fois par salle et figé quand la draft démarre. Les scores sont calculés en mémoire, sans requête statistique après chaque pick. Les imports sont limités à 12 Mo et 100 000 paires, avec validation des doublons, IDs, rôles et nombres.
 
 ## Structure
 
-- `src/domain` : types, coefficients, score, invariants de draft.
-- `src/data` : catalogue versionné, provider démo/import, validation JSON/CSV.
+- `src/pages` : préparation et draft ; `src/components` : portraits, icônes et popup de demande.
+- `src/domain` : types, invariants, poids et score.
 - `src/lib/rooms.ts` : Auth anonyme, RPC, Realtime et reprise canonique.
-- `src/App.tsx` : entrée, suivi de salle et actions communes. `src/pages/SetupPage.tsx` : préparation. `src/pages/DraftPage.tsx` : board, bans, swaps et recommandations. `src/components` : sélecteur partagé de champions.
-- `supabase/migrations` : schéma, permissions, fonctions atomiques et Realtime.
-- `tests` : tests de domaine, SQL multi-identités et navigateur ; CI GitHub Actions.
+- `src/data` : catalogue, fixture synthétique et validation des imports.
+- `supabase/migrations` : schéma, RLS et fonctions serveur.
+- `tests` : domaine, assets, base multi-identités et parcours navigateur.
 
-Ce projet communautaire n'est pas affilié à Riot Games. Les assets League of Legends appartiennent à Riot Games.
+Projet communautaire non affilié à Riot Games. Les assets League of Legends appartiennent à Riot Games.

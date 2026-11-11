@@ -28,7 +28,19 @@ export async function createRoom(
     token = crypto.randomUUID() + crypto.randomUUID();
   state.dataset = await new DemoProvider().load();
   if (!supabase) {
-    const room = { id: crypto.randomUUID(), host_id: uid, version: 0, state };
+    const base =
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "player";
+    const room = {
+      id: crypto.randomUUID(),
+      slug: `${base}s-room`,
+      name: `${name}'s room`,
+      host_id: uid,
+      version: 0,
+      state,
+    };
     localStorage.setItem("draftroom-demo", JSON.stringify(room));
     return { room, token: "" };
   }
@@ -40,17 +52,33 @@ export async function createRoom(
   return { room: data as Room, token };
 }
 export async function joinRoom(
-  id: string,
+  slug: string,
   token: string,
   name: string,
 ): Promise<Room> {
   await identity();
   if (!supabase) throw Error("Shared rooms are unavailable in local demo mode");
   const { data, error } = await supabase.rpc("join_room", {
-    room_id: id,
+    room_slug: slug,
     invite_token: token,
     nickname: name,
   });
+  if (error) throw error;
+  return data;
+}
+export async function resolveRoom(slug: string): Promise<Room> {
+  if (!supabase) {
+    const stored = localStorage.getItem("draftroom-demo");
+    if (!stored) throw Error("Room not found");
+    const r = JSON.parse(stored) as Room;
+    if (r.slug !== slug) throw Error("Room not found");
+    return r;
+  }
+  const { data, error } = await supabase
+    .from("rooms")
+    .select("*")
+    .eq("slug", slug)
+    .single();
   if (error) throw error;
   return data;
 }
@@ -146,20 +174,9 @@ export async function leaveRoom(room: Room): Promise<void> {
   }
   const { error } = await supabase.rpc("leave_room", {
     room_id: room.id,
-    expected_version: room.version,
   });
   if (error) throw error;
 }
-export async function endRoom(room: Room): Promise<Room> {
-  if (!supabase) return saveRoom(room, { ...room.state, phase: "finished" });
-  const { data, error } = await supabase.rpc("end_room", {
-    room_id: room.id,
-    expected_version: room.version,
-  });
-  if (error) throw error;
-  return data;
-}
-
 export async function readSwaps(roomId: string): Promise<RoleSwapRequest[]> {
   if (!supabase)
     return JSON.parse(
@@ -168,7 +185,8 @@ export async function readSwaps(roomId: string): Promise<RoleSwapRequest[]> {
   const { data, error } = await supabase
     .from("role_swap_requests")
     .select("*")
-    .eq("room_id", roomId);
+    .eq("room_id", roomId)
+    .gt("expires_at", new Date().toISOString());
   if (error) throw error;
   return data ?? [];
 }
@@ -197,7 +215,6 @@ export async function respondRoleSwap(
     room_id: room.id,
     request_id: requestId,
     accept,
-    expected_version: room.version,
   });
   if (error) throw error;
   return data;

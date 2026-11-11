@@ -39,13 +39,7 @@ export default function DraftPage({
         >
           <div className="section-heading">
             <h2>Draft board</h2>
-            <span className="badge">
-              {state!.phase === "setup"
-                ? "PREPARATION"
-                : state!.phase === "live"
-                  ? "LIVE"
-                  : "ENDED"}
-            </span>
+            <span className="badge">{"LIVE"}</span>
           </div>
           <div className="board-head">
             <span>ROLE</span>
@@ -69,7 +63,7 @@ export default function DraftPage({
                           <b>{names[pick.championId]}</b>
                           <select
                             aria-label={`Move ${names[pick.championId]} ${team}`}
-                            disabled={busy || state!.phase === "finished"}
+                            disabled={busy}
                             value={role}
                             onChange={(e) =>
                               void change((s) => {
@@ -103,7 +97,7 @@ export default function DraftPage({
                         <button
                           className="icon-button"
                           aria-label={`Remove ${names[pick.championId]} ${team}`}
-                          disabled={busy || state!.phase === "finished"}
+                          disabled={busy}
                           onClick={() =>
                             void change((s) => {
                               s.picks[team] = s.picks[team].filter(
@@ -123,7 +117,7 @@ export default function DraftPage({
                     <button
                       className={pick ? "edit-button" : "empty-pick"}
                       aria-label={`${pick ? "Edit" : "Choose"} ${roleName(role)} ${team}`}
-                      disabled={busy || state!.phase === "finished"}
+                      disabled={busy}
                       onClick={() => {
                         setMode("replace");
                         setPicker({ kind: "pick", team, role });
@@ -150,7 +144,7 @@ export default function DraftPage({
                   <div key={slot}>
                     <button
                       aria-label={`Ban ${slot + 1} ${team}`}
-                      disabled={busy || state!.phase === "finished"}
+                      disabled={busy}
                       onClick={() => setPicker({ kind: "ban", team, slot })}
                     >
                       {id ? <Portrait id={id} /> : <span>＋</span>}
@@ -159,7 +153,7 @@ export default function DraftPage({
                       <button
                         className="remove-ban"
                         aria-label={`Remove ban ${names[id]}`}
-                        disabled={busy || state!.phase === "finished"}
+                        disabled={busy}
                         onClick={() =>
                           void change((s) => {
                             s.bans[team][slot] = null;
@@ -189,7 +183,7 @@ export default function DraftPage({
                     <select
                       aria-label={`Assign ${names[p.championId]}`}
                       value=""
-                      disabled={busy || state!.phase === "finished"}
+                      disabled={busy}
                       onChange={(e) =>
                         void change((s) =>
                           place(s, team, e.target.value as Role, p.championId),
@@ -206,7 +200,7 @@ export default function DraftPage({
                       ))}
                     </select>
                     <button
-                      disabled={busy || state!.phase === "finished"}
+                      disabled={busy}
                       onClick={() =>
                         void change((s) => {
                           s.picks[team] = s.picks[team].filter(
@@ -251,7 +245,7 @@ export default function DraftPage({
               >
                 <div className="ranking-heading">
                   <b>{roleName(role)}</b>
-                  <span>{p?.name ?? "Available"}</span>
+                  <span>{p?.name ?? ""}</span>
                   {locked && <span className="badge">PICK</span>}
                   {host && p && state.phase === "live" && (
                     <button

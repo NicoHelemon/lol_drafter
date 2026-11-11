@@ -1,7 +1,7 @@
 import {roleName} from './roles';
 import {ROLES,type State,type Team} from './types';
 export function validateState(s:State,ids?:Set<string>){
- if(!['setup','live','finished'].includes(s.phase)||!['blue','red'].includes(s.side))throw Error('Invalid state');
+ if(!['setup','live'].includes(s.phase)||!['blue','red'].includes(s.side))throw Error('Invalid state');
  const seen=new Set<string>();
  for(const t of ['ally','enemy'] as Team[]){
   if(s.picks[t].length>5||s.bans[t].length!==5)throw Error('Each team can have at most five picks and five bans');
