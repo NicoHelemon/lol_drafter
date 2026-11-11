@@ -10,6 +10,8 @@ L’interface est en anglais. La préparation (`/rooms/:id/setup`) et la draft (
 
 Pour activer **Leave room** et **End room**, exécuter uniquement la nouvelle migration [202611110002_room_lifecycle.sql](supabase/migrations/202611110002_room_lifecycle.sql) dans **Supabase → SQL Editor → New query → Run**. Elle préserve les salles et datasets existants ; ne pas rejouer la migration initiale. Aucun secret ni changement de variable Netlify n’est nécessaire.
 
+Pour activer **Swap role**, exécuter ensuite [202611110003_role_swaps.sql](supabase/migrations/202611110003_role_swaps.sql). Chaque demande doit être acceptée par le joueur ciblé. Refus et annulation ne modifient aucun rôle ; une acceptation conserve les pools de chacun et annule leur état prêt. Changer de rôle, quitter ou terminer la salle invalide les demandes concernées. Les droits de l’hôte ne permettent pas de forcer un échange via `save_room`.
+
 **Leave room** libère le siège et révoque l’accès du joueur. Si l’hôte part, le premier joueur restant devient hôte. Une salle vide est supprimée. **End room**, réservé à l’hôte, ferme la salle depuis la préparation ou la draft : elle reste visible en lecture seule, et chacun peut ensuite la quitter. Fermer simplement l’onglet conserve le siège pour la reconnexion.
 
 ## Démarrer
@@ -21,7 +23,7 @@ npm ci
 npm run dev
 ```
 
-Sans variables, le bouton ouvre une **démo locale** persistée dans ce navigateur. Ce mode ne partage pas la salle avec d'autres personnes. Remplir les sièges libres via « Add demo player », choisir son pool et cliquer « Ready » pour démarrer. Les autres sièges de démonstration sont prêts par défaut.
+Sans variables, le bouton ouvre une **démo locale** persistée dans ce navigateur. Ce mode ne partage pas la salle avec d'autres personnes. Choisir un rôle dans sa case, ajouter des champions avec **[+]** puis cliquer **Ready** pour démarrer. Les nouveaux joueurs n’ont aucun rôle ni champion présélectionné. Ajout et retrait du pool sont enregistrés immédiatement ; les anciennes sélections restent conservées. Le mode local permet de tester seul ; les propositions d’échange nécessitent une salle partagée avec un autre joueur.
 
 ```sh
 npm test                 # scoring, imports, invariants, SQL/RLS à cinq identités
@@ -36,7 +38,7 @@ Le test SQL utilise PGlite (vrai moteur PostgreSQL WASM) et cinq identités Auth
 
 ## Créer Supabase (mode cinq joueurs)
 
-1. Créer un projet sur Supabase et ouvrir **SQL Editor**. Exécuter les fichiers de `supabase/migrations` dans l’ordre, `202611110001_draftroom.sql` puis `202611110002_room_lifecycle.sql`, sur un projet neuf. Le schéma `auth` et les rôles sont fournis par Supabase.
+1. Créer un projet sur Supabase et ouvrir **SQL Editor**. Exécuter les fichiers de `supabase/migrations` dans l’ordre, `202611110001_draftroom.sql`, `202611110002_room_lifecycle.sql` puis `202611110003_role_swaps.sql`, sur un projet neuf. Le schéma `auth` et les rôles sont fournis par Supabase.
 2. Dans **Authentication → Providers**, activer les connexions anonymes. Les utilisateurs n'ont pas de compte à créer. Conserver les limites Auth du projet ; configurer la protection contre l'abus avant une large diffusion publique.
 3. La migration ajoute `rooms` à la publication `supabase_realtime` si elle existe. Vérifier **Database → Replication** : `rooms` doit être activée.
 4. Copier `.env.example` vers `.env.local`, renseigner l'URL du projet et la clé **publique anon / publishable**. Ne jamais utiliser `service_role`, une clé secrète ou un mot de passe dans une variable `VITE_*`.
@@ -55,6 +57,12 @@ Le Realtime déclenche une relecture canonique. Une relecture de secours et un h
 5. Vérifier création/join, partage à cinq et reconnexion selon `docs/ACCEPTANCE.md`.
 
 Alternative CLI après authentification de votre compte : `npx netlify-cli login`, `npx netlify-cli init`, puis `npm run build` et `npx netlify-cli deploy --prod --dir=dist`. Le dépôt ne contient ni token Netlify ni identifiant de site préexistant.
+
+## Interface
+
+Les rôles affichés sont Top, Jungle, Mid, **Bottom**, Support. La clé persistée `ADC` reste conservée dans les salles, imports et coefficients pour compatibilité ; l’interface la présente comme Bottom. Le résultat est nommé **Score** ; la formule mathématique reste identique.
+
+Les icônes de rôles PNG sont téléchargées et embarquées dans `public/icons`. Leur provenance et la référence à l’icône d’échange du client League sont documentées dans [docs/ASSETS.md](docs/ASSETS.md).
 
 ## Données et scoring
 

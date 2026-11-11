@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { Room, State } from "../domain/types";
+import type { Room, State, RoleSwapRequest } from "../domain/types";
 import { initialState, DemoProvider } from "../data/provider";
 import { validateState } from "../domain/state";
 const url = import.meta.env.VITE_SUPABASE_URL,
@@ -154,6 +154,49 @@ export async function endRoom(room: Room): Promise<Room> {
   if (!supabase) return saveRoom(room, { ...room.state, phase: "finished" });
   const { data, error } = await supabase.rpc("end_room", {
     room_id: room.id,
+    expected_version: room.version,
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function readSwaps(roomId: string): Promise<RoleSwapRequest[]> {
+  if (!supabase)
+    return JSON.parse(
+      localStorage.getItem(`draftroom-swaps-${roomId}`) ?? "[]",
+    );
+  const { data, error } = await supabase
+    .from("role_swap_requests")
+    .select("*")
+    .eq("room_id", roomId);
+  if (error) throw error;
+  return data ?? [];
+}
+export async function requestRoleSwap(
+  room: Room,
+  targetId: string,
+): Promise<Room> {
+  if (!supabase)
+    throw Error("Role swaps require a shared room with another player");
+  const { data, error } = await supabase.rpc("request_role_swap", {
+    room_id: room.id,
+    target_id: targetId,
+    expected_version: room.version,
+  });
+  if (error) throw error;
+  return data;
+}
+export async function respondRoleSwap(
+  room: Room,
+  requestId: string,
+  accept: boolean,
+): Promise<Room> {
+  if (!supabase)
+    throw Error("Role swaps require a shared room with another player");
+  const { data, error } = await supabase.rpc("respond_role_swap", {
+    room_id: room.id,
+    request_id: requestId,
+    accept,
     expected_version: room.version,
   });
   if (error) throw error;

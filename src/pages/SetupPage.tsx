@@ -1,7 +1,7 @@
-import { ROLES, type State, type Role } from "../domain/types";
-import { defaultPools } from "../data/provider";
-import { supabase } from "../lib/rooms";
-import { Portrait } from "../components/Champions";
+import { ROLES, type State, type RoleSwapRequest } from "../domain/types";
+import { roleName } from "../domain/roles";
+import { Portrait, names } from "../components/Champions";
+import { RoleIcon, SwapIcon } from "../components/RoleIcon";
 interface Props {
   state: State;
   uid: string;
@@ -9,9 +9,12 @@ interface Props {
   busy: boolean;
   online: string[];
   readiness: { known: number; total: number };
+  swaps: RoleSwapRequest[];
   change: (fn: (s: State) => State) => Promise<void>;
-  editPool: (id: string, pool: string[]) => void;
+  editPool: (id: string) => void;
   onImport: (file?: File) => void;
+  requestSwap: (target: string) => void;
+  respondSwap: (id: string, accept: boolean) => void;
 }
 export default function SetupPage({
   state,
@@ -20,25 +23,87 @@ export default function SetupPage({
   busy,
   online,
   readiness,
+  swaps,
   change,
   editPool,
   onImport,
+  requestSwap,
+  respondSwap,
 }: Props) {
   const me = state.players.find((p) => p.id === uid);
+  function removeChampion(playerId: string, championId: string) {
+    void change((s) => {
+      const p = s.players.find((p) => p.id === playerId)!;
+      p.pool = p.pool.filter((id) => id !== championId);
+      p.ready = false;
+      return s;
+    });
+  }
   return (
     <section aria-label="Room preparation" className="setup-page">
-      {state.players.some(p=>!p.role)&&<p className="muted">Waiting for role: {state.players.filter(p=>!p.role).map(p=>p.name).join(', ')}</p>}
+      {state.players.some((p) => !p.role) && (
+        <p className="muted">
+          Choose a role:{" "}
+          {state.players
+            .filter((p) => !p.role)
+            .map((p) => p.name)
+            .join(", ")}
+        </p>
+      )}
+      {swaps
+        .filter((r) => r.requester_id === uid || r.target_id === uid)
+        .map((r) => {
+          const incoming = r.target_id === uid,
+            other = state.players.find(
+              (p) => p.id === (incoming ? r.requester_id : r.target_id),
+            );
+          return (
+            <div className="swap-request" role="status" key={r.id}>
+              <SwapIcon />
+              <span>
+                {incoming
+                  ? `${other?.name ?? "Player"} wants to swap ${roleName(r.from_role)} for ${roleName(r.to_role)}.`
+                  : `Waiting for ${other?.name ?? "player"} to accept the role swap.`}
+              </span>
+              <div>
+                {incoming && (
+                  <button
+                    disabled={busy}
+                    onClick={() => respondSwap(r.id, true)}
+                  >
+                    Accept
+                  </button>
+                )}
+                <button
+                  disabled={busy}
+                  onClick={() => respondSwap(r.id, false)}
+                >
+                  {incoming ? "Decline" : "Cancel"}
+                </button>
+              </div>
+            </div>
+          );
+        })}
       <section className="roster">
         {ROLES.map((role) => {
-          const p = state!.players.find((p) => p.role === role);
+          const p = state.players.find((p) => p.role === role),
+            editable = !!p && (p.id === uid || host),
+            canSwap = !!me?.role && !!p && p.id !== uid;
           return (
-            <div className={"seat " + (p?.id === uid ? "mine" : "")} key={role}>
+            <div
+              role="group"
+              aria-label={`${roleName(role)} role`}
+              className={"seat " + (p?.id === uid ? "mine" : "")}
+              key={role}
+            >
               <div className="seat-top">
-                <span className="role-icon">{role.slice(0, 1)}</span>
-                <b>{role}</b>
-                <span className="muted">
-                  {p?.ready ? "Ready ✓" : "Not ready"}
-                </span>
+                <RoleIcon role={role} />
+                <b>{roleName(role)}</b>
+                {p && (
+                  <span className="muted">
+                    {p.ready ? "Ready ✓" : "Not ready"}
+                  </span>
+                )}
               </div>
               <div className="seat-name">
                 <i
@@ -49,89 +114,79 @@ export default function SetupPage({
               </div>
               {p ? (
                 <>
-                  <div className="mini-pool">
-                    {p.pool.slice(0, 6).map((id) => (
-                      <Portrait key={id} id={id} />
+                  <div className="pool-tiles">
+                    {p.pool.map((id) => (
+                      <div className="pool-tile" key={id} title={names[id]}>
+                        <Portrait id={id} />
+                        {editable && (
+                          <button
+                            className="remove-champion"
+                            aria-label={`Remove ${names[id]} from ${roleName(role)} pool`}
+                            disabled={busy}
+                            onClick={() => removeChampion(p.id, id)}
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
                     ))}
-                    {p.pool.length > 6 && <span>+{p.pool.length - 6}</span>}
+                    {editable && (
+                      <button
+                        className="add-champion"
+                        aria-label={`Add champion to ${roleName(role)} pool`}
+                        disabled={busy}
+                        onClick={() => editPool(p.id)}
+                      >
+                        +
+                      </button>
+                    )}
                   </div>
-                  <button
-                    disabled={
-                      busy ||
-                      (!host && p.id !== uid) ||
-                      (state!.phase !== "setup" && !host)
-                    }
-                    onClick={() => {
-                      editPool(p.id, p.pool);
-                    }}
-                  >
-                    Pool · {p.pool.length} champions
-                  </button>
+                  {canSwap && (
+                    <button
+                      className="swap-role"
+                      aria-label={`Swap role with ${p.name}`}
+                      disabled={
+                        busy ||
+                        swaps.some(
+                          (r) =>
+                            [r.requester_id, r.target_id].includes(uid) ||
+                            [r.requester_id, r.target_id].includes(p.id),
+                        )
+                      }
+                      onClick={() => requestSwap(p.id)}
+                    >
+                      <SwapIcon />
+                      Swap role
+                    </button>
+                  )}
                 </>
               ) : (
                 <button
-                  disabled={busy || state!.phase !== "setup"}
+                  disabled={busy}
                   onClick={() =>
                     void change((s) => {
-                      let player = s.players.find((p) => p.id === uid);
-                      if (!supabase && player?.role) {
-                        s.players.push({
-                          id: `demo-${role}`,
-                          name: `Demo ${role}`,
-                          role,
-                          pool: defaultPools[role],
-                          ready: true,
-                        });
-                      } else if (player) {
-                        player.role = role;
-                        player.pool = defaultPools[role];
-                        player.ready = false;
-                      }
+                      const player = s.players.find((p) => p.id === uid)!;
+                      player.role = role;
+                      player.ready = false;
                       return s;
                     })
                   }
                 >
-                  {!supabase ? "Add demo player" : "Choose role"}
+                  Choose role
                 </button>
               )}
             </div>
           );
         })}
       </section>
-      {me && state!.phase === "setup" && (
+      {me?.role && (
         <div className="preparation">
-          <label>
-            My role
-            <select
-              aria-label="My role"
-              value={me.role ?? ""}
-              onChange={(e) =>
-                void change((s) => {
-                  const p = s.players.find((p) => p.id === uid)!;
-                  p.role = e.target.value as Role;
-                  p.pool = defaultPools[p.role];
-                  p.ready = false;
-                  return s;
-                })
-              }
-            >
-              <option value="" disabled>
-                Choose
-              </option>
-              {ROLES.map((r) => (
-                <option
-                  disabled={state!.players.some(
-                    (p) => p.id !== uid && p.role === r,
-                  )}
-                  key={r}
-                >
-                  {r}
-                </option>
-              ))}
-            </select>
-          </label>
           <button
-            disabled={busy || !me.pool.length}
+            disabled={
+              busy ||
+              !me.pool.length ||
+              swaps.some((r) => r.requester_id === uid || r.target_id === uid)
+            }
             onClick={() =>
               void change((s) => {
                 const p = s.players.find((p) => p.id === uid)!;
@@ -145,7 +200,7 @@ export default function SetupPage({
         </div>
       )}
       <details className="data-details">
-        <summary>Dataset settings</summary>{" "}
+        <summary>Dataset settings</summary>
         <div className="data-status">
           <i className="dot amber" />
           <b>
@@ -160,38 +215,36 @@ export default function SetupPage({
             {readiness.total.toLocaleString("en")} potential pairs available
           </span>
         </div>
-        <div className="preparation">
-          {host && (
-            <>
-              <label>
-                Side
-                <select
-                  value={state!.side}
-                  onChange={(e) =>
-                    void change((s) => {
-                      s.side = e.target.value as "blue" | "red";
-                      return s;
-                    })
-                  }
-                >
-                  <option value="blue">Blue</option>
-                  <option value="red">Red</option>
-                </select>
-              </label>
-              <label className="file-button">
-                Import JSON / CSV
-                <input
-                  type="file"
-                  accept=".json,.csv"
-                  onChange={(e) => {
-                    onImport(e.target.files?.[0]);
-                    e.target.value = "";
-                  }}
-                />
-              </label>
-            </>
-          )}
-        </div>
+        {host && (
+          <div className="preparation">
+            <label>
+              Side
+              <select
+                value={state.side}
+                onChange={(e) =>
+                  void change((s) => {
+                    s.side = e.target.value as "blue" | "red";
+                    return s;
+                  })
+                }
+              >
+                <option value="blue">Blue</option>
+                <option value="red">Red</option>
+              </select>
+            </label>
+            <label className="file-button">
+              Import JSON / CSV
+              <input
+                type="file"
+                accept=".json,.csv"
+                onChange={(e) => {
+                  onImport(e.target.files?.[0]);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          </div>
+        )}
       </details>
     </section>
   );

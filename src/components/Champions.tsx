@@ -21,8 +21,10 @@ export function Search({
   selected = [],
   blocked = new Set(),
   onChoose,
+  disabled = false,
 }: {
   selected?: string[];
+  disabled?: boolean;
   blocked?: Set<string>;
   onChoose: (id: string) => void;
 }) {
@@ -44,7 +46,7 @@ export function Search({
           .map((c) => (
             <button
               key={c.id}
-              disabled={blocked.has(c.id)}
+              disabled={disabled || blocked.has(c.id)}
               className={
                 selected.includes(c.id) ? "champion selected" : "champion"
               }
@@ -52,7 +54,7 @@ export function Search({
             >
               <Portrait id={c.id} />
               <span>{c.name}</span>
-              {selected.includes(c.id) && <b>✓</b>}
+              {selected.includes(c.id) && <b aria-hidden="true">✓</b>}
             </button>
           ))}
       </div>

@@ -8,3 +8,5 @@ export interface Player {id:string; name:string; role:Role|null; pool:string[]; 
 export interface Pick {championId:string; role:Role|null}
 export interface State {phase:'setup'|'live'|'finished'; side:'blue'|'red'; dataset:Dataset; players:Player[]; picks:Record<Team,Pick[]>; bans:Record<Team,(string|null)[]>; history:string[]}
 export interface Room {id:string; host_id:string; version:number; state:State}
+
+export interface RoleSwapRequest {id:string;room_id:string;requester_id:string;target_id:string;from_role:Role;to_role:Role;created_at:string}

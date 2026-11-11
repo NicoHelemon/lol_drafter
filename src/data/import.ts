@@ -15,9 +15,9 @@ export function importDataset(text:string,format:'json'|'csv',ids:Set<string>,me
  const keys=new Set<string>();const pairs:Pair[]=raw.pairs.map((p:Pair)=>{
   if(!['vs','with'].includes(p.relation)||!ROLES.includes(p.candidateRole)||!ROLES.includes(p.otherRole)||!ids.has(String(p.candidateChampionId))||!ids.has(String(p.otherChampionId)))throw Error('Invalid champion, role or relation');
   if(p.relation==='with'&&p.candidateRole===p.otherRole)throw Error('Invalid same-role synergy');
-  if(format==='json'&&p.delta2!==null&&typeof p.delta2!=='number')throw Error('JSON Delta 2 must be a number or null');
+  if(format==='json'&&p.delta2!==null&&typeof p.delta2!=='number')throw Error('JSON score must be a number or null');
   const delta2=p.delta2===null||(p.delta2 as unknown)===''?null:Number(p.delta2);
-  if(delta2!==null&&(!Number.isFinite(delta2)||Math.abs(delta2)>100))throw Error('Invalid Delta 2 (percentage points)');
+  if(delta2!==null&&(!Number.isFinite(delta2)||Math.abs(delta2)>100))throw Error('Invalid score');
   if(format==='json'&&p.games!==undefined&&typeof p.games!=='number')throw Error('JSON games must be a number');
   const games=p.games===undefined||(p.games as unknown)===''?undefined:Number(p.games);if(games!==undefined&&(!Number.isInteger(games)||games<0))throw Error('Invalid games count');
   const result={relation:p.relation,candidateChampionId:String(p.candidateChampionId),candidateRole:p.candidateRole,otherChampionId:String(p.otherChampionId),otherRole:p.otherRole,delta2,...(games===undefined?{}:{games})};

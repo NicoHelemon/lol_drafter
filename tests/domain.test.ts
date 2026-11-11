@@ -20,3 +20,5 @@ describe('authorized imports',()=>{
  it('parses quoted CSV, including zero and missing deltas',()=>{const meta={...demoDataset(),pairs:undefined,source:'Authorized, supplied'};const csv='relation,candidateChampionId,candidateRole,otherChampionId,otherRole,delta2,games\r\nvs,58,Top,202,ADC,0,100\r\nwith,58,Top,64,Jungle,,\r\n';const d=importDataset(csv,'csv',championIds,meta);expect(d.pairs.map(p=>p.delta2)).toEqual([0,null]);});
  it('rejects duplicates, unknown champions and nonfinite deltas',()=>{const d=demoDataset();d.pairs=[d.pairs[0],d.pairs[0]];expect(()=>importDataset(JSON.stringify(d),'json',championIds)).toThrow('Duplicate');d.pairs=[{...d.pairs[0],candidateChampionId:'invalid'}];expect(()=>importDataset(JSON.stringify(d),'json',championIds)).toThrow('Invalid');d.pairs=[{...demoDataset().pairs[0],delta2:101}];expect(()=>importDataset(JSON.stringify(d),'json',championIds)).toThrow('Invalid');});
 });
+
+it('starts new players without a role or champion preset',()=>{const s=initialState('player','Player');expect(s.players[0].role).toBeNull();expect(s.players[0].pool).toEqual([]);expect(s.players[0].ready).toBe(false);});

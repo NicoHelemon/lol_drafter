@@ -1,13 +1,15 @@
+import { roleName } from "./domain/roles";
 import { errorMessage } from "./lib/errors";
 import SetupPage from "./pages/SetupPage";
 import DraftPage from "./pages/DraftPage";
-import { Search, names } from "./components/Champions";
+import { Search, names, Portrait } from "./components/Champions";
 import { useEffect, useMemo, useState } from "react";
 import {
   type Room,
   type Role,
   type State,
   type Team,
+  type RoleSwapRequest,
 } from "./domain/types";
 import { coverage, unavailable } from "./domain/scoring";
 import { place, record } from "./domain/state";
@@ -25,6 +27,9 @@ import {
   supabase,
   leaveRoom,
   endRoom,
+  readSwaps,
+  requestRoleSwap,
+  respondRoleSwap,
 } from "./lib/rooms";
 export type Picker =
   | { kind: "pick"; team: Team; role: Role }
@@ -38,7 +43,7 @@ export default function App() {
     [sync, setSync] = useState("Not connected"),
     [busy, setBusy] = useState(false),
     [picker, setPicker] = useState<Picker | null>(null),
-    [poolDraft, setPoolDraft] = useState<string[]>([]),
+    [swaps, setSwaps] = useState<RoleSwapRequest[]>([]),
     [mode, setMode] = useState<"replace" | "unassign">("replace"),
     [online, setOnline] = useState<string[]>([]);
   const [invite, setInvite] = useState(() => location.hash.slice(1));
@@ -92,6 +97,39 @@ export default function App() {
         ? "Preparation · Draftroom"
         : "Draft · Draftroom";
   }, [room?.id, room?.state.phase, invite]);
+  useEffect(() => {
+    if (!room) return;
+    let active = true;
+    const refresh = () =>
+      readSwaps(room.id)
+        .then((data) => {
+          if (active) setSwaps(data);
+        })
+        .catch(() => {
+          if (active) setSwaps([]);
+        });
+    void refresh();
+    const timer = setInterval(refresh, 20000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
+  }, [room?.id, room?.version]);
+  async function swapAction(targetOrRequest: string, accept?: boolean) {
+    if (!room) return;
+    await run(async () => {
+      try {
+        setRoom(
+          accept === undefined
+            ? await requestRoleSwap(room, targetOrRequest)
+            : await respondRoleSwap(room, targetOrRequest, accept),
+        );
+      } catch (e) {
+        setRoom(await readRoom(room.id));
+        throw e;
+      }
+    });
+  }
   async function run(fn: () => Promise<void>) {
     setError("");
     setBusy(true);
@@ -200,9 +238,15 @@ export default function App() {
   function choose(id: string) {
     if (!picker) return;
     if (picker.kind === "pool") {
-      setPoolDraft((old) =>
-        old.includes(id) ? old.filter((x) => x !== id) : [...old, id],
-      );
+      const playerId = picker.player;
+      void change((s) => {
+        const p = s.players.find((p) => p.id === playerId)!;
+        if (!p.pool.includes(id)) {
+          p.pool = [...p.pool, id];
+          p.ready = false;
+        }
+        return s;
+      });
       return;
     }
     const p = picker;
@@ -313,6 +357,7 @@ export default function App() {
                   className="primary"
                   disabled={
                     busy ||
+                    swaps.length > 0 ||
                     state!.players.some(
                       (p) => !p.role || !p.pool.length || !p.ready,
                     )
@@ -342,7 +387,7 @@ export default function App() {
               {state!.players.map((p) => (
                 <span key={p.id}>
                   <i className={online.includes(p.id) ? "dot" : "dot off"} />
-                  {p.name} · {p.role ?? "No role"}
+                  {p.name} · {p.role ? roleName(p.role) : "No role"}
                 </span>
               ))}
             </div>
@@ -351,7 +396,6 @@ export default function App() {
             {state!.dataset.fictional
               ? "Fictional demo data"
               : `${state!.dataset.source} · ${state!.dataset.patch} / ${state!.dataset.tier}`}{" "}
-            · Delta 2 score
           </p>
           {state!.phase === "setup" ? (
             <SetupPage
@@ -361,11 +405,11 @@ export default function App() {
               busy={busy}
               online={online}
               readiness={readiness}
+              swaps={swaps}
+              requestSwap={(id) => void swapAction(id)}
+              respondSwap={(id, accept) => void swapAction(id, accept)}
               change={change}
-              editPool={(id, pool) => {
-                setPicker({ kind: "pool", player: id });
-                setPoolDraft(pool);
-              }}
+              editPool={(id) => setPicker({ kind: "pool", player: id })}
               onImport={importFile}
             />
           ) : (
@@ -373,10 +417,7 @@ export default function App() {
               state={state!}
               uid={uid}
               host={host}
-              editPool={(id, pool) => {
-                setPicker({ kind: "pool", player: id });
-                setPoolDraft(pool);
-              }}
+              editPool={(id) => setPicker({ kind: "pool", player: id })}
               busy={busy}
               change={change}
               setPicker={setPicker}
@@ -400,7 +441,7 @@ export default function App() {
       {picker && (
         <div className="modal-backdrop" onClick={() => setPicker(null)}>
           <section
-            className="modal"
+            className={picker.kind === "pool" ? "modal pool-picker" : "modal"}
             role="dialog"
             aria-modal="true"
             aria-label={
@@ -413,7 +454,7 @@ export default function App() {
                 {picker.kind === "pool"
                   ? "Champion pool"
                   : picker.kind === "pick"
-                    ? `${picker.role} · ${picker.team === "ally" ? "Our team" : "Opponents"}`
+                    ? `${roleName(picker.role)} · ${picker.team === "ally" ? "Our team" : "Opponents"}`
                     : "Choose ban"}
               </h2>
               <button aria-label="Close" onClick={() => setPicker(null)}>
@@ -435,32 +476,51 @@ export default function App() {
                   </select>
                 </label>
               )}
-            <Search
-              selected={picker.kind === "pool" ? poolDraft : []}
-              blocked={picker.kind === "pool" ? new Set() : used}
-              onChoose={choose}
-            />
             {picker.kind === "pool" && (
-              <div className="modal-actions">
-                <span>{poolDraft.length} champions selected</span>
-                <button
-                  className="primary"
-                  disabled={!poolDraft.length || busy}
-                  onClick={() => {
-                    const p = picker;
-                    void change((s) => {
-                      const player = s.players.find((x) => x.id === p.player)!;
-                      player.pool = poolDraft;
-                      player.ready = false;
-                      return record(s, `Pool updated · ${player.name}`);
-                    });
-                    setPicker(null);
-                  }}
-                >
-                  Save pool
-                </button>
+              <div className="pool-tiles">
+                {state?.players
+                  .find((p) => p.id === picker.player)
+                  ?.pool.map((id) => (
+                    <div className="pool-tile" key={id}>
+                      <Portrait id={id} />
+                      <button
+                        className="remove-champion"
+                        aria-label={`Remove ${names[id]} from pool`}
+                        disabled={busy}
+                        onClick={() => {
+                          const playerId = picker.player;
+                          void change((s) => {
+                            const p = s.players.find((p) => p.id === playerId)!;
+                            p.pool = p.pool.filter((c) => c !== id);
+                            p.ready = false;
+                            return s;
+                          });
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
               </div>
             )}
+            <Search
+              selected={
+                picker.kind === "pool"
+                  ? (state?.players.find((p) => p.id === picker.player)?.pool ??
+                    [])
+                  : []
+              }
+              blocked={
+                picker.kind === "pool"
+                  ? new Set(
+                      state?.players.find((p) => p.id === picker.player)
+                        ?.pool ?? [],
+                    )
+                  : used
+              }
+              disabled={busy}
+              onChoose={choose}
+            />
           </section>
         </div>
       )}

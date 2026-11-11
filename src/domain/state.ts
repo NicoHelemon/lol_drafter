@@ -1,3 +1,4 @@
+import {roleName} from './roles';
 import {ROLES,type State,type Team} from './types';
 export function validateState(s:State,ids?:Set<string>){
  if(!['setup','live','finished'].includes(s.phase)||!['blue','red'].includes(s.side))throw Error('Invalid state');
@@ -16,5 +17,5 @@ export function place(s:State,team:Team,role:typeof ROLES[number],championId:str
  const next=structuredClone(s), occupied=next.picks[team].find(p=>p.role===role), existing=next.picks[team].find(p=>p.championId===championId);
  if(existing){const old=existing.role;existing.role=role;if(occupied&&occupied!==existing)occupied.role=old;}
  else {if(occupied){if(mode==='unassign')occupied.role=null;else next.picks[team]=next.picks[team].filter(p=>p!==occupied);}next.picks[team].push({championId,role});}
- validateState(next);return record(next,`${team==='ally'?'Allies':'Opponents'} · ${championId} → ${role}`);
+ validateState(next);return record(next,`${team==='ally'?'Allies':'Opponents'} · ${championId} → ${roleName(role)}`);
 }

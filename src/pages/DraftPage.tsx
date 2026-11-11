@@ -1,3 +1,5 @@
+import { roleName } from "../domain/roles";
+import { RoleIcon } from "../components/RoleIcon";
 import { useState } from "react";
 import { ROLES, type State, type Team, type Role } from "../domain/types";
 import { rank } from "../domain/scoring";
@@ -8,7 +10,7 @@ interface Props {
   state: State;
   uid: string;
   host: boolean;
-  editPool: (id: string, pool: string[]) => void;
+  editPool: (id: string) => void;
   busy: boolean;
   change: (fn: (s: State) => State) => Promise<void>;
   setPicker: (p: Picker) => void;
@@ -52,7 +54,10 @@ export default function DraftPage({
           </div>
           {ROLES.map((role) => (
             <div className="board-row" key={role}>
-              <span className="role-label">{role}</span>
+              <span className="role-label">
+                <RoleIcon role={role} />
+                {roleName(role)}
+              </span>
               {(["ally", "enemy"] as Team[]).map((team) => {
                 const pick = state!.picks[team].find((p) => p.role === role);
                 return (
@@ -88,7 +93,9 @@ export default function DraftPage({
                             }
                           >
                             {ROLES.map((r) => (
-                              <option key={r}>{r}</option>
+                              <option key={r} value={r}>
+                                {roleName(r)}
+                              </option>
                             ))}
                             <option value="unknown">Unassigned role</option>
                           </select>
@@ -115,7 +122,7 @@ export default function DraftPage({
                     ) : null}
                     <button
                       className={pick ? "edit-button" : "empty-pick"}
-                      aria-label={`${pick ? "Edit" : "Choose"} ${role} ${team}`}
+                      aria-label={`${pick ? "Edit" : "Choose"} ${roleName(role)} ${team}`}
                       disabled={busy || state!.phase === "finished"}
                       onClick={() => {
                         setMode("replace");
@@ -193,7 +200,9 @@ export default function DraftPage({
                         Assign / swap
                       </option>
                       {ROLES.map((r) => (
-                        <option key={r}>{r}</option>
+                        <option key={r} value={r}>
+                          {roleName(r)}
+                        </option>
                       ))}
                     </select>
                     <button
@@ -229,7 +238,7 @@ export default function DraftPage({
         >
           <div className="section-heading">
             <h2>Recommendations</h2>
-            <span className="muted">DELTA 2 SCORE</span>
+            <span className="muted">SCORE</span>
           </div>
           {ROLES.map((role) => {
             const p = state!.players.find((p) => p.role === role),
@@ -241,14 +250,14 @@ export default function DraftPage({
                 key={role}
               >
                 <div className="ranking-heading">
-                  <b>{role}</b>
+                  <b>{roleName(role)}</b>
                   <span>{p?.name ?? "Available"}</span>
                   {locked && <span className="badge">PICK</span>}
                   {host && p && state.phase === "live" && (
                     <button
                       className="edit-pool"
                       disabled={busy}
-                      onClick={() => editPool(p.id, p.pool)}
+                      onClick={() => editPool(p.id)}
                     >
                       Edit pool
                     </button>
@@ -297,7 +306,7 @@ export default function DraftPage({
                               <div key={j}>
                                 <span>
                                   {c.relation === "vs" ? "Against" : "With"}{" "}
-                                  {names[c.championId]} · {c.role}
+                                  {names[c.championId]} · {roleName(c.role)}
                                 </span>
                                 <b>
                                   {c.delta2 === null
@@ -324,9 +333,7 @@ export default function DraftPage({
               </section>
             );
           })}
-          <p className="muted">
-            Weighted Delta 2 average, in percentage points.
-          </p>
+          <p className="muted"></p>
         </aside>
       </div>
     </section>

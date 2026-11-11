@@ -20,3 +20,14 @@ Tests automatisés déjà disponibles : `npm test` (SQL/Postgres avec cinq ident
 - Le démarrage ouvre `/rooms/:id/draft` sur tous les appareils ; le rechargement garde le bon écran.
 - Quitter pendant la préparation libère le siège et autorise un remplaçant. Quitter comme hôte transfère les droits au prochain participant.
 - Terminer depuis la préparation ou le live fige la salle pour tous. Seul l’hôte dispose de cette action. Chacun peut quitter une salle terminée.
+
+## Pools et échanges de rôles
+
+- Une nouvelle salle commence sans rôle ni champions prédéfinis. Les sélections des salles existantes restent conservées.
+- Choisir un rôle depuis sa case ; ajouter un champion via [+] l’enregistre immédiatement. Retirer le dernier champion reste possible, mais désactive Ready. Un changement de pool annule Ready.
+- Les portraits du pool et le bouton [+] ont la même taille (58 × 58 px). Aucun bouton My role, Pool · x champions ou Save pool.
+- Tous les libellés affichent Bottom et Score. Le moteur et les clés de données ne changent pas.
+- Avec deux navigateurs membres A et B, choisir deux rôles distincts. A clique Swap role dans la case de B : A attend, B reçoit Accept / Decline.
+- Seul B peut accepter. Les rôles sont intervertis atomiquement, les pools restent liés à leur joueur et les deux joueurs redeviennent Not ready.
+- Décliner ou annuler conserve les rôles. Une deuxième demande impliquant l’un des deux joueurs est refusée. La draft ne démarre pas avec une demande en attente.
+- Changer de rôle, quitter ou fermer la salle retire la demande devenue obsolète.
