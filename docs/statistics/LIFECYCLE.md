@@ -159,6 +159,10 @@ Les tests SQL utilisent PGlite ; ils ne prouvent pas un service Realtime héberg
 ni une course entre plusieurs connexions PostgreSQL. Le script pg_cron est
 préparé et relu ; son installation et ses exécutions réelles restent à constater.
 
+La CI GitHub complète du code `7884e55` a également réussi :
+[run 43302864123](https://github.com/NicoHelemon/lol_drafter/actions/runs/43302864123),
+tests Python, applicatifs, build et onze parcours navigateur compris.
+
 ## Frontière de production
 
 Aucune migration appliquée, aucune purge ou promotion distante lancée pendant

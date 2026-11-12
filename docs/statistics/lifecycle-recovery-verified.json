@@ -40,7 +40,8 @@
     "projectRef": "zsmpdkjfjqgtjinzoexv",
     "administrativeAccess": "verified via read-only query",
     "scheduledEnableVariable": "user-declared; variables API returns 403",
-    "generalCiRun": 43302864123
+    "generalCiRun": 43302864123,
+    "generalCiConclusion": "success"
   },
   "productionChanges": {
     "migrationApplied": false,
