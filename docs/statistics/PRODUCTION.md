@@ -5,14 +5,16 @@ L'utilisateur a autorisé la publication dans cette session. La branche
 frontend. La migration 008 et les deux jobs `pg_cron` sont installés dans le
 projet vérifié `zsmpdkjfjqgtjinzoexv`, `NicoHelemon's Project`, `ACTIVE_HEALTHY`.
 
-**Le site et sa maintenance sont en production. Le rafraîchissement quotidien
-GitHub reste bloqué par un jeton Supabase invalide dans les secrets GitHub.**
+**Le site et sa maintenance sont en production. Le jeton GitHub a été remplacé
+par son propriétaire : le nouveau précontrôle en lecture seule est vert.
+Le rafraîchissement exhaustif est lancé et sa promotion reste à constater.**
 
 ## Déploiement et données préservées
 
 - Livraison initiale du cycle de vie : `a7956fd`.
 - Correctif du contrôle Actions et du test navigateur : `d13ebdf`.
 - Visibilité de l’activation quotidienne dans le précontrôle : `1ef400a`.
+- Renouvellement de présence réellement envoyé à Supabase : `2729cb3`.
 - Ces révisions ont été constatées sur `/deployment.json` du site public.
 - Migration 008 appliquée une seule fois, sans rejouer 001–007.
 - Avant application : sauvegarde privée locale des salles, dépendances,
@@ -69,9 +71,23 @@ Une nouvelle salle a pu être créée puis quittée normalement.
 Les tables salle/membres/invitation/échanges ne conservaient aucune dépendance
 de cette salle de test après suppression.
 
-## GitHub Actions : résultat réel et blocage restant
+## Renouvellement de présence corrigé
 
-La CI complète passe : **38 tests Python, 57 tests applicatifs/PostgreSQL,
+Le contrôle prolongé d'une salle témoin a révélé un appel `rpc(heartbeat)`
+construit mais jamais exécuté : les builders PostgREST sont des thenables
+paresseux. `void` seul n'envoie aucune requête. Le correctif `2729cb3` consomme
+explicitement le résultat avec `.then`, vérifie les erreurs et préserve le retour
+à l'accueil lorsqu'une salle disparaît. Deux tests ciblés ont été ajoutés.
+
+Vérification réelle après déploiement : requête `/rpc/heartbeat` observée,
+réponse **204**, et dernière présence âgée d'environ **5,7 secondes après
+25 secondes** d'ouverture de salle. La CI [43309989600](https://github.com/NicoHelemon/lol_drafter/actions/runs/43309989600)
+est verte. Une salle ouverte peut ainsi rester active au-delà du délai
+inactif de deux heures, dans la limite absolue prévue de 24 heures.
+
+## GitHub Actions : incident initial puis jeton corrigé
+
+La CI complète passe : **38 tests Python, 59 tests applicatifs/PostgreSQL,
 11 parcours navigateur, build réussi**, plus actionlint local.
 
 Le lancement de publication
@@ -89,20 +105,22 @@ des accès GitHub/Supabase par ce premier run sont donc corrigées.
 La tentative de mise à jour du secret `SUPABASE_ACCESS_TOKEN` depuis Codex est
 refusée : **HTTP 403, Resource not accessible by integration**, lors de la lecture
 de la clé publique des secrets du dépôt. Aucun secret n'a été modifié.
-Le propriétaire doit remplacer ce secret par un **jeton de gestion Supabase
-valide**, dans les [secrets Actions du dépôt](https://github.com/NicoHelemon/lol_drafter/settings/secrets/actions).
-Ne pas utiliser de clé anon/publishable, ni copier le jeton dans le chat.
+Le propriétaire a ensuite remplacé lui-même le secret par un jeton de gestion
+valide, sans le copier dans le chat. Le [précontrôle 43308157993](https://github.com/NicoHelemon/lol_drafter/actions/runs/43308157993)
+a réellement réussi : requête d'audit exécutée, 865 fragments et 786 704 paires
+lues, 008 et cron confirmés. Le jeton de Codex reste fonctionnel séparément.
 
-Après confirmation de cette correction, lancer d'abord `statistics.yml` sur
-`main` avec `publish=false`, puis avec `publish=true` pour constater une collecte
-et une promotion complètes. Le précontrôle corrigé
+Le rafraîchissement [43308233633](https://github.com/NicoHelemon/lol_drafter/actions/runs/43308233633)
+a été lancé sur `main` avec `publish=true` après ce précontrôle vert.
+Le passage exhaustif avec débit limité est en cours ; aucune promotion n'est
+annoncée avant son résultat et le contrôle du pointeur distant. Le précontrôle corrigé
 [43306087734](https://github.com/NicoHelemon/lol_drafter/actions/runs/43306087734)
 a confirmé **`STATISTICS_REFRESH_ENABLED=true`**, puis échoué explicitement sur
 le HTTP 401 ; son job de publication a été ignoré. Cela vérifie que le correctif
 ne masque plus le refus d'accès. La planification reste à 06:17 UTC, soit
 07:17 en Suisse en novembre.
 
-La maintenance Supabase fonctionne indépendamment de ce blocage GitHub.
+La maintenance Supabase fonctionne indépendamment de la collecte GitHub.
 Voir [lifecycle-production-verified.json](lifecycle-production-verified.json)
 pour les preuves machine de cette mise en production, et
 [production-database-verified.json](production-database-verified.json) pour la

@@ -164,7 +164,9 @@ tests Python, applicatifs, build et onze parcours navigateur compris.
 
 Après accord explicite de l'utilisateur, cette branche a été intégrée à `main`,
 008 appliquée et cron activé. Netlify et les parcours hébergés ont été vérifiés.
-Le premier rafraîchissement réel a établi le blocage du secret GitHub (HTTP 401),
-puis le refus de sa correction par l'intégration (HTTP 403). Le contrôle qui
-masquait cette erreur a été corrigé. Voir [PRODUCTION.md](PRODUCTION.md) pour les
+Le premier rafraîchissement réel a établi le blocage initial du secret GitHub
+(HTTP 401), puis le refus de sa correction par l'intégration (HTTP 403).
+Le propriétaire a depuis remplacé le secret et un précontrôle réel est vert.
+Le contrôle qui masquait cette erreur et le renouvellement de présence
+PostgREST ont été corrigés. Voir [PRODUCTION.md](PRODUCTION.md) pour les
 résultats, les purges effectivement réalisées et le seul blocage restant.
