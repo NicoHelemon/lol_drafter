@@ -1,5 +1,7 @@
 # Passation — Draftroom / lol_drafter
 
+> **Publication effectuée :** les 865 fragments réels sont promus dans Supabase et leurs contenus sont vérifiés ; le code est poussé sur `main`, CI verte. Le contrôle Netlify dans le navigateur et la configuration GitHub du quotidien attendent les domaines réseau manquants. Voir le [statut de production](statistics/PRODUCTION.md).
+
 > **Livrable actuel complet :** 865/865 couples collectés, 433 233 Against + 353 471 Synergy réels, snapshot vérifié et archive locale de 7 Mo. Voir [LIVE_PIPELINE.md](statistics/LIVE_PIPELINE.md) et [le bilan machine](statistics/full-acquisition-summary.json). 30 tests Python, 44 tests applicatifs et neuf parcours navigateur passent. Aucun push ni publication distante.
 
 > **État courant :** le [pipeline réel Against + Synergy](statistics/LIVE_PIPELINE.md) est implémenté et testé sur de vraies réponses, avec 228 cellules Synergy comparées au navigateur. Les anciens blocages techniques et résultats limités aux mocks ci-dessous sont historiques. Aucun seuil Lane/Games/Pick n’est appliqué aux nouveaux exports.

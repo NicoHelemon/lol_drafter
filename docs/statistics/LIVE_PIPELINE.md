@@ -1,5 +1,7 @@
 # Acquisition réelle Against et Synergy
 
+> **Publication effectuée :** les 865 fragments réels sont promus dans Supabase et leurs contenus sont vérifiés ; le code est poussé sur `main`, CI verte. Le contrôle Netlify dans le navigateur et la configuration GitHub du quotidien attendent les domaines réseau manquants. Voir le [statut de production](PRODUCTION.md).
+
 Les deux relations sont maintenant extraites de réponses réelles Lolalytics, normalisées dans le format existant puis construites et vérifiées par le pipeline. Le moteur de scoring, ses poids et l’interface restent inchangés.
 
 **Choix retenu : une page Build publique pour les cinq rôles adverses, une réponse `build-team` du site pour les quatre rôles alliés, par champion/rôle candidat.** Aucun calcul de Delta 2 depuis les winrates, aucune division par 100, aucun repli vers un autre rôle, aucune symétrie ou paire inventée. Les seuils Lane/Games/Pick sont tous à zéro ; les nombres de parties restent dans chaque observation. Le contexte conservé est Emerald+, Solo/Duo, Global, 14 jours.

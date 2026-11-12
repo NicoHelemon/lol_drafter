@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-11-12T19:27:11.277493+00:00",
+  "project": "zsmpdkjfjqgtjinzoexv",
+  "snapshotId": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb",
+  "ready": true,
+  "current": true,
+  "fictional": false,
+  "shards": 865,
+  "pairs": 786704,
+  "contentVerified": true,
+  "semanticFallbackChecks": 0,
+  "coverage": {
+    "vs": 433233,
+    "with": 353471
+  }
+}
