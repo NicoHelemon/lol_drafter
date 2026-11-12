@@ -177,7 +177,11 @@ export function watchRoom(
       if (s === "SUBSCRIBED") void refresh();
     });
   const timer = setInterval(() => {
-    void supabase!.rpc("heartbeat", { room_id: id });
+    // PostgREST builders are lazy thenables: void alone never sends the RPC.
+    void supabase!.rpc("heartbeat", { room_id: id }).then(
+      ({ error }) => { if (error && active) status("Reconnecting…"); },
+      () => { if (active) status("Reconnecting…"); },
+    );
     void refresh();
   }, 20000);
   window.addEventListener("online", refresh);
