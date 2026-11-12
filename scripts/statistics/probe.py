@@ -42,7 +42,7 @@ class InspectHTML(HTMLParser):
             self._row = []
         elif tag in ('td', 'th') and self._row is not None:
             self._cell = ''
-        elif tag == 'script' and (attrs.get('type') == 'application/json' or attrs.get('id') == '__NEXT_DATA__'):
+        elif tag == 'script' and (attrs.get('type') in ('application/json', 'qwik/json') or attrs.get('id') == '__NEXT_DATA__'):
             self._script = {'id': attrs.get('id'), 'text': ''}
 
     def handle_data(self, data):

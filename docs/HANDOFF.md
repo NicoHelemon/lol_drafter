@@ -1,5 +1,13 @@
 # Passation — Draftroom / lol_drafter
 
+> **Livrable actuel complet :** 865/865 couples collectés, 433 233 Against + 353 471 Synergy réels, snapshot vérifié et archive locale de 7 Mo. Voir [LIVE_PIPELINE.md](statistics/LIVE_PIPELINE.md) et [le bilan machine](statistics/full-acquisition-summary.json). 30 tests Python, 44 tests applicatifs et neuf parcours navigateur passent. Aucun push ni publication distante.
+
+> **État courant :** le [pipeline réel Against + Synergy](statistics/LIVE_PIPELINE.md) est implémenté et testé sur de vraies réponses, avec 228 cellules Synergy comparées au navigateur. Les anciens blocages techniques et résultats limités aux mocks ci-dessous sont historiques. Aucun seuil Lane/Games/Pick n’est appliqué aux nouveaux exports.
+
+> **Dernière décision utilisateur :** suppression des seuils indicatifs Lane/Games/Pick pour la collecte. Voir la [comparaison testée des collecteurs](statistics/COLLECTOR_REVIEW.md) : 2 518 lignes Against conservées, Hextech contrôlé sur 278 paires, Synergy testée sur mocks uniquement. Les résultats avec seuils ci-dessous sont historiques.
+
+> **Mise à jour de reprise — 12 novembre 2026 :** voir le [POC public](statistics/PUBLIC_POC.md). Accès réseau rétabli ; 285 lignes Against réelles comparées, inspecteur expérimental testé. Synergy non collectée : avis explicite d’API privée sur `a1.lolalytics.com`. Aucun dataset publié. Les résultats ci-dessous décrivent la session antérieure.
+
 Date : **12 novembre 2026**. État du code relu : **`d38db00ef1784e38d6941fc042732a9fa17b7f42`**, présent sur `main` avant l'ajout de ce document.
 
 ## 1. Lire ceci avant de reprendre

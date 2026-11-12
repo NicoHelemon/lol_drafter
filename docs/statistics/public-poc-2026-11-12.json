@@ -1,0 +1,448 @@
+{
+  "kind": "limited-public-page-experiment",
+  "complete": false,
+  "synergyVerified": 0,
+  "publicationEligible": false,
+  "pages": [
+    {
+      "champion": "renekton",
+      "url": "https://lolalytics.com/lol/renekton/build/?lane=top&patch=14",
+      "sha256": "fdea372a036f92bba116de3ade5e769da0f9509efbff8230fba96bca64923405",
+      "bytes": 662890,
+      "sourceCounts": {
+        "top": 172,
+        "jungle": 144,
+        "middle": 170,
+        "bottom": 166,
+        "support": 170
+      },
+      "countsAtLeast100": {
+        "Top": 101,
+        "Jungle": 73,
+        "Mid": 88,
+        "ADC": 51,
+        "Support": 75
+      },
+      "verifiedRenderedRows": 95,
+      "renderedRowsPerRole": 19,
+      "zeroCount": 3,
+      "unknownChampionIds": [],
+      "samples": [
+        {
+          "relation": "vs",
+          "candidateChampionId": "58",
+          "candidateRole": "Top",
+          "otherChampionId": "799",
+          "otherRole": "Top",
+          "delta2": 2.09,
+          "games": 8509,
+          "otherName": "Ambessa",
+          "displayedCells": [
+            "55.83",
+            "5.09",
+            "2.09",
+            "5.24",
+            "8,509"
+          ],
+          "matchupHref": "/lol/renekton/vs/ambessa/build/?lane=top&vslane=top&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "58",
+          "candidateRole": "Top",
+          "otherChampionId": "266",
+          "otherRole": "Top",
+          "delta2": 0,
+          "games": 6639,
+          "otherName": "Aatrox",
+          "displayedCells": [
+            "51.42",
+            "3.00",
+            "0.00",
+            "4.09",
+            "6,639"
+          ],
+          "matchupHref": "/lol/renekton/vs/aatrox/build/?lane=top&vslane=top&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "58",
+          "candidateRole": "Top",
+          "otherChampionId": "64",
+          "otherRole": "Jungle",
+          "delta2": 0.68,
+          "games": 10674,
+          "otherName": "Lee Sin",
+          "displayedCells": [
+            "53.92",
+            "3.68",
+            "0.68",
+            "6.57",
+            "10,674"
+          ],
+          "matchupHref": "/lol/renekton/vs/leesin/build/?lane=top&vslane=jungle&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "58",
+          "candidateRole": "Top",
+          "otherChampionId": "245",
+          "otherRole": "Jungle",
+          "delta2": 0,
+          "games": 3863,
+          "otherName": "Ekko",
+          "displayedCells": [
+            "50.38",
+            "3.00",
+            "0.00",
+            "2.38",
+            "3,863"
+          ],
+          "matchupHref": "/lol/renekton/vs/ekko/build/?lane=top&vslane=jungle&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "58",
+          "candidateRole": "Top",
+          "otherChampionId": "103",
+          "otherRole": "Mid",
+          "delta2": -0.79,
+          "games": 8663,
+          "otherName": "Ahri",
+          "displayedCells": [
+            "49.06",
+            "2.21",
+            "-0.79",
+            "5.34",
+            "8,663"
+          ],
+          "matchupHref": "/lol/renekton/vs/ahri/build/?lane=top&vslane=middle&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "58",
+          "candidateRole": "Top",
+          "otherChampionId": "145",
+          "otherRole": "ADC",
+          "delta2": 0.02,
+          "games": 19454,
+          "otherName": "Kai'Sa",
+          "displayedCells": [
+            "51.58",
+            "3.02",
+            "0.02",
+            "11.98",
+            "19,454"
+          ],
+          "matchupHref": "/lol/renekton/vs/kaisa/build/?lane=top&vslane=bottom&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "58",
+          "candidateRole": "Top",
+          "otherChampionId": "412",
+          "otherRole": "Support",
+          "delta2": 0.09,
+          "games": 11620,
+          "otherName": "Thresh",
+          "displayedCells": [
+            "50.07",
+            "3.09",
+            "0.09",
+            "7.16",
+            "11,620"
+          ],
+          "matchupHref": "/lol/renekton/vs/thresh/build/?lane=top&vslane=support&patch=14"
+        }
+      ],
+      "requests": {
+        "documents": 1,
+        "totalAttempted": 541,
+        "fetchOrXHRBlockedBeforeNetwork": [
+          "https://a1.lolalytics.com/mega/?ep=build-team&v=1&patch=14&c=renekton&lane=top&tier=emerald_plus&queue=ranked&region=all"
+        ],
+        "note": "Attempted browser resources, including locally aborted images/API; not successful source requests. Shared browser module cache affects counts."
+      },
+      "fixtureNote": "Pruned public Qwik excerpt; references remapped, retained scalar values unchanged. Not a complete page."
+    },
+    {
+      "champion": "ahri",
+      "url": "https://lolalytics.com/lol/ahri/build/?lane=middle&patch=14",
+      "sha256": "6bf3d929c715b23286380e7a594c6844036a904c6e7fa12060bd82e7d8971d2a",
+      "bytes": 631511,
+      "sourceCounts": {
+        "top": 172,
+        "jungle": 160,
+        "middle": 170,
+        "bottom": 169,
+        "support": 172
+      },
+      "countsAtLeast100": {
+        "Top": 122,
+        "Jungle": 78,
+        "Mid": 106,
+        "ADC": 59,
+        "Support": 84
+      },
+      "verifiedRenderedRows": 95,
+      "renderedRowsPerRole": 19,
+      "zeroCount": 1,
+      "unknownChampionIds": [],
+      "samples": [
+        {
+          "relation": "vs",
+          "candidateChampionId": "103",
+          "candidateRole": "Mid",
+          "otherChampionId": "777",
+          "otherRole": "Top",
+          "delta2": 1.23,
+          "games": 10874,
+          "otherName": "Yone",
+          "displayedCells": [
+            "55.21",
+            "6.09",
+            "1.23",
+            "3.76",
+            "10,874"
+          ],
+          "matchupHref": "/lol/ahri/vs/yone/build/?lane=middle&vslane=top&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "103",
+          "candidateRole": "Mid",
+          "otherChampionId": "64",
+          "otherRole": "Jungle",
+          "delta2": -0.31,
+          "games": 17102,
+          "otherName": "Lee Sin",
+          "displayedCells": [
+            "54.79",
+            "4.55",
+            "-0.31",
+            "5.91",
+            "17,102"
+          ],
+          "matchupHref": "/lol/ahri/vs/leesin/build/?lane=middle&vslane=jungle&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "103",
+          "candidateRole": "Mid",
+          "otherChampionId": "134",
+          "otherRole": "Mid",
+          "delta2": -0.78,
+          "games": 16483,
+          "otherName": "Syndra",
+          "displayedCells": [
+            "52.93",
+            "4.08",
+            "-0.78",
+            "5.70",
+            "16,483"
+          ],
+          "matchupHref": "/lol/ahri/vs/syndra/build/?lane=middle&vslane=middle&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "103",
+          "candidateRole": "Mid",
+          "otherChampionId": "145",
+          "otherRole": "ADC",
+          "delta2": 0.13,
+          "games": 33445,
+          "otherName": "Kai'Sa",
+          "displayedCells": [
+            "53.55",
+            "4.99",
+            "0.13",
+            "11.56",
+            "33,445"
+          ],
+          "matchupHref": "/lol/ahri/vs/kaisa/build/?lane=middle&vslane=bottom&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "103",
+          "candidateRole": "Mid",
+          "otherChampionId": "412",
+          "otherRole": "Support",
+          "delta2": -0.15,
+          "games": 20656,
+          "otherName": "Thresh",
+          "displayedCells": [
+            "51.69",
+            "4.71",
+            "-0.15",
+            "7.14",
+            "20,656"
+          ],
+          "matchupHref": "/lol/ahri/vs/thresh/build/?lane=middle&vslane=support&patch=14"
+        }
+      ],
+      "requests": {
+        "documents": 1,
+        "totalAttempted": 501,
+        "fetchOrXHRBlockedBeforeNetwork": [
+          "https://a1.lolalytics.com/mega/?ep=build-team&v=1&patch=14&c=ahri&lane=middle&tier=emerald_plus&queue=ranked&region=all"
+        ],
+        "note": "Attempted browser resources, including locally aborted images/API; not successful source requests. Shared browser module cache affects counts."
+      },
+      "fixtureNote": "Pruned public Qwik excerpt; references remapped, retained scalar values unchanged. Not a complete page."
+    },
+    {
+      "champion": "jhin",
+      "url": "https://lolalytics.com/lol/jhin/build/?lane=bottom&patch=14",
+      "sha256": "7aac5a960903c6d24a5154486bfccab8e5b2ff839cd8b68438775a12253e8bdc",
+      "bytes": 640132,
+      "sourceCounts": {
+        "top": 172,
+        "jungle": 166,
+        "middle": 172,
+        "bottom": 172,
+        "support": 171
+      },
+      "countsAtLeast100": {
+        "Top": 136,
+        "Jungle": 86,
+        "Mid": 122,
+        "ADC": 71,
+        "Support": 110
+      },
+      "verifiedRenderedRows": 95,
+      "renderedRowsPerRole": 19,
+      "zeroCount": 2,
+      "unknownChampionIds": [],
+      "samples": [
+        {
+          "relation": "vs",
+          "candidateChampionId": "202",
+          "candidateRole": "ADC",
+          "otherChampionId": "777",
+          "otherRole": "Top",
+          "delta2": -0.21,
+          "games": 19315,
+          "otherName": "Yone",
+          "displayedCells": [
+            "52.34",
+            "3.22",
+            "-0.21",
+            "3.80",
+            "19,315"
+          ],
+          "matchupHref": "/lol/jhin/vs/yone/build/?lane=bottom&vslane=top&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "202",
+          "candidateRole": "ADC",
+          "otherChampionId": "64",
+          "otherRole": "Jungle",
+          "delta2": -0.3,
+          "games": 36476,
+          "otherName": "Lee Sin",
+          "displayedCells": [
+            "53.37",
+            "3.13",
+            "-0.30",
+            "7.18",
+            "36,476"
+          ],
+          "matchupHref": "/lol/jhin/vs/leesin/build/?lane=bottom&vslane=jungle&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "202",
+          "candidateRole": "ADC",
+          "otherChampionId": "103",
+          "otherRole": "Mid",
+          "delta2": -0.47,
+          "games": 27211,
+          "otherName": "Ahri",
+          "displayedCells": [
+            "49.81",
+            "2.96",
+            "-0.47",
+            "5.36",
+            "27,211"
+          ],
+          "matchupHref": "/lol/jhin/vs/ahri/build/?lane=bottom&vslane=middle&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "202",
+          "candidateRole": "ADC",
+          "otherChampionId": "145",
+          "otherRole": "ADC",
+          "delta2": -2.07,
+          "games": 74649,
+          "otherName": "Kai'Sa",
+          "displayedCells": [
+            "49.92",
+            "1.36",
+            "-2.07",
+            "14.69",
+            "74,649"
+          ],
+          "matchupHref": "/lol/jhin/vs/kaisa/build/?lane=bottom&vslane=bottom&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "202",
+          "candidateRole": "ADC",
+          "otherChampionId": "29",
+          "otherRole": "ADC",
+          "delta2": 0,
+          "games": 12737,
+          "otherName": "Twitch",
+          "displayedCells": [
+            "50.18",
+            "3.43",
+            "0.00",
+            "2.51",
+            "12,737"
+          ],
+          "matchupHref": "/lol/jhin/vs/twitch/build/?lane=bottom&vslane=bottom&patch=14"
+        },
+        {
+          "relation": "vs",
+          "candidateChampionId": "202",
+          "candidateRole": "ADC",
+          "otherChampionId": "412",
+          "otherRole": "Support",
+          "delta2": -0.25,
+          "games": 36377,
+          "otherName": "Thresh",
+          "displayedCells": [
+            "50.16",
+            "3.18",
+            "-0.25",
+            "7.16",
+            "36,377"
+          ],
+          "matchupHref": "/lol/jhin/vs/thresh/build/?lane=bottom&vslane=support&patch=14"
+        }
+      ],
+      "requests": {
+        "documents": 1,
+        "totalAttempted": 505,
+        "fetchOrXHRBlockedBeforeNetwork": [
+          "https://a1.lolalytics.com/mega/?ep=build-team&v=1&patch=14&c=jhin&lane=bottom&tier=emerald_plus&queue=ranked&region=all"
+        ],
+        "note": "Attempted browser resources, including locally aborted images/API; not successful source requests. Shared browser module cache affects counts."
+      },
+      "fixtureNote": "Pruned public Qwik excerpt; references remapped, retained scalar values unchanged. Not a complete page."
+    }
+  ],
+  "access": {
+    "publicRobotsStatus": 200,
+    "a1RobotsStatus": 200,
+    "a1RootStatus": 200,
+    "a1RootSha256": "bbafaddebbc5d8c509941b3d83f8f12a384121f4ad7a9cfb82336b5dbc1908bb",
+    "a1Notice": "evidence/a1-access-notice.txt",
+    "privateEndpointsCalled": 0,
+    "initialSynergyAttemptBeforeDomainAllowed": "Browser CONNECT refused by environment proxy",
+    "subsequentCaptures": "All non-lolalytics.com requests aborted locally before network, including build-team; API data never downloaded."
+  },
+  "observedOn": "2026-11-12"
+}

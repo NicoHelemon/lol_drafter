@@ -61,7 +61,7 @@ class PipelineTests(unittest.TestCase):
             data['context'] = dict(CONTEXT)
             if mutation == 'context': data['context']['windowDays'] = 30
             if mutation == 'delta': data['pairs'][0].pop('delta2'); data['pairs'][0]['winrate'] = 52.3
-            if mutation == 'games': data['pairs'][0]['games'] = 99
+            if mutation == 'games': data['pairs'][0]['games'] = -1
             if mutation == 'identity': data['pairs'][0]['candidateChampionId'] = 'missing'
             if mutation == 'role': data['pairs'][0]['otherRole'] = 'Unassigned'
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):

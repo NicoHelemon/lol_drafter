@@ -12,9 +12,12 @@ from collections import Counter
 
 ROOT = Path(__file__).resolve().parents[2]
 ROLES = ('Top', 'Jungle', 'Mid', 'ADC', 'Support')
-CONTEXT = dict(tier='emerald_plus', region='global', queue='ranked_solo_duo',
+LEGACY_CONTEXT = dict(tier='emerald_plus', region='global', queue='ranked_solo_duo',
                windowDays=14, minLanePercent=2, minGames=100, minPickPercent=0,
                metric='delta2', unit='percentage_points')
+
+# New exports collect every supplied pair. Old immutable snapshots retain their declared context.
+CONTEXT = {**LEGACY_CONTEXT, 'minLanePercent': 0, 'minGames': 0}
 
 
 def encoded(value):
@@ -28,7 +31,7 @@ def digest(value):
 
 def validate(document):
     """Require declared filters and observed deltas, never derive them from winrates."""
-    if document.get('context') != CONTEXT:
+    if document.get('context') not in (CONTEXT, LEGACY_CONTEXT):
         raise ValueError('Context must exactly match the fixed acquisition filters')
     for key in ('id', 'patch', 'tier', 'source', 'importedAt'):
         if not isinstance(document.get(key), str) or not document[key].strip():
@@ -60,8 +63,8 @@ def validate(document):
         if delta is not None and (type(delta) not in (float, int) or
                                   not math.isfinite(delta) or abs(delta) > 100):
             raise ValueError('delta2 must be null or a finite observed number in points')
-        if type(row.get('games')) is not int or row['games'] < CONTEXT['minGames']:
-            raise ValueError('Each exported observation needs games >= 100')
+        if type(row.get('games')) is not int or row['games'] < document['context']['minGames']:
+            raise ValueError('Invalid games or below the snapshot declared minimum')
         normalized = dict(zip(('relation', 'candidateChampionId', 'candidateRole',
                                'otherChampionId', 'otherRole'), key), delta2=delta, games=row['games'])
         groups.setdefault(f'{candidate}:{role}', []).append(normalized)

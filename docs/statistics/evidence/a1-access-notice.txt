@@ -1,0 +1,7 @@
+This is a private API for the sole use of visitors to the website lolalytics.com.
+
+All data inside this API is Copyright LoLalytics Limited and may not be used by third parties.
+
+The reason for this restriction is to ensure the best possible experience for users of lolaytics.com.
+
+In light of that we do hope in the future to release a public API with a managable portion of our data. Until that time please respect this copyright notice.

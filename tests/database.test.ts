@@ -5,7 +5,7 @@ import {beforeAll,afterAll,it,expect} from 'vitest';
 import {initialState} from '../src/data/provider';
 import {place} from '../src/domain/state';
 import type {Room,State} from '../src/domain/types';
-import {StatisticsCache,persistedState} from '../src/data/shared';
+import {StatisticsCache,persistedState,snapshotMetadata} from '../src/data/shared';
 const ids=Array.from({length:6},(_,i)=>`00000000-0000-4000-8000-00000000000${i+1}`),token='a'.repeat(72);
 let db:PGlite;
 async function as<T>(uid:string,sql:string,args:unknown[]=[]):Promise<T>{await db.exec(`set role authenticated; set request.jwt.claim.sub='${uid}';`);try{return (await db.query<T>(sql,args)).rows[0];}finally{await db.exec('reset role');}}
@@ -105,4 +105,37 @@ with tempfile.TemporaryDirectory() as folder:
  for(const sql of plan.queries)await db.exec(sql);
  expect((await db.query<{snapshot_id:string}>('select snapshot_id from public.statistics_current')).rows[0].snapshot_id).toBe(plan.result.snapshotId);
  expect((await db.query<{n:number}>('select count(*)::int n from public.statistics_shards where snapshot_id=$1',[plan.result.snapshotId])).rows[0].n).toBe(3);
+});
+
+it('publishes real source pairs locally and new rooms hydrate them while older rooms keep their snapshot',async()=>{
+ const oldRoom=await create('Before real source'),oldSnapshot=oldRoom.state.dataset.snapshotId;
+ const plan=JSON.parse(execFileSync('python3',['-c',`
+import sys,tempfile,pathlib,json
+sys.path.insert(0,'scripts/statistics')
+from pipeline import build
+from publish import publish
+data=json.load(open('tests/fixtures/lolalytics-real-pairs.json'))
+assert data['fictional'] is False
+queries=[]
+def execute(sql): queries.append(sql);return []
+with tempfile.TemporaryDirectory() as folder:
+ m=build(data,folder)
+ result=publish(pathlib.Path(folder)/m['metadata']['snapshotId'],execute)
+ print(json.dumps(dict(queries=queries,result=result)))
+`],{encoding:'utf8'})) as {queries:string[];result:{snapshotId:string}};
+ for(const sql of plan.queries)await db.exec(sql);
+ // Match createRoom(): resolve current metadata as an authenticated client before the RPC.
+ const current=await as<{metadata:unknown}>(ids[0],'select s.metadata from public.statistics_current c join public.statistics_snapshots s on s.id=c.snapshot_id');
+ const state=initialState(ids[0],'Real source');state.dataset=snapshotMetadata(current.metadata);
+ let r=(await as<{r:Room}>(ids[0],'select public.create_room($1::jsonb,$2) as r',[JSON.stringify(state),token])).r;
+ expect(r.state.dataset.snapshotId).toBe(plan.result.snapshotId);
+ expect(r.state.dataset.fictional).toBe(false);
+ expect(r.state.dataset.pairs).toEqual([]);
+ const previous=await as<{dataset:State['dataset']}>(ids[0],"select state->'dataset' dataset from public.rooms where id=$1",[oldRoom.id]);
+ expect(previous.dataset.snapshotId).toBe(oldSnapshot);
+ r.state.players[0].role='Top';r.state.players[0].pool=['58'];r=await save(r,r.state);
+ const cache=new StatisticsCache(async(snapshot,keys)=>(await db.query<{candidate_key:string;pairs:State['dataset']['pairs']}>('select candidate_key,pairs from public.statistics_shards where snapshot_id=$1 and candidate_key=any($2::text[])',[snapshot,keys])).rows);
+ const hydrated=await cache.hydrate(r);
+ expect(hydrated.state.dataset.pairs.map(p=>p.delta2).sort((a,b)=>a!-b!)).toEqual([-0.1,2.09]);
+ expect(persistedState(hydrated.state).dataset.pairs).toEqual([]);
 });

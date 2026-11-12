@@ -1,0 +1,42 @@
+{
+  "kind": "full-live-acquisition",
+  "fictional": false,
+  "startedAt": "2026-11-12T18:46:48.488710+00:00",
+  "finishedAt": "2026-11-12T19:03:21.023923+00:00",
+  "championCount": 173,
+  "requestedCandidateRoles": 865,
+  "completedCandidateRoles": 865,
+  "snapshotId": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb",
+  "pairCount": 786704,
+  "coverage": {
+    "vs": 433233,
+    "with": 353471
+  },
+  "observations": {
+    "known": 786704,
+    "null": 0,
+    "zero": 464
+  },
+  "retainedBelow100": 610253,
+  "shardCount": 865,
+  "maxPairsPerShard": 1537,
+  "sourceResponseCount": 1730,
+  "uniqueSourceUrls": 1730,
+  "rawShardBytes": 108687811,
+  "gzipShardBytes": 6799398,
+  "sourceCapturedFrom": "2026-11-12T18:46:48.331853+00:00",
+  "sourceCapturedTo": "2026-11-12T19:03:21.007815+00:00",
+  "context": {
+    "metric": "delta2",
+    "minGames": 0,
+    "minLanePercent": 0,
+    "minPickPercent": 0,
+    "queue": "ranked_solo_duo",
+    "region": "global",
+    "tier": "emerald_plus",
+    "unit": "percentage_points",
+    "windowDays": 14
+  },
+  "remotePublished": false,
+  "note": "All 865 candidate-role configurations requested; only observed source pairs retained. No artificial matrix completion."
+}

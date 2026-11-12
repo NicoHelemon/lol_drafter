@@ -70,13 +70,20 @@ Le script valide les IDs, noms de fichiers et images PNG carrées avant de rempl
 
 Le score conserve la moyenne pondérée des deltas normalisés définie dans `src/domain/scoring.ts`, avec les coefficients centralisés dans `weights.ts`. Top et Support suivent les coefficients choisis ; Jungle, Mid et Bottom utilisent provisoirement `2/9` par paire. Il ne s’agit pas d’une probabilité de victoire. Les paires manquantes restent manquantes, sans faux zéro ; aucune paire connue donne N/A. Aucun winrate global, prior ou heuristique de composition n’est ajouté.
 
-Les **statistiques de démonstration restent fictives**. Le nouveau catalogue de portraits n’ajoute aucune vraie statistique. Aucun scraping ni appel à l’API privée Lolalytics n’est intégré.
+Les **statistiques de démonstration restent fictives**. Le catalogue de portraits n’ajoute aucune statistique. La collecte réelle tourne dans les scripts backend ; le navigateur et le moteur de scoring ne contactent jamais Lolalytics.
 
 L’hôte peut importer des données autorisées JSON ou CSV en préparation : [exemple JSON](public/examples/dataset.json), [exemple CSV](public/examples/pairs.csv). Métadonnées requises : `id`, `patch`, `tier`, `source`, `importedAt` (ISO), `fictional` (booléen). Chaque paire contient `relation`, `candidateChampionId`, `candidateRole`, `otherChampionId`, `otherRole`, `delta2` et éventuellement `games`. Les IDs Riot sont des chaînes ; les clés de rôles dans les données sont `Top`, `Jungle`, `Mid`, `ADC`, `Support` (ADC est affiché Bottom).
 
 Les statistiques sont stockées dans un cache partagé, découpé par champion/rôle. Chaque salle conserve uniquement une référence figée à son instantané ; le navigateur charge les fragments de ses pools et des picks affichés, puis calcule les scores en mémoire. Un nouveau candidat ou rôle peut charger un fragment supplémentaire du cache, sans appeler la source statistique. Les imports de l’interface sont limités à 12 Mo et 100 000 paires, avec validation des doublons, IDs, rôles et nombres.
 
-Un pipeline Python séparé valide les exports autorisés, produit des fichiers gzip versionnés et les publie dans le cache Supabase. Le workflow quotidien reste désactivé tant qu’une source réelle n’est pas vérifiée et configurée. **L’extraction des vrais Delta 2 Lolalytics reste à démontrer** : le proxy de l’environnement bloque actuellement l’accès au domaine. Essais, mesures, commandes et étapes restantes : [rapport d’acquisition](docs/statistics/REPORT.md).
+Le collecteur Python extrait désormais les vrais **Delta 2 Against et Synergy**, avec les deux rôles et le nombre de parties, sans seuil de volume/popularité. Il utilise les données Qwik des pages Build et le chargement Synergy de l’interface Lolalytics. L’accès est non officiel ; les conditions restrictives de la source restent documentées. La démo synthétique reste le repli tant qu’un snapshot réel n’a pas été publié sur le cache distant.
+
+```sh
+python3 scripts/statistics/collect_lolalytics.py --all --output statistics-cache/run-2026-11-12
+python3 -m unittest discover -s tests/statistics -v
+```
+
+Le pipeline produit des fragments gzip vérifiés, puis le publisher existant permet leur promotion atomique dans Supabase. La collecte est réutilisable et reprend après interruption ; aucune requête Lolalytics n’est déclenchée par un pick ou une salle. Le workflow quotidien supporte `STATISTICS_SOURCE=lolalytics` ; son activation distante reste conditionnée à `STATISTICS_REFRESH_ENABLED=true`. Commandes, preuves et volumes réels : [pipeline réel](docs/statistics/LIVE_PIPELINE.md).
 
 ## Structure
 

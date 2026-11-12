@@ -1,5 +1,11 @@
 # Acquisition des Delta 2 : résultat des essais du 12 novembre 2026
 
+> **État courant :** le [pipeline réel Against + Synergy](LIVE_PIPELINE.md) est implémenté et testé sur de vraies réponses, avec 228 cellules Synergy comparées au navigateur. Les anciens blocages techniques et résultats limités aux mocks ci-dessous sont historiques. Aucun seuil Lane/Games/Pick n’est appliqué aux nouveaux exports.
+
+> **Dernière décision utilisateur :** suppression des seuils indicatifs Lane/Games/Pick pour la collecte. Voir la [comparaison testée des collecteurs](COLLECTOR_REVIEW.md) : 2 518 lignes Against conservées, Hextech contrôlé sur 278 paires, Synergy testée sur mocks uniquement. Les résultats avec seuils ci-dessous sont historiques.
+
+> **Mise à jour de reprise — 12 novembre 2026 :** voir le [POC public](PUBLIC_POC.md). Accès réseau rétabli ; 285 lignes Against réelles comparées, inspecteur expérimental testé. Synergy non collectée : avis explicite d’API privée sur `a1.lolalytics.com`. Aucun dataset publié. Les résultats ci-dessous décrivent la session antérieure.
+
 **Le cache et son intégration sont opérationnels et testés. L’extraction réelle de Lolalytics n’est pas démontrée : l’environnement refuse la connexion au domaine avant de contacter le site. Zéro Delta 2 réel a été récupéré ou comparé à l’affichage.** Les statistiques du site restent fictives tant qu’aucune source réelle vérifiée n’est publiée.
 
 Ce document distingue les observations effectuées, le code livré et les hypothèses restant à tester. Il peut être transmis à un autre intervenant sans l’historique du chat.

@@ -1,0 +1,74 @@
+{
+  "team_h": [
+    "id",
+    "wr",
+    "d1",
+    "d2",
+    "pr",
+    "n"
+  ],
+  "team": {
+    "top": [
+      [
+        777,
+        51.29,
+        -0.02,
+        0.37,
+        3.77,
+        19698
+      ]
+    ],
+    "jungle": [
+      [
+        64,
+        49.42,
+        -1.35,
+        -0.41,
+        6.65,
+        34804
+      ]
+    ],
+    "middle": [
+      [
+        103,
+        52.82,
+        0.4,
+        -0.32,
+        5.46,
+        28570
+      ],
+      [
+        48,
+        52.17,
+        0.23,
+        0,
+        0.01,
+        46
+      ]
+    ],
+    "support": [
+      [
+        412,
+        51.32,
+        -1.05,
+        -1.71,
+        5.9,
+        30841
+      ],
+      [
+        17,
+        50.69,
+        -0.5,
+        0,
+        0.26,
+        1377
+      ]
+    ]
+  },
+  "cache": "cached",
+  "response": {
+    "valid": true,
+    "duration": "1"
+  },
+  "fixtureNote": "Pruned real build-team response received by the browser on 2026-11-12; scalar values unchanged; not a full matrix."
+}

@@ -1,0 +1,220 @@
+{
+  "revisions": {
+    "rabadon": "848eb8a7274d488a5f54b68e282d255b7cbd9397",
+    "hextech": "fed9bc6af990bc27cd40b81f406125bca2a42a8f"
+  },
+  "networkConnections": 0,
+  "rabadon": {
+    "kind": "synthetic-only",
+    "networkConnections": 0,
+    "requestsSimulated": [
+      {
+        "ep": "build-team",
+        "v": "1",
+        "patch": "14",
+        "lane": "top",
+        "tier": "emerald_plus",
+        "queue": "ranked",
+        "region": "all",
+        "c": "renekton"
+      },
+      {
+        "ep": "counter",
+        "v": "1",
+        "patch": "14",
+        "lane": "top",
+        "tier": "emerald_plus",
+        "queue": "ranked",
+        "region": "all",
+        "c": "renekton",
+        "vslane": "top"
+      },
+      {
+        "ep": "counter",
+        "v": "1",
+        "patch": "14",
+        "lane": "top",
+        "tier": "emerald_plus",
+        "queue": "ranked",
+        "region": "all",
+        "c": "renekton",
+        "vslane": "jungle"
+      },
+      {
+        "ep": "counter",
+        "v": "1",
+        "patch": "14",
+        "lane": "top",
+        "tier": "emerald_plus",
+        "queue": "ranked",
+        "region": "all",
+        "c": "renekton",
+        "vslane": "middle"
+      },
+      {
+        "ep": "counter",
+        "v": "1",
+        "patch": "14",
+        "lane": "top",
+        "tier": "emerald_plus",
+        "queue": "ranked",
+        "region": "all",
+        "c": "renekton",
+        "vslane": "bottom"
+      },
+      {
+        "ep": "counter",
+        "v": "1",
+        "patch": "14",
+        "lane": "top",
+        "tier": "emerald_plus",
+        "queue": "ranked",
+        "region": "all",
+        "c": "renekton",
+        "vslane": "support"
+      }
+    ],
+    "exactEnemyFraction": 0.025,
+    "exactSynergyFraction": 0.0125,
+    "missingSupportIncorrectlyFallsBackToMid": true,
+    "localNormalizerKeepsPointsAndExactRoles": true
+  },
+  "hextech": [
+    {
+      "champion": "renekton",
+      "counterRows": 101,
+      "buildRowsAllRoles": 822,
+      "buildRowsSameRole": 172,
+      "counterBuildExactMatches": 101,
+      "differences": [],
+      "sourceOnlyBelow100": 434
+    },
+    {
+      "champion": "ahri",
+      "counterRows": 106,
+      "buildRowsAllRoles": 843,
+      "buildRowsSameRole": 170,
+      "counterBuildExactMatches": 106,
+      "differences": [],
+      "sourceOnlyBelow100": 394
+    },
+    {
+      "champion": "jhin",
+      "counterRows": 71,
+      "buildRowsAllRoles": 853,
+      "buildRowsSameRole": 172,
+      "counterBuildExactMatches": 71,
+      "differences": [],
+      "sourceOnlyBelow100": 328
+    }
+  ],
+  "unfilteredBuild": [
+    {
+      "sourceUrl": "https://lolalytics.com/lol/renekton/build/?lane=top&patch=14",
+      "sourceSha256": "a9fff20cf0e5de8e943f58849d816b6aeead47b065af99ec21844dbb5c87f8e2",
+      "counts": {
+        "Top": 172,
+        "Jungle": 144,
+        "Mid": 170,
+        "ADC": 166,
+        "Support": 170
+      },
+      "zeroCount": 3,
+      "nullCount": 0,
+      "minGamesObserved": 1,
+      "retainedBelow100": 434
+    },
+    {
+      "sourceUrl": "https://lolalytics.com/lol/ahri/build/?lane=middle&patch=14",
+      "sourceSha256": "4d42c7cfc4135e75c8f55a7a4c779f8fc7e9540243837d50559417cc23468193",
+      "counts": {
+        "Top": 172,
+        "Jungle": 160,
+        "Mid": 170,
+        "ADC": 169,
+        "Support": 172
+      },
+      "zeroCount": 1,
+      "nullCount": 0,
+      "minGamesObserved": 1,
+      "retainedBelow100": 394
+    },
+    {
+      "sourceUrl": "https://lolalytics.com/lol/jhin/build/?lane=bottom&patch=14",
+      "sourceSha256": "f60742b48143631a7b8b0d3b2b987d97b13e10ddb0e55c09acfb82ce3d4e3c5b",
+      "counts": {
+        "Top": 172,
+        "Jungle": 166,
+        "Mid": 172,
+        "ADC": 172,
+        "Support": 171
+      },
+      "zeroCount": 2,
+      "nullCount": 0,
+      "minGamesObserved": 1,
+      "retainedBelow100": 328
+    }
+  ],
+  "upstreamTests": {
+    "rabadon": 25,
+    "hextech": 16,
+    "networkEnabled": false
+  },
+  "accessBoundary": "No live private API request; API-shaped transports and Synergy values are synthetic only.",
+  "publicCaptures": {
+    "startedAt": "2026-11-12T18:30:27.256562+00:00",
+    "verifiedObservations": 0,
+    "verifiedObservationsNote": "Generic probe deliberately does not verify numeric observations; this comparison independently checks 278 rows.",
+    "requests": [
+      {
+        "url": "https://lolalytics.com/robots.txt",
+        "status": 200,
+        "bytes": 2716,
+        "sha256": "7c8de98cd9663974d3cf74a15812355c0e757a1c5a5a909d6a584116e6873d06",
+        "seconds": 0.414
+      },
+      {
+        "url": "https://lolalytics.com/lol/renekton/build/?lane=top&patch=14",
+        "status": 200,
+        "bytes": 662845,
+        "sha256": "a9fff20cf0e5de8e943f58849d816b6aeead47b065af99ec21844dbb5c87f8e2",
+        "seconds": 0.493
+      },
+      {
+        "url": "https://lolalytics.com/lol/renekton/counters/?lane=top&vslane=top&patch=14",
+        "status": 200,
+        "bytes": 1361596,
+        "sha256": "8c29ef37c0271f20ac19d00fe39468766a2c321796e4fdf0216d983ecee2689d",
+        "seconds": 0.599
+      },
+      {
+        "url": "https://lolalytics.com/lol/ahri/build/?lane=middle&patch=14",
+        "status": 200,
+        "bytes": 631545,
+        "sha256": "4d42c7cfc4135e75c8f55a7a4c779f8fc7e9540243837d50559417cc23468193",
+        "seconds": 0.421
+      },
+      {
+        "url": "https://lolalytics.com/lol/ahri/counters/?lane=middle&vslane=middle&patch=14",
+        "status": 200,
+        "bytes": 1404905,
+        "sha256": "faf312dcf3ad2d85a581e8c3f4a39c2ed0f00d3717fc565f223c550f1ecb7dbe",
+        "seconds": 0.666
+      },
+      {
+        "url": "https://lolalytics.com/lol/jhin/build/?lane=bottom&patch=14",
+        "status": 200,
+        "bytes": 640143,
+        "sha256": "f60742b48143631a7b8b0d3b2b987d97b13e10ddb0e55c09acfb82ce3d4e3c5b",
+        "seconds": 0.421
+      },
+      {
+        "url": "https://lolalytics.com/lol/jhin/counters/?lane=bottom&vslane=bottom&patch=14",
+        "status": 200,
+        "bytes": 1082002,
+        "sha256": "f9e98a3555854eb2d614db381c9f1dedd2253e1c6d35a18e41f59f98b3895a84",
+        "seconds": 0.539
+      }
+    ]
+  }
+}

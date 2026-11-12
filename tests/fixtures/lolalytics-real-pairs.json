@@ -1,0 +1,39 @@
+{
+  "context": {
+    "metric": "delta2",
+    "minGames": 0,
+    "minLanePercent": 0,
+    "minPickPercent": 0,
+    "queue": "ranked_solo_duo",
+    "region": "global",
+    "tier": "emerald_plus",
+    "unit": "percentage_points",
+    "windowDays": 14
+  },
+  "fictional": false,
+  "id": "lolalytics-live-two-pair-fixture",
+  "importedAt": "2026-11-12T18:46:43.131107+00:00",
+  "pairs": [
+    {
+      "candidateChampionId": "58",
+      "candidateRole": "Top",
+      "delta2": 2.09,
+      "games": 8509,
+      "otherChampionId": "799",
+      "otherRole": "Top",
+      "relation": "vs"
+    },
+    {
+      "candidateChampionId": "58",
+      "candidateRole": "Top",
+      "delta2": -0.1,
+      "games": 10562,
+      "otherChampionId": "64",
+      "otherRole": "Jungle",
+      "relation": "with"
+    }
+  ],
+  "patch": "14d",
+  "source": "Lolalytics unofficial: public Build HTML + website build-team JSON",
+  "tier": "Emerald+"
+}
