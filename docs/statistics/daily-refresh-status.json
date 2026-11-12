@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-11-12T21:38:13.048433+00:00",
+  "credentialPreflight": {
+    "run": 43308157993,
+    "conclusion": "success"
+  },
+  "firstFullRun": {
+    "run": 43308233633,
+    "conclusion": "failure",
+    "completedTargets": 520,
+    "totalTargets": 865,
+    "cause": "IncompleteRead",
+    "currentSnapshotPreserved": true
+  },
+  "retryFix": {
+    "commit": "fd172a783b7fb607057926482f112243241419d2",
+    "ciRun": 43311590931,
+    "ciConclusion": "success",
+    "pythonTests": 39,
+    "applicationPostgresTests": 59,
+    "browserTests": 11
+  },
+  "currentFullRun": {
+    "run": 43311641996,
+    "status": "in_progress",
+    "preflight": "success",
+    "publicationVerified": false
+  }
+}

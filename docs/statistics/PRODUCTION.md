@@ -87,7 +87,7 @@ inactif de deux heures, dans la limite absolue prévue de 24 heures.
 
 ## GitHub Actions : incident initial puis jeton corrigé
 
-La CI complète passe : **38 tests Python, 59 tests applicatifs/PostgreSQL,
+La CI complète passe : **39 tests Python, 59 tests applicatifs/PostgreSQL,
 11 parcours navigateur, build réussi**, plus actionlint local.
 
 Le lancement de publication
@@ -111,9 +111,18 @@ a réellement réussi : requête d'audit exécutée, 865 fragments et 786 704 pa
 lues, 008 et cron confirmés. Le jeton de Codex reste fonctionnel séparément.
 
 Le rafraîchissement [43308233633](https://github.com/NicoHelemon/lol_drafter/actions/runs/43308233633)
-a été lancé sur `main` avec `publish=true` après ce précontrôle vert.
-Le passage exhaustif avec débit limité est en cours ; aucune promotion n'est
-annoncée avant son résultat et le contrôle du pointeur distant. Le précontrôle corrigé
+a ensuite collecté 520 couples sur 865 avant une réponse source tronquée
+(`http.client.IncompleteRead`). Aucune promotion ni modification du courant.
+L'entretien après échec a réussi, et la salle témoin a été supprimée.
+
+Le correctif `fd172a7` ajoute cette coupure aux erreurs réseau réessayées, avec
+la même limite de trois tentatives. Une réponse partielle n'entre jamais dans
+le cache ; le test vérifie réussite après troncature, épuisement des trois
+essais et absence de cache partiel. Les 403 et les erreurs de validation restent
+bloquants. La CI [43311590931](https://github.com/NicoHelemon/lol_drafter/actions/runs/43311590931)
+est verte. Le second passage complet
+[43311641996](https://github.com/NicoHelemon/lol_drafter/actions/runs/43311641996)
+est en cours, avec précontrôle réussi. La promotion reste à constater. Le précontrôle corrigé
 [43306087734](https://github.com/NicoHelemon/lol_drafter/actions/runs/43306087734)
 a confirmé **`STATISTICS_REFRESH_ENABLED=true`**, puis échoué explicitement sur
 le HTTP 401 ; son job de publication a été ignoré. Cela vérifie que le correctif
