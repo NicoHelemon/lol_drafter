@@ -38,7 +38,7 @@
     "publicationJob": "skipped",
     "effectiveSource": "lolalytics",
     "projectRef": "zsmpdkjfjqgtjinzoexv",
-    "administrativeAccess": "verified via read-only query",
+    "administrativeAccess": "Initial Actions audit result invalidated: tee masked HTTP 401; command fixed during production rollout. Codex management access verified independently.",
     "scheduledEnableVariable": "user-declared; variables API returns 403",
     "generalCiRun": 43302864123,
     "generalCiConclusion": "success"

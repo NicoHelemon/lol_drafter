@@ -36,7 +36,8 @@ jobs:
               raise SystemExit('Missing authorized export URL')
           print('Backend configuration present; checking read access')
           PY
-          python3 scripts/statistics/maintenance.py --audit | tee statistics-audit.json
+          python3 scripts/statistics/maintenance.py --audit > statistics-audit.json
+          cat statistics-audit.json
         env:
           STATISTICS_SOURCE: ${{ vars.STATISTICS_SOURCE || 'lolalytics' }}
           STATISTICS_IMPORT_URL: ${{ secrets.STATISTICS_IMPORT_URL }}

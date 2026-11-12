@@ -33,19 +33,16 @@ retourne HTTP 403 `Resource not accessible by integration` : configuration
 déclarée par l'utilisateur, non vérifiée par ces endpoints.
 Aucun secret n'a été créé, modifié ou copié dans les logs.
 
-Un véritable lancement manuel **en lecture seule** a ensuite réussi sur la
-branche : [run 43302888389](https://github.com/NicoHelemon/lol_drafter/actions/runs/43302888389),
-commit `7884e55`. Les 38 tests Python, le contrôle de configuration et la requête
-d'audit Supabase ont réussi ; le job `refresh` est **skipped**, conformément à
-`publish=false` et à la protection de branche. Le mode effectif est `lolalytics`
-et le projet est `zsmpdkjfjqgtjinzoexv` ; le secret permet bien l'accès à la base.
-Cela vérifie la configuration backend effective sans lire la valeur du secret.
-La valeur de `STATISTICS_REFRESH_ENABLED` reste déclarée par l'utilisateur,
-car l'API de variables est toujours interdite à cette intégration.
-Le téléchargement local de l'artefact a rencontré un domaine Azure interdit ;
-les étapes et journaux du job ont été consultés via le connecteur GitHub.
-Cette vérification ne prétend pas avoir exécuté une nouvelle collecte ni une
-promotion complète en production.
+Le lancement manuel [43302888389](https://github.com/NicoHelemon/lol_drafter/actions/runs/43302888389)
+a terminé vert avec le job de publication ignoré. **Ce vert ne prouvait pas
+l'accès Supabase depuis Actions** : l'audit était envoyé à `tee`, dont le succès
+masquait l'échec Python dans le shell par défaut. Le premier lancement réel en
+production a établi un HTTP 401 sur le jeton GitHub. Cette erreur d'interprétation
+a été corrigée ; l'audit écrit maintenant d'abord dans un fichier et doit réussir
+avant toute suite. L'accès administratif depuis l'environnement Codex est vérifié
+séparément et fonctionne. Voir [PRODUCTION.md](PRODUCTION.md) pour l'état courant.
+La lecture et la modification des secrets restent refusées avec HTTP 403 à
+l'intégration GitHub ; la correction du secret nécessite son propriétaire.
 
 ## Politique implémentée
 

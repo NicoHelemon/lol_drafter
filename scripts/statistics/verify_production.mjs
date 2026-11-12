@@ -16,7 +16,12 @@ const against=pairs.find(p=>p.relation==='vs'&&p.otherChampionId==='799'&&p.othe
 const withAlly=pairs.find(p=>p.relation==='with'&&p.otherChampionId==='64'&&p.otherRole==='Jungle');
 const expected=(.4*against.delta2+.2*withAlly.delta2)/.6;
 const label=`${expected>=0?'+':''}${expected.toFixed(2)}`;
-const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||'/usr/bin/chromium'});
+const browser=await chromium.launch({
+  executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||'/usr/bin/chromium',
+  // Trust only the known environment proxy CA when Chromium's NSS store lags
+  // behind the supplied system trust. Never disable HTTPS checks globally.
+  args:process.env.CHROMIUM_TRUSTED_PROXY_SPKI ? [`--ignore-certificate-errors-spki-list=${process.env.CHROMIUM_TRUSTED_PROXY_SPKI}`] : [],
+});
 const page=await browser.newPage({viewport:{width:1440,height:1000}});
 const proof={checkedAt:new Date().toISOString(),site:base,sourceRequests:0,shardRequests:0,expectedScore:label};
 const shardTasks=[];
