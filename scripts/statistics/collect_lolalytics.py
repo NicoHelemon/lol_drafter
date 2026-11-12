@@ -12,6 +12,7 @@ import threading
 from datetime import datetime, timezone
 import gzip
 import hashlib
+from http.client import IncompleteRead
 import json
 from pathlib import Path
 import time
@@ -140,7 +141,7 @@ class Fetcher:
                 else:
                     with self.rate_lock:
                         self.cooldown_until = max(self.cooldown_until, time.monotonic() + 2 ** attempt)
-            except (URLError, TimeoutError):
+            except (URLError, TimeoutError, IncompleteRead, ConnectionError):
                 if attempt == 2:
                     raise
                 time.sleep(2 ** attempt)
@@ -195,7 +196,9 @@ def collect(directory, all_candidates=False, candidates=None, interval=1., fetch
         return slug, lane, pairs, html_record, team_record
     def collect_target(target):
         if stop.is_set():
-            raise failures[0]
+            # Do not raise the same exception instance in hundreds of queued
+            # futures: that grows a shared traceback and hides the first cause.
+            raise RuntimeError('Collection stopped after a source error') from failures[0]
         try:
             return collect_target_data(target)
         except Exception as error:

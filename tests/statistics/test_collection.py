@@ -113,6 +113,29 @@ class CollectionTests(unittest.TestCase):
             self.assertEqual(client.opener.open.call_count, 1)
             self.assertFalse(Path(folder, hashlib.sha256(url2.encode()).hexdigest() + '.json').exists())
 
+    def test_truncated_response_is_retried_and_never_cached_as_complete(self):
+        from http.client import IncompleteRead
+        class Truncated(Response):
+            def read(self, size=-1):
+                raise IncompleteRead(b'partial', 100)
+        with tempfile.TemporaryDirectory() as folder, patch.object(collector.time, 'sleep'):
+            client = collector.Fetcher(folder)
+            url = 'https://lolalytics.com/robots.txt'
+            client.opener.open = Mock(side_effect=[Truncated(b''), Response(b'Allow: /')])
+            raw, _ = client.get(url)
+            self.assertEqual(raw,b'Allow: /')
+            self.assertEqual(client.opener.open.call_count,2)
+            self.assertEqual(client.get(url)[0],b'Allow: /')
+            self.assertEqual(client.opener.open.call_count,2)
+            second = 'https://a1.lolalytics.com/robots.txt'
+            client.opener.open = Mock(side_effect=lambda *args, **kwargs: Truncated(b''))
+            with self.assertRaises(IncompleteRead):
+                client.get(second)
+            self.assertEqual(client.opener.open.call_count,3)
+            key=hashlib.sha256(second.encode()).hexdigest()
+            self.assertFalse(Path(folder,key+'.json').exists())
+            self.assertFalse(Path(folder,key+'.gz').exists())
+
     def test_daily_refresh_collects_before_publishing_and_rejects_bad_mode(self):
         import refresh
         with patch.dict('os.environ', {'STATISTICS_SOURCE':'lolalytics','SUPABASE_ACCESS_TOKEN':'unit-test-placeholder','SUPABASE_PROJECT_REF':'test'}), \
