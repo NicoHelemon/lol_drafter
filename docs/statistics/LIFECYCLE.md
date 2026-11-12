@@ -160,10 +160,11 @@ La CI GitHub complète du code `7884e55` a également réussi :
 [run 43302864123](https://github.com/NicoHelemon/lol_drafter/actions/runs/43302864123),
 tests Python, applicatifs, build et onze parcours navigateur compris.
 
-## Frontière de production
+## Mise en production autorisée ensuite
 
-Aucune migration appliquée, aucune purge ou promotion distante lancée pendant
-cette reprise. Aucun changement de secret et aucun push sur `main`.
-L'installation 008, l'activation cron et la publication du nouveau frontend
-nécessitent l'accord de l'utilisateur, conformément à sa demande actuelle.
-L'exécution d'une collecte avec promotion réelle attend également cet accord.
+Après accord explicite de l'utilisateur, cette branche a été intégrée à `main`,
+008 appliquée et cron activé. Netlify et les parcours hébergés ont été vérifiés.
+Le premier rafraîchissement réel a établi le blocage du secret GitHub (HTTP 401),
+puis le refus de sa correction par l'intégration (HTTP 403). Le contrôle qui
+masquait cette erreur a été corrigé. Voir [PRODUCTION.md](PRODUCTION.md) pour les
+résultats, les purges effectivement réalisées et le seul blocage restant.

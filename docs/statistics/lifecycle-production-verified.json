@@ -1,0 +1,211 @@
+{
+  "checkedAt": "2026-11-12T21:02:29.160097+00:00",
+  "projectRef": "zsmpdkjfjqgtjinzoexv",
+  "authorizedByUser": true,
+  "deployment": {
+    "initialRevision": "a7956fd57b20043be4d1d91ee8308ff0ab3bf3af",
+    "auditCorrection": "d13ebdfe7f762094baff96428137a1656e23500a",
+    "scheduleVisibility": "1ef400a0ed253022f6a2203d37ecbf9c6a82ad33",
+    "productionBranch": "main",
+    "site": "https://draftroom-lol.netlify.app"
+  },
+  "migration": {
+    "migration": "008",
+    "applied": true,
+    "allShardFingerprintsPreserved": 880,
+    "roomDataPreserved": true,
+    "preview": [
+      {
+        "preview": {
+          "rooms": 5,
+          "dryRun": true,
+          "shards": 0,
+          "retired": 0,
+          "snapshots": 0
+        }
+      }
+    ],
+    "health": [
+      {
+        "health": {
+          "pairs": 786704,
+          "rooms": 5,
+          "shards": 865,
+          "source": "Lolalytics unofficial: public Build HTML + website build-team JSON",
+          "context": {
+            "tier": "emerald_plus",
+            "unit": "percentage_points",
+            "queue": "ranked_solo_duo",
+            "metric": "delta2",
+            "region": "global",
+            "minGames": 0,
+            "windowDays": 14,
+            "minLanePercent": 0,
+            "minPickPercent": 0
+          },
+          "retired": 1,
+          "coverage": {
+            "vs": 433233,
+            "with": 353471
+          },
+          "ageSeconds": 6637.857283,
+          "importedAt": "2026-11-12T19:03:21.023923+00:00",
+          "incomplete": 0,
+          "snapshotId": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb"
+        }
+      }
+    ]
+  },
+  "database": {
+    "checkedAt": "2026-11-12T21:00:38.931240+00:00",
+    "health": [
+      {
+        "health": {
+          "pairs": 786704,
+          "rooms": 0,
+          "shards": 865,
+          "source": "Lolalytics unofficial: public Build HTML + website build-team JSON",
+          "context": {
+            "tier": "emerald_plus",
+            "unit": "percentage_points",
+            "queue": "ranked_solo_duo",
+            "metric": "delta2",
+            "region": "global",
+            "minGames": 0,
+            "windowDays": 14,
+            "minLanePercent": 0,
+            "minPickPercent": 0
+          },
+          "retired": 1,
+          "coverage": {
+            "vs": 433233,
+            "with": 353471
+          },
+          "ageSeconds": 7035.601639,
+          "importedAt": "2026-11-12T19:03:21.023923+00:00",
+          "incomplete": 0,
+          "snapshotId": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb"
+        }
+      }
+    ],
+    "jobs": [
+      {
+        "jobname": "draftroom-statistics-log-retention",
+        "schedule": "43 3 * * *",
+        "active": true,
+        "status": null,
+        "return_message": null,
+        "start_time": null,
+        "end_time": null
+      },
+      {
+        "jobname": "draftroom-statistics-maintenance",
+        "schedule": "*/10 * * * *",
+        "active": true,
+        "status": "succeeded",
+        "return_message": "1 row",
+        "start_time": "2026-11-12 21:00:00.10904+00",
+        "end_time": "2026-11-12 21:00:00.119999+00"
+      }
+    ],
+    "privileges": [
+      {
+        "role": "anon",
+        "can_maintain": false,
+        "can_read_health": false
+      },
+      {
+        "role": "authenticated",
+        "can_maintain": false,
+        "can_read_health": false
+      }
+    ]
+  },
+  "browser": {
+    "checkedAt": "2026-11-12T20:56:13.112Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "shardRequests": 4,
+    "expectedScore": "+1.34",
+    "deployment": {
+      "commit": "a7956fd57b20043be4d1d91ee8308ff0ab3bf3af",
+      "builtAt": "2026-11-12T20:54:17.917Z"
+    },
+    "snapshotId": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb",
+    "fictional": false,
+    "inlinePairs": 0,
+    "displayedScore": "+1.34",
+    "details": "Renekton · Top\n×\n\nScore +1.34\n2/2 pairs\n\nAgainst Ambessa · Top\n+2.09 × 0.400\nWith Lee Sin · Jungle\n-0.15 × 0.200",
+    "reloadPreservedScore": true,
+    "success": true,
+    "testRoomRemoved": true
+  },
+  "hostedLifecycle": {
+    "checkedAt": "2026-11-12T20:57:33.979Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "distinctAnonymousIdentities": true,
+    "privateInvitationJoined": true,
+    "synchronizedRole": true,
+    "maintenance": {
+      "result": [
+        {
+          "maintenance": {
+            "rooms": 6,
+            "dryRun": false,
+            "shards": 0,
+            "retired": 0,
+            "snapshots": 0
+          }
+        }
+      ],
+      "remaining": {
+        "rooms": 0,
+        "room_members": 0,
+        "room_invites": 0,
+        "role_swap_requests": 0
+      }
+    },
+    "bothMembersReturnedHome": true,
+    "pickerClosed": true,
+    "newRoomCreatedAfterExpiration": true,
+    "newRoomQuit": true,
+    "success": true,
+    "cleanup": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0
+    }
+  },
+  "initialProductionRoomsExpired": 5,
+  "testRoomsArtificiallyAged": 1,
+  "originalShardFingerprintsStillUnchanged": 880,
+  "github": {
+    "ciRun": 43305525510,
+    "ciConclusion": "success",
+    "realRefreshRun": 43304876138,
+    "realRefreshConclusion": "failure",
+    "failure": "HTTP 401 Unauthorized from Supabase management API before collection",
+    "correctedPreflightRun": 43306087734,
+    "correctedPreflightConclusion": "failure",
+    "publicationSkippedAfterFailedPreflight": true,
+    "scheduledRefreshEnabled": true,
+    "secretReplacementAttempt": "rejected: GitHub HTTP 403 Resource not accessible by integration on repository secrets public-key endpoint",
+    "secretsModified": false
+  },
+  "validation": {
+    "pythonTests": 38,
+    "applicationPostgresTests": 57,
+    "localBrowserTests": 11,
+    "hostedBrowserScoring": true,
+    "hostedTwoIdentityLifecycle": true,
+    "build": "passed",
+    "actionlint": "passed"
+  },
+  "pending": [
+    "Owner must replace GitHub SUPABASE_ACCESS_TOKEN with valid Supabase management token",
+    "Then rerun read-only preflight and full refresh to verify a new promotion",
+    "Daily cron log-retention job first run is scheduled for 03:43 UTC"
+  ]
+}

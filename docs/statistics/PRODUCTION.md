@@ -1,54 +1,109 @@
-# Mise en production — 12 novembre 2026
+# Production — cycle de vie officialisé le 12 novembre 2026
 
-> **Reprise du cycle de vie :** voir [LIFECYCLE.md](LIFECYCLE.md) pour l’audit du dépôt, la rétention reconstituée, les tests et les limites de publication de cette nouvelle session.
+L'utilisateur a autorisé la publication dans cette session. La branche
+`wip/statistics-lifecycle` a été intégrée à `main` et Netlify sert le nouveau
+frontend. La migration 008 et les deux jobs `pg_cron` sont installés dans le
+projet vérifié `zsmpdkjfjqgtjinzoexv`, `NicoHelemon's Project`, `ACTIVE_HEALTHY`.
 
-## Données effectivement publiées
+**Le site et sa maintenance sont en production. Le rafraîchissement quotidien
+GitHub reste bloqué par un jeton Supabase invalide dans les secrets GitHub.**
 
-Projet vérifié : **NicoHelemon’s Project**, référence `zsmpdkjfjqgtjinzoexv`, état `ACTIVE_HEALTHY`.
+## Déploiement et données préservées
 
-Le snapshot **`0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb`** a été chargé, marqué prêt et promu dans `statistics_current` par la transaction finale du publisher.
+- Livraison initiale du cycle de vie : `a7956fd`.
+- Correctif du contrôle Actions et du test navigateur : `d13ebdf`.
+- Visibilité de l’activation quotidienne dans le précontrôle : `1ef400a`.
+- Ces révisions ont été constatées sur `/deployment.json` du site public.
+- Migration 008 appliquée une seule fois, sans rejouer 001–007.
+- Avant application : sauvegarde privée locale des salles, dépendances,
+  métadonnées et fragments non courants ; corpus courant archivé séparément.
+- Les **880 empreintes de fragments** (865 courants et 15 historiques) sont
+  identiques avant migration, après migration et après la maintenance initiale.
+- Aucune modification du moteur de scoring, de ses poids ou du collecteur.
 
-- **865 fragments**, **786 704 observations réelles** (`fictional:false`).
-- **433 233 Against** et **353 471 Synergy**.
-- Contrôle distant après promotion : 865 comptes de paires et **865 empreintes de contenu concordantes** avec les fragments locaux. Aucun recours à une comparaison approximative.
-- Les cinq salles préexistantes restent sur leur ancien instantané. La publication ne modifie aucun état de salle.
-- Les connexions anonymes Supabase sont activées, les inscriptions ne sont pas désactivées et aucun CAPTCHA n’est configuré.
+Le snapshot courant reste :
+`0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb`.
+Il contient **865 fragments, 786 704 observations réelles** :
+433 233 Against et 353 471 Synergy, `fictional:false`.
+Les seuils Lane/Games/Pick restent à zéro.
 
-Preuve machine : [production-database-verified.json](production-database-verified.json), contrôlée le 12 novembre à **20:27 heure suisse**.
+Les cinq salles anciennes ont été sauvegardées puis vérifiées comme inactives
+depuis plus de deux heures. Elles ont été supprimées par la politique approuvée,
+avec leurs dépendances. Les essais hébergés ont utilisé des salles privées
+jetables, nettoyées ensuite. Aucune identité Auth n'a été effacée.
 
-Les nouvelles salles résolvent le pointeur courant dans `createRoom`, puis chargent les fragments de leurs pools/picks. Une salle ouverte auparavant conserve volontairement son snapshot : créer une nouvelle salle pour utiliser la source publiée.
+## Maintenance réellement installée
 
-## Code effectivement poussé
+| Job | Horaire UTC | Effet |
+| --- | --- | --- |
+| `draftroom-statistics-maintenance` | Toutes les dix minutes | Expiration des salles et purge des snapshots éligibles |
+| `draftroom-statistics-log-retention` | 03:43 chaque jour | Sept jours de journaux, uniquement pour les deux jobs Draftroom |
 
-Deux commits poussés sur `main` :
+Les deux jobs sont actifs sous `postgres`. La première exécution automatique
+de maintenance a réussi le 12 novembre à 21:00 UTC (22:00 en Suisse), en environ
+11 millisecondes. Les fonctions administratives
+`maintain_statistics` et `statistics_health` sont inaccessibles aux rôles web
+`anon` et `authenticated`, vérification effectuée sur le service hébergé.
+La rétention exacte et ses délais sont décrits dans [LIFECYCLE.md](LIFECYCLE.md).
+La tâche de purge des journaux sera exécutée à son prochain horaire quotidien ;
+son activation ne constitue pas une exécution déjà observée.
 
-- `6c851aec0f93ef3a2b1f48e8a11d1a2b0f778fdc` — collecteur réel, normalisation, fixtures et rafraîchissement.
-- `bf69d09ea6f2d8ca4e0838e1ee91dbef5bbc5c72` — publication par lots et `/deployment.json` pour vérifier la révision réellement servie.
+## Vérifications contre le vrai site
 
-CI GitHub verte pour les deux : [premier run](https://github.com/NicoHelemon/lol_drafter/actions/runs/43287909314), [second run](https://github.com/NicoHelemon/lol_drafter/actions/runs/43289186398). Validation locale après regroupement des écritures : **31 tests Python, 44 tests applicatifs/PostgreSQL, build réussi**. Les neuf parcours navigateur avaient passé avant cette adaptation backend ; le dernier CI les exécute aussi.
+Un navigateur Chromium, utilisant explicitement la clé publique de l'autorité
+TLS du proxy de cet environnement, a vérifié :
 
-Aucune migration, modification du scoring ou modification de l’interface utilisateur n’a été nécessaire. Le build émet uniquement un petit fichier public `deployment.json` contenant le commit et la date du build, sans secret, pour permettre un contrôle explicite du déploiement Netlify.
+1. Révision servie par Netlify et création d'une salle privée avec le snapshot réel.
+2. État persistant sans paires inline ; lecture des seuls fragments Supabase.
+3. Renekton Top contre Ambessa Top (+2,09) avec Lee Sin Jungle (−0,15) :
+   **score +1,34**, conforme aux poids existants, détail **2/2 paires**.
+4. Score préservé après rechargement ; zéro requête vers Lolalytics depuis la draft.
+5. Quit et disparition de la salle de test.
 
-## Contrôle du site encore bloqué par le réseau de cette machine
+Un second essai avec deux identités anonymes réellement distinctes a vérifié
+l'invitation privée et la synchronisation d'un rôle entre les navigateurs.
+La salle de test a ensuite été artificiellement vieillie, puis expirée par
+`maintain_statistics(false)`. Les deux navigateurs sont revenus à l'accueil,
+avec notification anglaise, sélection fermée et référence locale effacée.
+Une nouvelle salle a pu être créée puis quittée normalement.
+Les tables salle/membres/invitation/échanges ne conservaient aucune dépendance
+de cette salle de test après suppression.
 
-Le push sur `main` a été effectué pour le déploiement automatique Netlify configuré. **Le résultat Netlify n’est pas encore constaté indépendamment** : le proxy de l’environnement refuse le tunnel vers `draftroom-lol.netlify.app` avec HTTP 403. L’API GitHub et le domaine public du projet Supabase sont aussi absents de la politique active.
+## GitHub Actions : résultat réel et blocage restant
 
-Le brouillon réseau enregistré conserve les domaines existants et ajoute :
+La CI complète passe : **38 tests Python, 57 tests applicatifs/PostgreSQL,
+11 parcours navigateur, build réussi**, plus actionlint local.
 
-```text
-draftroom-lol.netlify.app
-zsmpdkjfjqgtjinzoexv.supabase.co
-api.github.com
-```
+Le lancement de publication
+[43304876138](https://github.com/NicoHelemon/lol_drafter/actions/runs/43304876138)
+a échoué **avant la collecte et toute promotion**, au premier appel administratif
+Supabase, avec **HTTP 401 Unauthorized**. Le snapshot courant reste intact.
+Le jeton de l'environnement Codex, lui, fonctionne pour les mêmes opérations.
 
-L’outil a confirmé `status=saved`, `requires_publish=true`. Ce résultat n’est pas une application active. Au dernier contrôle, la politique appliquée autorisait encore seulement `a1.lolalytics.com`, `api.supabase.com`, `lolalytics.com`, `www.lolalytics.com` en plus des presets.
+Le premier contrôle en lecture seule avait terminé vert à tort : le shell par
+défaut renvoyait le succès de `tee` malgré l'échec Python. Le correctif `d13ebdf`
+écrit d'abord l'audit dans un fichier ; un échec arrête maintenant le job et
+empêche la publication dépendante. Les affirmations antérieures de validation
+des accès GitHub/Supabase par ce premier run sont donc corrigées.
 
-Le test de production est préparé, sans journaliser de jeton Auth ni d’invitation :
+La tentative de mise à jour du secret `SUPABASE_ACCESS_TOKEN` depuis Codex est
+refusée : **HTTP 403, Resource not accessible by integration**, lors de la lecture
+de la clé publique des secrets du dépôt. Aucun secret n'a été modifié.
+Le propriétaire doit remplacer ce secret par un **jeton de gestion Supabase
+valide**, dans les [secrets Actions du dépôt](https://github.com/NicoHelemon/lol_drafter/settings/secrets/actions).
+Ne pas utiliser de clé anon/publishable, ni copier le jeton dans le chat.
 
-```sh
-node scripts/statistics/verify_production.mjs /tmp/draftroom-production-check
-```
+Après confirmation de cette correction, lancer d'abord `statistics.yml` sur
+`main` avec `publish=false`, puis avec `publish=true` pour constater une collecte
+et une promotion complètes. Le précontrôle corrigé
+[43306087734](https://github.com/NicoHelemon/lol_drafter/actions/runs/43306087734)
+a confirmé **`STATISTICS_REFRESH_ENABLED=true`**, puis échoué explicitement sur
+le HTTP 401 ; son job de publication a été ignoré. Cela vérifie que le correctif
+ne masque plus le refus d'accès. La planification reste à 06:17 UTC, soit
+07:17 en Suisse en novembre.
 
-Il doit contrôler le commit servi, créer une salle privée jetable, vérifier son snapshot réel et l’absence de paires inline, sélectionner Renekton Top contre Ambessa Top avec Lee Sin Jungle, comparer le score aux observations publiées, recharger la page puis quitter/supprimer sa salle de test. Le script a été tenté contre le site avec Chromium : échec `net::ERR_TUNNEL_CONNECTION_FAILED` sur `/deployment.json`, avant création de toute salle. **La vérification complète attend l’accès réseau**. Ne pas annoncer ce parcours comme réussi avant d’avoir sa preuve.
-
-Le rafraîchissement quotidien est implémenté dans le workflow, mais les secrets/variables GitHub et son activation distante n’ont pas été configurés ou vérifiés pendant ce déploiement : l’API GitHub est encore bloquée. Aucun secret ne doit être demandé ou copié dans le chat.
+La maintenance Supabase fonctionne indépendamment de ce blocage GitHub.
+Voir [lifecycle-production-verified.json](lifecycle-production-verified.json)
+pour les preuves machine de cette mise en production, et
+[production-database-verified.json](production-database-verified.json) pour la
+preuve historique de publication du corpus initial.
