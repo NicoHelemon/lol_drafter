@@ -22,5 +22,7 @@ export function importDataset(text:string,format:'json'|'csv',ids:Set<string>,me
   const games=p.games===undefined||(p.games as unknown)===''?undefined:Number(p.games);if(games!==undefined&&(!Number.isInteger(games)||games<0))throw Error('Invalid games count');
   const result={relation:p.relation,candidateChampionId:String(p.candidateChampionId),candidateRole:p.candidateRole,otherChampionId:String(p.otherChampionId),otherRole:p.otherRole,delta2,...(games===undefined?{}:{games})};
   const key=pairKey(result);if(keys.has(key))throw Error('Duplicate directional pair');keys.add(key);return result;
- });return {id:raw.id,patch:raw.patch,tier:raw.tier,source:raw.source,importedAt:raw.importedAt,fictional:raw.fictional,pairs};
+ });
+ if(raw.context!==undefined&&(!raw.context||typeof raw.context!=='object'||Array.isArray(raw.context)||Object.values(raw.context).some(v=>typeof v!=='string'&&!(typeof v==='number'&&Number.isFinite(v)))))throw Error('Invalid source context');
+ return {id:raw.id,patch:raw.patch,tier:raw.tier,source:raw.source,importedAt:raw.importedAt,fictional:raw.fictional,pairs,...(raw.context===undefined?{}:{context:raw.context})};
 }

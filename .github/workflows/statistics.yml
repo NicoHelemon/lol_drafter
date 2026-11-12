@@ -1,0 +1,26 @@
+name: Import authorized statistics
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: statistics-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    # Off until a source has been verified and explicitly enabled in repo vars.
+    if: github.event_name == 'workflow_dispatch' || vars.STATISTICS_REFRESH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m unittest discover -s tests/statistics -v
+      - run: python3 scripts/statistics/refresh.py
+        env:
+          STATISTICS_IMPORT_URL: ${{ secrets.STATISTICS_IMPORT_URL }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}

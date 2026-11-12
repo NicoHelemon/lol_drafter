@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-11-12T11:54:45.432048+00:00",
+  "requests": [
+    {
+      "url": "https://lolalytics.com/robots.txt",
+      "status": null,
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    }
+  ],
+  "verifiedObservations": 0,
+  "stopped": "HTTP/network failure; no bypass or retries"
+}

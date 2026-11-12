@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "id": "synthetic-test",
+    "patch": "Test only",
+    "tier": "Emerald+",
+    "source": "Synthetic test fixture",
+    "importedAt": "2026-11-12T00:00:00Z",
+    "fictional": true,
+    "context": {
+      "tier": "emerald_plus",
+      "region": "global",
+      "queue": "ranked_solo_duo",
+      "windowDays": 14,
+      "minLanePercent": 2,
+      "minGames": 100,
+      "minPickPercent": 0,
+      "metric": "delta2",
+      "unit": "percentage_points"
+    },
+    "snapshotId": "f8ac04e8b97196fb679077b460b185ffad2a60725bf36914b1b6171f5adefa9d"
+  },
+  "shards": {
+    "103:Mid": {
+      "file": "103-Mid.json.gz",
+      "sha256": "f466c19bbe61f78efe4bc5b8db7185e67bc4a25e1d654b11f2aaba94b7526e2e",
+      "pairs": 3,
+      "bytes": 414,
+      "gzipBytes": 168
+    },
+    "202:ADC": {
+      "file": "202-ADC.json.gz",
+      "sha256": "6e29370e7ce3603039bbfecef557564e4111841af91ca6d51336762f35444781",
+      "pairs": 3,
+      "bytes": 414,
+      "gzipBytes": 168
+    },
+    "58:Top": {
+      "file": "58-Top.json.gz",
+      "sha256": "ab2e9a00663149daff6c4e19cdaa76770f54b8f41886a5557fc18741ce88f026",
+      "pairs": 3,
+      "bytes": 412,
+      "gzipBytes": 170
+    }
+  },
+  "pairCount": 9,
+  "coverage": {
+    "vs": 6,
+    "with": 3
+  },
+  "observations": {
+    "known": 6,
+    "null": 3,
+    "zero": 3
+  },
+  "missingPolicy": "absent-or-null-is-missing-zero-is-observed"
+}

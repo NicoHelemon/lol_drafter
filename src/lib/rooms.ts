@@ -3,9 +3,18 @@ import { createClient } from "@supabase/supabase-js";
 import type { Room, State, RoleSwapRequest } from "../domain/types";
 import { initialState, DemoProvider } from "../data/provider";
 import { validateState } from "../domain/state";
+import { StatisticsCache, persistedState, snapshotMetadata } from "../data/shared";
 const url = import.meta.env.VITE_SUPABASE_URL,
   key = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const supabase = url && key ? createClient(url, key) : null;
+const statistics = new StatisticsCache(async (snapshot, keys) => {
+  if (!supabase) throw Error('Shared statistics require Supabase');
+  const { data, error } = await supabase.from('statistics_shards')
+    .select('candidate_key,pairs').eq('snapshot_id', snapshot).in('candidate_key', keys);
+  if (error) throw error;
+  return data ?? [];
+});
+const hydrated = (room: Room) => statistics.hydrate(room);
 let identityPromise: Promise<string> | null = null;
 export function identity() {
   return (identityPromise ??= resolveIdentity().catch((e) => {
@@ -45,12 +54,19 @@ export async function createRoom(
     localStorage.setItem("draftroom-demo", JSON.stringify(room));
     return { room, token: "" };
   }
+  const current = await supabase.from('statistics_current').select('snapshot_id').maybeSingle();
+  if (current.error) throw current.error;
+  if (current.data) {
+    const snapshot = await supabase.from('statistics_snapshots').select('metadata').eq('id', current.data.snapshot_id).single();
+    if (snapshot.error) throw snapshot.error;
+    state.dataset = snapshotMetadata(snapshot.data.metadata);
+  }
   const { data, error } = await supabase.rpc("create_room", {
     initial_state: state,
     invite_token: token,
   });
   if (error) throw error;
-  return { room: data as Room, token };
+  return { room: await hydrated(data as Room), token };
 }
 export async function joinRoom(
   slug: string,
@@ -65,7 +81,7 @@ export async function joinRoom(
     nickname: name,
   });
   if (error) throw error;
-  return data;
+  return hydrated(data);
 }
 export async function resolveRoom(slug: string): Promise<Room> {
   if (!supabase) {
@@ -81,7 +97,7 @@ export async function resolveRoom(slug: string): Promise<Room> {
     .eq("slug", slug)
     .single();
   if (error) throw error;
-  return data;
+  return hydrated(data);
 }
 export async function readRoom(id: string): Promise<Room> {
   if (!supabase) {
@@ -97,7 +113,7 @@ export async function readRoom(id: string): Promise<Room> {
     .eq("id", id)
     .single();
   if (error) throw error;
-  return data;
+  return hydrated(data);
 }
 export async function saveRoom(room: Room, next: State): Promise<Room> {
   validateState(next);
@@ -112,10 +128,10 @@ export async function saveRoom(room: Room, next: State): Promise<Room> {
   const { data, error } = await supabase.rpc("save_room", {
     room_id: room.id,
     expected_version: room.version,
-    next_state: next,
+    next_state: persistedState(next),
   });
   if (error) throw error;
-  return data;
+  return hydrated(data);
 }
 export function watchRoom(
   id: string,
@@ -203,7 +219,7 @@ export async function requestRoleSwap(
     expected_version: room.version,
   });
   if (error) throw error;
-  return data;
+  return hydrated(data);
 }
 export async function respondRoleSwap(
   room: Room,
@@ -218,7 +234,7 @@ export async function respondRoleSwap(
     accept,
   });
   if (error) throw error;
-  return data;
+  return hydrated(data);
 }
 
 export async function addCandidate(
@@ -235,5 +251,5 @@ export async function addCandidate(
     expected_version: room.version,
   });
   if (error) throw error;
-  return data;
+  return hydrated(data);
 }
