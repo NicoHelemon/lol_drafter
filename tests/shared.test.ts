@@ -60,3 +60,53 @@ it('retries failed loads and rejects another candidate’s data in a shard', asy
   expect((await cache.hydrate(room())).state.dataset.pairs).toEqual([pair]);
   expect(read).toHaveBeenCalledTimes(2);
 });
+
+it('evicts the least recently used shard and expires hot entries after thirty minutes', async () => {
+  let now = 0;
+  const read = vi.fn(async () => []);
+  const cache = new StatisticsCache(read, {capacity:2, now:() => now});
+  const first = room(), second = room('b'.repeat(64)), third = room('c'.repeat(64));
+  await cache.hydrate(first); await cache.hydrate(second); await cache.hydrate(first);
+  await cache.hydrate(third); await cache.hydrate(first);
+  expect(read).toHaveBeenCalledTimes(3);
+  await cache.hydrate(second); expect(read).toHaveBeenCalledTimes(4);
+  now = 30 * 60_000 - 1;
+  await cache.hydrate(second); expect(read).toHaveBeenCalledTimes(4);
+  now++;
+  await cache.hydrate(second); expect(read).toHaveBeenCalledTimes(5);
+});
+
+it('fully hydrates a request larger than capacity and batches forty keys', async () => {
+  const {champions} = await import('../src/data/provider');
+  const r = room(); r.state.players[0].pool = champions.slice(0,135).map(c => c.id);
+  const read = vi.fn(async (_:string,keys:string[]) => keys.map(key => ({candidate_key:key,pairs:[{...pair,candidateChampionId:key.split(':')[0]}]})));
+  const cache = new StatisticsCache(read);
+  const loaded = await cache.hydrate(r);
+  expect(loaded.state.dataset.pairs).toHaveLength(135);
+  expect(read.mock.calls.map(c => c[1].length)).toEqual([40,40,40,15]);
+  // Touch an entry that should have survived, then an evicted first entry.
+  const only = room(); only.state.players[0].pool = [r.state.players[0].pool.map(id => `${id}:Top`).sort()[134].split(':')[0]];
+  await cache.hydrate(only); expect(read).toHaveBeenCalledTimes(4);
+  only.state.players[0].pool = [r.state.players[0].pool.map(id => `${id}:Top`).sort()[0].split(':')[0]];
+  await cache.hydrate(only); expect(read).toHaveBeenCalledTimes(5);
+});
+
+it('deduplicates overlapping concurrent requests, retries failures, and ignores cleared in-flight entries', async () => {
+  let reject!: (e:Error) => void;
+  const read = vi.fn(() => new Promise<never>((_,fail) => {reject=fail;}));
+  const cache = new StatisticsCache(read);
+  const one = cache.hydrate(room()), two = cache.hydrate(room());
+  const outcomes = Promise.allSettled([one,two]);
+  await Promise.resolve(); expect(read).toHaveBeenCalledTimes(1);
+  reject(Error('offline'));
+  expect((await outcomes).map(r => r.status)).toEqual(['rejected','rejected']);
+  read.mockImplementation(async () => [] as never);
+  await cache.hydrate(room()); expect(read).toHaveBeenCalledTimes(2);
+  cache.clear();
+  await cache.hydrate(room()); expect(read).toHaveBeenCalledTimes(3);
+  // A cleared pending load must not refill the resolved cache.
+  const spy = vi.fn(async () => []);
+  const pending = new StatisticsCache(spy);
+  const inflight = pending.hydrate(room()); pending.clear(); await inflight;
+  await pending.hydrate(room()); expect(spy).toHaveBeenCalledTimes(2);
+});

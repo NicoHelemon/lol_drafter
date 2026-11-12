@@ -10,3 +10,5 @@ test-results/
 *.tsbuildinfo
 __pycache__/
 statistics-cache/
+
+work/

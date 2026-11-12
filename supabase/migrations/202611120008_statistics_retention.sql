@@ -107,8 +107,8 @@ begin
  for r in select * from public.rooms order by id for update skip locked loop
   if r.created_at<=now()-interval '24 hours'
    or greatest(r.created_at,coalesce((select max(last_seen) from public.room_members where room_id=r.id),r.created_at))<=now()-interval '2 hours'
-   or exists(select 1 from public.statistics_snapshots s where s.id=r.state->'dataset'->>'snapshotId'
-     and s.retired_at<=now()-interval '1 hour' and not exists(select 1 from public.statistics_current c where c.snapshot_id=s.id)) then
+   or exists(select 1 from public.statistics_snapshots ss where ss.id=r.state->'dataset'->>'snapshotId'
+     and ss.retired_at<=now()-interval '1 hour' and not exists(select 1 from public.statistics_current c where c.snapshot_id=ss.id)) then
    room_count=room_count+1;
    if not dry_run then delete from public.rooms where id=r.id;end if;
   end if;
@@ -118,9 +118,9 @@ begin
  for s in select * from public.statistics_snapshots order by id for update skip locked loop
   if exists(select 1 from public.statistics_current where snapshot_id=s.id) then continue;end if;
   if ((s.ready and s.retired_at<=now()-interval '1 hour') or (not s.ready and s.created_at<=now()-interval '24 hours'))
-   and not exists(select 1 from public.rooms r where r.state->'dataset'->>'snapshotId'=s.id and
-     (not dry_run or not (r.created_at<=now()-interval '24 hours'
-       or greatest(r.created_at,coalesce((select max(last_seen) from public.room_members where room_id=r.id),r.created_at))<=now()-interval '2 hours'
+   and not exists(select 1 from public.rooms rr where rr.state->'dataset'->>'snapshotId'=s.id and
+     (not dry_run or not (rr.created_at<=now()-interval '24 hours'
+       or greatest(rr.created_at,coalesce((select max(last_seen) from public.room_members where room_id=rr.id),rr.created_at))<=now()-interval '2 hours'
        or s.retired_at<=now()-interval '1 hour'))) then
    snapshot_count=snapshot_count+1;
    select count(*) into n from public.statistics_shards where snapshot_id=s.id;

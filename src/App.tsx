@@ -57,13 +57,13 @@ export default function App() {
   useEffect(() => {
     void run(async () => {
       setUid(await identity());
-      const id = inviteRoom ?? localStorage.getItem("draftroom-current");
+      const saved = localStorage.getItem("draftroom-current");
+      const id = inviteRoom ?? saved;
       if (id) {
         try {
           setRoom(await resolveRoom(id));
         } catch (e) {
-          localStorage.removeItem("draftroom-current");
-          if (e instanceof RoomExpiredError && !invite) expireRoom();
+          if (e instanceof RoomExpiredError && (!invite || saved === id)) expireRoom();
           else if (!(e instanceof RoomExpiredError)) throw e;
         }
       }
@@ -199,6 +199,8 @@ export default function App() {
   }
   function clearRoom() {
     localStorage.removeItem("draftroom-current");
+    localStorage.removeItem("draftroom-demo");
+    if (room) localStorage.removeItem(`draftroom-swaps-${room.id}`);
     setRoom(null);
     setPicker(null);
     setInvite("");

@@ -116,18 +116,24 @@ class CollectionTests(unittest.TestCase):
     def test_daily_refresh_collects_before_publishing_and_rejects_bad_mode(self):
         import refresh
         with patch.dict('os.environ', {'STATISTICS_SOURCE':'lolalytics','SUPABASE_ACCESS_TOKEN':'unit-test-placeholder','SUPABASE_PROJECT_REF':'test'}), \
+                patch.object(refresh, 'health', return_value=None), \
+                patch.object(refresh, 'maintain', return_value={}) as maintain, \
                 patch.object(collector, 'collect', return_value={'snapshotId':'a'*64}) as collect, \
-                patch.object(refresh, 'publish', return_value={'snapshotId':'a'*64}) as publish:
+                patch.object(refresh, 'publish_refresh', return_value={'snapshotId':'a'*64}) as publish:
             self.assertEqual(refresh.refresh(), {'snapshotId':'a'*64})
             collect.assert_called_once(); publish.assert_called_once()
+            maintain.assert_called_once_with(dry_run=False)
         with patch.dict('os.environ', {'STATISTICS_SOURCE':'typo'}), self.assertRaises(ValueError):
             refresh.refresh()
         with patch.dict('os.environ', {'STATISTICS_SOURCE':'lolalytics','SUPABASE_ACCESS_TOKEN':'unit-test-placeholder','SUPABASE_PROJECT_REF':'test'}), \
+                patch.object(refresh, 'health', return_value=None), \
+                patch.object(refresh, 'maintain', return_value={}) as maintain, \
                 patch.object(collector, 'collect', side_effect=RuntimeError('failed source')), \
-                patch.object(refresh, 'publish') as publish:
+                patch.object(refresh, 'publish_refresh') as publish:
             with self.assertRaises(RuntimeError):
                 refresh.refresh()
             publish.assert_not_called()
+            self.assertEqual(maintain.call_count, 2)
 
 
 if __name__ == '__main__':

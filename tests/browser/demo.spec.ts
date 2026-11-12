@@ -513,3 +513,32 @@ test("represented allies add candidates without picking, toggle selections, and 
     fullPage: true,
   });
 });
+
+test('room expiration closes the picker, clears the saved room and allows a new room', async ({page}) => {
+  await page.clock.install();
+  await openDemo(page);
+  await page.getByRole('group', {name:'Top role',exact:true}).getByRole('button', {name:'Join',exact:true}).click();
+  await page.getByRole('button', {name:'Add champion to Top pool'}).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.evaluate(() => localStorage.removeItem('draftroom-demo'));
+  await page.clock.fastForward(20_001);
+  await expect(page.getByRole('alert')).toContainText('This room has expired');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page).toHaveURL('/');
+  expect(await page.evaluate(() => localStorage.getItem('draftroom-current'))).toBeNull();
+  await page.getByPlaceholder('Your name').fill('New host');
+  await page.getByRole('button',{name:'Open local demo'}).click();
+  await expect(page.getByRole('heading',{name:"New host's room",exact:true})).toBeVisible();
+});
+
+test('an expired saved room returns to the creation form after reload', async ({page}) => {
+  await openDemo(page);
+  await page.evaluate(() => {
+    localStorage.removeItem('draftroom-demo');
+    history.replaceState(null, '', location.pathname + '#test-invitation');
+  });
+  await page.reload();
+  await expect(page.getByRole('alert')).toContainText('This room has expired');
+  await expect(page.getByRole('heading',{name:'Create room',exact:true})).toBeVisible();
+  await expect(page).toHaveURL('/');
+});
