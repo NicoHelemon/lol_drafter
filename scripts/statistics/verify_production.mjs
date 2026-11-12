@@ -32,7 +32,7 @@ page.on('response',r=>{
 });
 let roomCreated=false;
 try{
-  const revision=await page.request.get(`${base}/deployment.json`);
+  const revision=await page.goto(`${base}/deployment.json`,{waitUntil:'domcontentloaded'});
   if(!revision.ok())throw Error('Deployment metadata unavailable');
   proof.deployment=await revision.json();
   if(process.env.EXPECTED_COMMIT&&!proof.deployment.commit.startsWith(process.env.EXPECTED_COMMIT))throw Error('Unexpected deployed commit');

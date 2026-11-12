@@ -47,6 +47,6 @@ Le test de production est préparé, sans journaliser de jeton Auth ni d’invit
 node scripts/statistics/verify_production.mjs /tmp/draftroom-production-check
 ```
 
-Il doit contrôler le commit servi, créer une salle privée jetable, vérifier son snapshot réel et l’absence de paires inline, sélectionner Renekton Top contre Ambessa Top avec Lee Sin Jungle, comparer le score aux observations publiées, recharger la page puis quitter/supprimer sa salle de test. Le script est syntaxiquement contrôlé ; **son exécution contre le site attend l’accès réseau**. Ne pas annoncer ce parcours comme réussi avant d’avoir sa preuve.
+Il doit contrôler le commit servi, créer une salle privée jetable, vérifier son snapshot réel et l’absence de paires inline, sélectionner Renekton Top contre Ambessa Top avec Lee Sin Jungle, comparer le score aux observations publiées, recharger la page puis quitter/supprimer sa salle de test. Le script a été tenté contre le site avec Chromium : échec `net::ERR_TUNNEL_CONNECTION_FAILED` sur `/deployment.json`, avant création de toute salle. **La vérification complète attend l’accès réseau**. Ne pas annoncer ce parcours comme réussi avant d’avoir sa preuve.
 
 Le rafraîchissement quotidien est implémenté dans le workflow, mais les secrets/variables GitHub et son activation distante n’ont pas été configurés ou vérifiés pendant ce déploiement : l’API GitHub est encore bloquée. Aucun secret ne doit être demandé ou copié dans le chat.
