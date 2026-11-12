@@ -166,7 +166,11 @@ Après accord explicite de l'utilisateur, cette branche a été intégrée à `m
 008 appliquée et cron activé. Netlify et les parcours hébergés ont été vérifiés.
 Le premier rafraîchissement réel a établi le blocage initial du secret GitHub
 (HTTP 401), puis le refus de sa correction par l'intégration (HTTP 403).
-Le propriétaire a depuis remplacé le secret et un précontrôle réel est vert.
+Le propriétaire a depuis remplacé le secret. Le précontrôle puis le passage
+complet sont verts : 865/865 cibles, 786 720 observations publiées et contrôle
+hébergé des salles avant/après promotion. Une réponse tronquée observée lors
+du premier passage est maintenant réessayée au plus trois fois ; aucun contenu
+partiel n'est mis en cache. Voir [daily-refresh-verified.json](daily-refresh-verified.json).
 Le contrôle qui masquait cette erreur et le renouvellement de présence
 PostgREST ont été corrigés. Voir [PRODUCTION.md](PRODUCTION.md) pour les
 résultats, les purges effectivement réalisées et le seul blocage restant.

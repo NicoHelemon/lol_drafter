@@ -5,9 +5,9 @@ L'utilisateur a autorisé la publication dans cette session. La branche
 frontend. La migration 008 et les deux jobs `pg_cron` sont installés dans le
 projet vérifié `zsmpdkjfjqgtjinzoexv`, `NicoHelemon's Project`, `ACTIVE_HEALTHY`.
 
-**Le site et sa maintenance sont en production. Le jeton GitHub a été remplacé
-par son propriétaire : le nouveau précontrôle en lecture seule est vert.
-Le rafraîchissement exhaustif est lancé et sa promotion reste à constater.**
+**Le site, sa maintenance et le rafraîchissement quotidien sont opérationnels.
+Le nouveau jeton GitHub est validé, le passage complet 865/865 a réussi et le
+nouveau snapshot a été promu puis vérifié sur le vrai site.**
 
 ## Déploiement et données préservées
 
@@ -23,11 +23,17 @@ Le rafraîchissement exhaustif est lancé et sa promotion reste à constater.**
   identiques avant migration, après migration et après la maintenance initiale.
 - Aucune modification du moteur de scoring, de ses poids ou du collecteur.
 
-Le snapshot courant reste :
-`0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb`.
-Il contient **865 fragments, 786 704 observations réelles** :
-433 233 Against et 353 471 Synergy, `fictional:false`.
-Les seuils Lane/Games/Pick restent à zéro.
+Le snapshot courant est désormais :
+`83a505ceed4690136c3cedaa67eff2a306c3956e724477d40bebd91bc07f131c`.
+Il contient **865 fragments, 786 720 observations réelles** :
+433 249 Against et 353 471 Synergy, `fictional:false`.
+La promotion a été constatée le 12 novembre vers **23:10 en Suisse**
+(22:10 UTC), après collecte et vérification complètes.
+Les seuils Lane/Games/Pick restent à zéro. L'ancien snapshot réel conserve ses
+865 empreintes inchangées pendant sa transition d'une heure. L'ancien import
+de démonstration, 15 fragments non référencés et retirés depuis plus d'une heure,
+a été effectivement purgé par cron à 22:00 UTC ; le snapshot réel courant est
+resté intact. Aucun reset de base ni suppression d'identité Auth.
 
 Les cinq salles anciennes ont été sauvegardées puis vérifiées comme inactives
 depuis plus de deux heures. Elles ont été supprimées par la politique approuvée,
@@ -50,7 +56,27 @@ La rétention exacte et ses délais sont décrits dans [LIFECYCLE.md](LIFECYCLE.
 La tâche de purge des journaux sera exécutée à son prochain horaire quotidien ;
 son activation ne constitue pas une exécution déjà observée.
 
-## Vérifications contre le vrai site
+## Vérification du nouveau snapshot après la première actualisation
+
+Le passage [43311641996](https://github.com/NicoHelemon/lol_drafter/actions/runs/43311641996)
+est **success**, collecte et publication comprises. Les journaux contiennent
+les 865 cibles terminées et le résultat du publisher concorde avec
+`statistics_health()` : identité, fragments, total et deux relations.
+Aucune publication incomplète ne reste en base.
+
+Une salle privée créée avant la promotion a conservé sa référence au snapshot
+`0551fd…`, y compris après rechargement. Une salle créée après a reçu `83a505…`,
+sans paires inline. Les deux salles ont ensuite été quittées et supprimées.
+
+Un nouveau contrôle du score sur le site a lu les fragments du snapshot promu :
+Renekton Top contre Ambessa Top **+2,11**, avec Lee Sin Jungle **−0,15**,
+soit **+1,36**, détail 2/2 paires. Score conservé après rechargement,
+quatre lectures de fragments Supabase et **zéro appel navigateur à Lolalytics**.
+La salle de test a été supprimée. Le calcul et les coefficients n'ont pas changé.
+
+Preuve complète : [daily-refresh-verified.json](daily-refresh-verified.json).
+
+## Vérifications hébergées lors du déploiement initial
 
 Un navigateur Chromium, utilisant explicitement la clé publique de l'autorité
 TLS du proxy de cet environnement, a vérifié :
@@ -122,7 +148,10 @@ essais et absence de cache partiel. Les 403 et les erreurs de validation restent
 bloquants. La CI [43311590931](https://github.com/NicoHelemon/lol_drafter/actions/runs/43311590931)
 est verte. Le second passage complet
 [43311641996](https://github.com/NicoHelemon/lol_drafter/actions/runs/43311641996)
-est en cours, avec précontrôle réussi. La promotion reste à constater. Le précontrôle corrigé
+a réussi avec précontrôle vert, 865/865 cibles traitées puis publication
+complète. Les réponses tronquées sont désormais réessayées dans la limite
+prévue, sans mettre de contenu partiel en cache. Les observations détaillées
+de la nouvelle promotion sont consignées plus haut. Le précontrôle corrigé
 [43306087734](https://github.com/NicoHelemon/lol_drafter/actions/runs/43306087734)
 a confirmé **`STATISTICS_REFRESH_ENABLED=true`**, puis échoué explicitement sur
 le HTTP 401 ; son job de publication a été ignoré. Cela vérifie que le correctif

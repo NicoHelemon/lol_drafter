@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-12T21:38:13.048433+00:00",
+  "checkedAt": "2026-11-12T22:14:25.501630+00:00",
   "credentialPreflight": {
     "run": 43308157993,
     "conclusion": "success"
@@ -22,8 +22,17 @@
   },
   "currentFullRun": {
     "run": 43311641996,
-    "status": "in_progress",
+    "status": "completed",
+    "conclusion": "success",
     "preflight": "success",
-    "publicationVerified": false
+    "publicationVerified": true,
+    "targetsCompleted": 865,
+    "snapshotId": "83a505ceed4690136c3cedaa67eff2a306c3956e724477d40bebd91bc07f131c",
+    "shards": 865,
+    "pairs": 786720,
+    "coverage": {
+      "vs": 433249,
+      "with": 353471
+    }
   }
 }

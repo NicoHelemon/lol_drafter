@@ -1,0 +1,112 @@
+{
+  "checkedAt": "2026-11-12T22:14:25.501630+00:00",
+  "run": 43311641996,
+  "conclusion": "success",
+  "workflowCommit": "fd172a783b7fb607057926482f112243241419d2",
+  "requestedTargets": 865,
+  "completedTargets": 865,
+  "credentialPreflightRun": 43308157993,
+  "credentialPreflightConclusion": "success",
+  "health": {
+    "pairs": 786720,
+    "rooms": 0,
+    "shards": 865,
+    "source": "Lolalytics unofficial: public Build HTML + website build-team JSON",
+    "context": {
+      "tier": "emerald_plus",
+      "unit": "percentage_points",
+      "queue": "ranked_solo_duo",
+      "metric": "delta2",
+      "region": "global",
+      "minGames": 0,
+      "windowDays": 14,
+      "minLanePercent": 0,
+      "minPickPercent": 0
+    },
+    "retired": 1,
+    "coverage": {
+      "vs": 433249,
+      "with": 353471
+    },
+    "ageSeconds": 426.74039,
+    "importedAt": "2026-11-12T22:04:07.968103+00:00",
+    "incomplete": 0,
+    "snapshotId": "83a505ceed4690136c3cedaa67eff2a306c3956e724477d40bebd91bc07f131c"
+  },
+  "referenceTransition": {
+    "checkedAt": "2026-11-12T21:35:30.512Z",
+    "sourceRequests": 0,
+    "initialSnapshot": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb",
+    "nextSnapshot": "83a505ceed4690136c3cedaa67eff2a306c3956e724477d40bebd91bc07f131c",
+    "existingRoomPinned": true,
+    "existingRoomReloaded": true,
+    "newRoomUsesNewSnapshot": true,
+    "newRoomHasNoInlinePairs": true,
+    "previousSnapshotRetiredAt": "2026-11-12 22:10:14.031099+00",
+    "success": true,
+    "cleanup": [
+      {
+        "removed": true
+      },
+      {
+        "removed": true
+      }
+    ]
+  },
+  "browser": {
+    "checkedAt": "2026-11-12T22:11:40.808Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "shardRequests": 4,
+    "expectedScore": "+1.36",
+    "deployment": {
+      "commit": "fd172a783b7fb607057926482f112243241419d2",
+      "builtAt": "2026-11-12T21:34:48.889Z"
+    },
+    "snapshotId": "83a505ceed4690136c3cedaa67eff2a306c3956e724477d40bebd91bc07f131c",
+    "fictional": false,
+    "inlinePairs": 0,
+    "displayedScore": "+1.36",
+    "details": "Renekton · Top\n×\n\nScore +1.36\n2/2 pairs\n\nAgainst Ambessa · Top\n+2.11 × 0.400\nWith Lee Sin · Jungle\n-0.15 × 0.200",
+    "reloadPreservedScore": true,
+    "success": true,
+    "testRoomRemoved": true
+  },
+  "integrity": {
+    "previousSnapshotShardsPreserved": 865,
+    "activeRooms": 0
+  },
+  "retention": {
+    "originalCurrentShardsPreserved": 865,
+    "expiredHistoricalShardsRemaining": 0,
+    "cron": [
+      {
+        "status": "succeeded",
+        "start_time": "2026-11-12 22:00:00.089848+00",
+        "end_time": "2026-11-12 22:00:00.123515+00",
+        "return_message": "1 row"
+      }
+    ],
+    "current": [
+      {
+        "snapshot_id": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb"
+      }
+    ]
+  },
+  "validation": {
+    "pythonTests": 39,
+    "applicationPostgresTests": 59,
+    "browserTests": 11,
+    "sourceRetryCiRun": 43311590931,
+    "sourceRetryCiConclusion": "success",
+    "heartbeatCiRun": 43309989600,
+    "heartbeatCiConclusion": "success"
+  },
+  "schedule": {
+    "refreshUtc": "06:17",
+    "refreshSwissTimeInNovember": "07:17",
+    "enabled": true,
+    "maintenanceUtc": "every 10 minutes",
+    "logRetentionDays": 7
+  }
+}
