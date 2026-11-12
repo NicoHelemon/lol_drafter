@@ -1,5 +1,7 @@
 # Acquisition des Delta 2 : résultat des essais du 12 novembre 2026
 
+> **Reprise du cycle de vie :** voir [LIFECYCLE.md](LIFECYCLE.md) pour l’audit du dépôt, la rétention reconstituée, les tests et les limites de publication de cette nouvelle session.
+
 > **État courant :** le [pipeline réel Against + Synergy](LIVE_PIPELINE.md) est implémenté et testé sur de vraies réponses, avec 228 cellules Synergy comparées au navigateur. Les anciens blocages techniques et résultats limités aux mocks ci-dessous sont historiques. Aucun seuil Lane/Games/Pick n’est appliqué aux nouveaux exports.
 
 > **Dernière décision utilisateur :** suppression des seuils indicatifs Lane/Games/Pick pour la collecte. Voir la [comparaison testée des collecteurs](COLLECTOR_REVIEW.md) : 2 518 lignes Against conservées, Hextech contrôlé sur 278 paires, Synergy testée sur mocks uniquement. Les résultats avec seuils ci-dessous sont historiques.

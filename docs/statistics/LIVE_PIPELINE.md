@@ -1,5 +1,7 @@
 # Acquisition réelle Against et Synergy
 
+> **Reprise du cycle de vie :** voir [LIFECYCLE.md](LIFECYCLE.md) pour l’audit du dépôt, la rétention reconstituée, les tests et les limites de publication de cette nouvelle session.
+
 > **Publication effectuée :** les 865 fragments réels sont promus dans Supabase et leurs contenus sont vérifiés ; le code est poussé sur `main`, CI verte. Le contrôle Netlify dans le navigateur et la configuration GitHub du quotidien attendent les domaines réseau manquants. Voir le [statut de production](PRODUCTION.md).
 
 Les deux relations sont maintenant extraites de réponses réelles Lolalytics, normalisées dans le format existant puis construites et vérifiées par le pipeline. Le moteur de scoring, ses poids et l’interface restent inchangés.

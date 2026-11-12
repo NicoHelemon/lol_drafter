@@ -1,5 +1,7 @@
 # Mise en production — 12 novembre 2026
 
+> **Reprise du cycle de vie :** voir [LIFECYCLE.md](LIFECYCLE.md) pour l’audit du dépôt, la rétention reconstituée, les tests et les limites de publication de cette nouvelle session.
+
 ## Données effectivement publiées
 
 Projet vérifié : **NicoHelemon’s Project**, référence `zsmpdkjfjqgtjinzoexv`, état `ACTIVE_HEALTHY`.

@@ -1,0 +1,53 @@
+{
+  "checkedAt": "2026-11-12T20:43:35.765429+00:00",
+  "branch": "wip/statistics-lifecycle",
+  "baseCommit": "ea11097a7d3a8afd4288210f5be6f23f31b3faeb",
+  "implementationCommit": "7884e55954241bd9219715100472e6b962ae2f13",
+  "recovery": {
+    "cleanCheckout": true,
+    "missingChanges": [
+      "migration008",
+      "boundedCache",
+      "RoomExpiredError",
+      "roomWatchExpiration",
+      "AppExpirationHandling"
+    ],
+    "archivePresent": true,
+    "archiveSha256": "9f07003435fc1a8a6bab7bfa341a97ff049243c52f8fcb2efbaf400786a8ec8d"
+  },
+  "readOnlyDatabaseAudit": {
+    "current_snapshot": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb",
+    "rooms": 5,
+    "snapshots": 2,
+    "current_shards": 865,
+    "current_pairs": 786704,
+    "retention_column": 0,
+    "cron_installed": 0
+  },
+  "localValidation": {
+    "pythonTests": 38,
+    "applicationPostgresTests": 57,
+    "browserTests": 11,
+    "build": "passed",
+    "actionlint": "passed",
+    "completeSnapshotVerification": "passed"
+  },
+  "githubValidation": {
+    "readOnlyStatisticsRun": 43302888389,
+    "conclusion": "success",
+    "publicationJob": "skipped",
+    "effectiveSource": "lolalytics",
+    "projectRef": "zsmpdkjfjqgtjinzoexv",
+    "administrativeAccess": "verified via read-only query",
+    "scheduledEnableVariable": "user-declared; variables API returns 403",
+    "generalCiRun": 43302864123
+  },
+  "productionChanges": {
+    "migrationApplied": false,
+    "cronInstalled": false,
+    "dataDeleted": false,
+    "snapshotPromoted": false,
+    "mainPushed": false,
+    "secretsChanged": false
+  }
+}
