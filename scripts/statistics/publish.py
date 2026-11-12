@@ -83,6 +83,7 @@ def publish(directory, execute=query, max_batch_bytes=900_000, progress=None):
     # Completeness verification AND pointer change in one database transaction.
     # Old current stays valid on any HTTP or SQL failure before/inside this query.
     execute(f"""begin;
+      select pg_advisory_xact_lock(765432100);
       select id from public.statistics_snapshots where id={sid} for update;
       do $check$ begin
         if (select count(*) from public.statistics_shards where snapshot_id={sid}) <> {len(groups)}

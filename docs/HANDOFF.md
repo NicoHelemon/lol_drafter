@@ -1,5 +1,7 @@
 # Passation — Draftroom / lol_drafter
 
+> **Reprise du cycle de vie — 12 novembre 2026 :** audit depuis `ea11097`, checkout propre ; les cinq modifications de rétention de la session interrompue étaient absentes. Elles sont reconstituées sur `wip/statistics-lifecycle`. Supabase contrôlé en lecture seule : 5 salles, 865 fragments et 786 704 observations dans le snapshot courant ; 008 et pg_cron absents. Archive locale complète préservée. Aucun changement distant appliqué. Voir [LIFECYCLE.md](statistics/LIFECYCLE.md). Les paragraphes historiques ci-dessous ne remplacent pas cet état ni les dernières instructions utilisateur.
+
 > **Publication effectuée :** les 865 fragments réels sont promus dans Supabase et leurs contenus sont vérifiés ; le code est poussé sur `main`, CI verte. Le contrôle Netlify dans le navigateur et la configuration GitHub du quotidien attendent les domaines réseau manquants. Voir le [statut de production](statistics/PRODUCTION.md).
 
 > **Livrable actuel complet :** 865/865 couples collectés, 433 233 Against + 353 471 Synergy réels, snapshot vérifié et archive locale de 7 Mo. Voir [LIVE_PIPELINE.md](statistics/LIVE_PIPELINE.md) et [le bilan machine](statistics/full-acquisition-summary.json). 30 tests Python, 44 tests applicatifs et neuf parcours navigateur passent. Aucun push ni publication distante.

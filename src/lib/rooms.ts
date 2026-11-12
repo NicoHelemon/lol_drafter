@@ -1,3 +1,4 @@
+import { RoomExpiredError } from "./errors";
 import { addDraftCandidate } from "../domain/draft";
 import { createClient } from "@supabase/supabase-js";
 import type { Room, State, RoleSwapRequest } from "../domain/types";
@@ -15,6 +16,7 @@ const statistics = new StatisticsCache(async (snapshot, keys) => {
   return data ?? [];
 });
 const hydrated = (room: Room) => statistics.hydrate(room);
+export const clearStatisticsCache = () => statistics.clear();
 let identityPromise: Promise<string> | null = null;
 export function identity() {
   return (identityPromise ??= resolveIdentity().catch((e) => {
@@ -80,39 +82,43 @@ export async function joinRoom(
     invite_token: token,
     nickname: name,
   });
+  if (error?.message === "Room not found") throw new RoomExpiredError();
   if (error) throw error;
+  if (!data) throw new RoomExpiredError();
   return hydrated(data);
 }
 export async function resolveRoom(slug: string): Promise<Room> {
   if (!supabase) {
     const stored = localStorage.getItem("draftroom-demo");
-    if (!stored) throw Error("Room not found");
+    if (!stored) throw new RoomExpiredError();
     const r = JSON.parse(stored) as Room;
-    if (r.slug !== slug) throw Error("Room not found");
+    if (r.slug !== slug) throw new RoomExpiredError();
     return r;
   }
   const { data, error } = await supabase
     .from("rooms")
     .select("*")
     .eq("slug", slug)
-    .single();
+    .maybeSingle();
   if (error) throw error;
+  if (!data) throw new RoomExpiredError();
   return hydrated(data);
 }
 export async function readRoom(id: string): Promise<Room> {
   if (!supabase) {
     const stored = localStorage.getItem("draftroom-demo");
-    if (!stored) throw Error("Room not found");
+    if (!stored) throw new RoomExpiredError();
     const room = JSON.parse(stored) as Room;
-    if (room.id !== id) throw Error("Room not found");
+    if (room.id !== id) throw new RoomExpiredError();
     return room;
   }
   const { data, error } = await supabase
     .from("rooms")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
   if (error) throw error;
+  if (!data) throw new RoomExpiredError();
   return hydrated(data);
 }
 export async function saveRoom(room: Room, next: State): Promise<Room> {
@@ -131,21 +137,29 @@ export async function saveRoom(room: Room, next: State): Promise<Room> {
     next_state: persistedState(next),
   });
   if (error) throw error;
+  if (!data) throw new RoomExpiredError();
   return hydrated(data);
 }
 export function watchRoom(
   id: string,
   receive: (r: Room) => void,
   status: (s: string) => void,
+  expired: () => void,
 ) {
-  if (!supabase) {
-    status("Local demo");
-    return () => {};
-  }
+  let active = true;
   const refresh = () =>
     readRoom(id)
-      .then(receive)
-      .catch(() => status("Reconnecting…"));
+      .then(r => { if (active) receive(r); })
+      .catch(error => {
+        if (!active) return;
+        if (error instanceof RoomExpiredError) { active = false; expired(); }
+        else status("Reconnecting…");
+      });
+  if (!supabase) {
+    status("Local demo");
+    const timer = setInterval(refresh, 20000);
+    return () => { active = false; clearInterval(timer); };
+  }
   const channel = supabase
     .channel(`room:${id}`)
     .on(
@@ -168,6 +182,7 @@ export function watchRoom(
   }, 20000);
   window.addEventListener("online", refresh);
   return () => {
+    active = false;
     clearInterval(timer);
     window.removeEventListener("online", refresh);
     void supabase!.removeChannel(channel);
@@ -219,6 +234,7 @@ export async function requestRoleSwap(
     expected_version: room.version,
   });
   if (error) throw error;
+  if (!data) throw new RoomExpiredError();
   return hydrated(data);
 }
 export async function respondRoleSwap(
@@ -234,6 +250,7 @@ export async function respondRoleSwap(
     accept,
   });
   if (error) throw error;
+  if (!data) throw new RoomExpiredError();
   return hydrated(data);
 }
 
@@ -251,5 +268,6 @@ export async function addCandidate(
     expected_version: room.version,
   });
   if (error) throw error;
+  if (!data) throw new RoomExpiredError();
   return hydrated(data);
 }

@@ -1,7 +1,7 @@
 import Participants from "./components/Participants";
 import SwapPrompt from "./components/SwapPrompt";
 import { roleName } from "./domain/roles";
-import { errorMessage } from "./lib/errors";
+import { errorMessage, RoomExpiredError } from "./lib/errors";
 import SetupPage from "./pages/SetupPage";
 import DraftPage from "./pages/DraftPage";
 import { Search, names, Portrait } from "./components/Champions";
@@ -33,6 +33,7 @@ import {
   requestRoleSwap,
   respondRoleSwap,
   addCandidate,
+  clearStatisticsCache,
 } from "./lib/rooms";
 export type Picker =
   | { kind: "pick"; team: Team; role: Role }
@@ -50,7 +51,7 @@ export default function App() {
     [swaps, setSwaps] = useState<RoleSwapRequest[]>([]),
     [online, setOnline] = useState<string[]>([]);
   const [invite, setInvite] = useState(() => location.hash.slice(1));
-  const [inviteRoom] = useState(
+  const [inviteRoom, setInviteRoom] = useState(
     () => location.pathname.match(/^\/rooms\/([^/]+)/)?.[1] ?? null,
   );
   useEffect(() => {
@@ -60,8 +61,10 @@ export default function App() {
       if (id) {
         try {
           setRoom(await resolveRoom(id));
-        } catch {
+        } catch (e) {
           localStorage.removeItem("draftroom-current");
+          if (e instanceof RoomExpiredError && !invite) expireRoom();
+          else if (!(e instanceof RoomExpiredError)) throw e;
         }
       }
     });
@@ -76,6 +79,7 @@ export default function App() {
           old && r.id === old.id && r.version >= old.version ? r : old,
         ),
       setSync,
+      expireRoom,
     );
     const update = () => presence(room.id).then(setOnline);
     void update();
@@ -158,7 +162,8 @@ export default function App() {
     try {
       await fn();
     } catch (e) {
-      setError(errorMessage(e));
+      if (e instanceof RoomExpiredError) expireRoom();
+      else setError(errorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -188,14 +193,23 @@ export default function App() {
         : { known: 0, total: 0 },
     [state?.dataset, state?.players],
   );
+  function expireRoom() {
+    clearRoom();
+    setError(new RoomExpiredError().message);
+  }
   function clearRoom() {
     localStorage.removeItem("draftroom-current");
     setRoom(null);
     setPicker(null);
     setInvite("");
+    setInviteRoom(null);
+    setSwaps([]);
+    setOnline([]);
+    clearStatisticsCache();
+    document.title = "Draftroom";
     setSync("Not connected");
     history.replaceState(null, "", "/");
-    location.assign("/");
+
   }
   async function exitRoom() {
     if (!room || !confirm("Quit this room?")) return;

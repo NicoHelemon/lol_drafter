@@ -8,8 +8,22 @@ type ReadShards = (snapshot: string, keys: string[]) => Promise<Shard[]>;
 // One cache per browser session, keyed by immutable snapshot AND candidate/role.
 // No cache entry is reused across daily snapshots. Failures may be retried.
 export class StatisticsCache {
-  private entries = new Map<string, Promise<Pair[]>>();
-  constructor(private read: ReadShards) {}
+  private entries = new Map<string, { pairs: Pair[]; expires: number }>();
+  private pending = new Map<string, Promise<Pair[]>>();
+  private capacity: number;
+  private ttlMs: number;
+  private now: () => number;
+  constructor(private read: ReadShards, options: { capacity?: number; ttlMs?: number; now?: () => number } = {}) {
+    this.capacity = options.capacity ?? 128;
+    this.ttlMs = options.ttlMs ?? 30 * 60_000;
+    this.now = options.now ?? Date.now;
+    if (!Number.isInteger(this.capacity) || this.capacity < 1 || !Number.isFinite(this.ttlMs) || this.ttlMs <= 0) throw Error('Invalid cache limits');
+  }
+
+  clear() {
+    this.entries.clear();
+    this.pending.clear();
+  }
 
   async hydrate(room: Room): Promise<Room> {
     const dataset = room.state.dataset;
@@ -19,10 +33,21 @@ export class StatisticsCache {
       ...room.state.players.flatMap(p => p.role ? p.pool.map(id => `${id}:${p.role}`) : []),
       ...Object.values(room.state.picks).flat().map(p => `${p.championId}:${p.role}`),
     ])].sort();
-    const missing = keys.filter(key => !this.entries.has(`${dataset.snapshotId}/${key}`));
+    // Keep this hydration's promises even if a larger request evicts LRU entries.
+    const values = new Map<string, Promise<Pair[]>>();
+    for (const [key, entry] of this.entries) if (entry.expires <= this.now()) this.entries.delete(key);
+    const missing = keys.filter(key => {
+      const cacheKey = `${dataset.snapshotId}/${key}`, entry = this.entries.get(cacheKey);
+      if (entry) {
+        this.entries.delete(cacheKey);
+        this.entries.set(cacheKey, entry);
+        values.set(key, Promise.resolve(entry.pairs));
+      } else if (this.pending.has(cacheKey)) values.set(key, this.pending.get(cacheKey)!);
+      return !values.has(key);
+    });
     for (let i = 0; i < missing.length; i += 40) {
       const batch = missing.slice(i, i + 40), snapshot = dataset.snapshotId;
-      const request = this.read(snapshot, batch).then(rows => {
+      const request = Promise.resolve().then(() => this.read(snapshot, batch)).then(rows => {
         const found = new Map<string, Pair[]>();
         for (const row of rows) {
           if (!batch.includes(row.candidate_key) || found.has(row.candidate_key)) throw Error('Unexpected statistics shard');
@@ -34,14 +59,21 @@ export class StatisticsCache {
       });
       for (const key of batch) {
         const cacheKey = `${snapshot}/${key}`;
-        const value = request.then(rows => rows.get(key) ?? []).catch(error => {
-          this.entries.delete(cacheKey);
-          throw error;
+        const value = request.then(rows => {
+          const pairs = rows.get(key) ?? [];
+          if (this.pending.get(cacheKey) === value) {
+            this.entries.set(cacheKey, { pairs, expires: this.now() + this.ttlMs });
+            while (this.entries.size > this.capacity) this.entries.delete(this.entries.keys().next().value!);
+          }
+          return pairs;
+        }).finally(() => {
+          if (this.pending.get(cacheKey) === value) this.pending.delete(cacheKey);
         });
-        this.entries.set(cacheKey, value);
+        this.pending.set(cacheKey, value);
+        values.set(key, value);
       }
     }
-    const pairs = (await Promise.all(keys.map(key => this.entries.get(`${dataset.snapshotId}/${key}`)!))).flat();
+    const pairs = (await Promise.all(keys.map(key => values.get(key)!))).flat();
     return { ...room, state: { ...room.state, dataset: { ...dataset, pairs } } };
   }
 }

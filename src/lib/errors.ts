@@ -3,3 +3,7 @@ export function errorMessage(error: unknown): string {
     ? String(error.message)
     : String(error);
 }
+export class RoomExpiredError extends Error {
+  constructor() { super('This room has expired or is no longer available. Please create a new room.'); }
+}
+
