@@ -113,10 +113,35 @@ class PipelineTests(unittest.TestCase):
             queries = []
             def execute(sql): queries.append(sql); return []
             publish(Path(directory) / m['metadata']['snapshotId'], execute)
-            self.assertEqual(sum('insert into public.statistics_shards' in q for q in queries), 3)
+            self.assertEqual(sum('insert into public.statistics_shards' in q for q in queries), 1)
+            for key in ('58:Top', '103:Mid', '202:ADC'):
+                self.assertTrue(any(key in q for q in queries))
             self.assertIn('begin;', queries[-1])
             self.assertIn('statistics_current', queries[-1])
             self.assertIn('Incomplete snapshot', queries[-1])
+
+    def test_publication_batches_obey_body_limit_and_split_rejected_requests(self):
+        import io
+        from urllib.error import HTTPError
+        with tempfile.TemporaryDirectory() as directory:
+            data = fixture(); data['fictional'] = False
+            manifest = build(data, directory)
+            path = Path(directory) / manifest['metadata']['snapshotId']
+            queries = []
+            publish(path, lambda sql: queries.append(sql) or [], max_batch_bytes=900)
+            batches = [q for q in queries if q.startswith('insert into public.statistics_shards')]
+            self.assertGreater(len(batches), 1)
+            self.assertTrue(all(len(json.dumps({'query':q}).encode()) <= 900 for q in batches))
+            queries = []; progress = []
+            def size_limited(sql):
+                if sql.startswith('insert into public.statistics_shards') and '::jsonb),' in sql:
+                    raise HTTPError('https://api.supabase.com', 413, 'size', {}, io.BytesIO(b'Payload too large'))
+                queries.append(sql)
+                return []
+            publish(path, size_limited, progress=lambda count,total:progress.append((count,total)))
+            self.assertEqual(progress, [(1,3),(2,3),(3,3)])
+            self.assertEqual(sum(q.startswith('insert into public.statistics_shards') for q in queries), 3)
+            self.assertIn('statistics_current', queries[-1])
 
     def test_discovery_reports_labels_without_claiming_verified_numbers(self):
         result = inspect(b'<table><tr><th>Delta 2</th></tr><tr><td>0</td></tr></table>'

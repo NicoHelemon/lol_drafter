@@ -79,16 +79,18 @@ python3 scripts/statistics/publish.py statistics-cache/RUN/snapshots/SHA256
 STATISTICS_SOURCE=lolalytics python3 scripts/statistics/refresh.py
 ```
 
-Les deux dernières commandes écrivent dans Supabase et nécessitent `SUPABASE_PROJECT_REF` et `SUPABASE_ACCESS_TOKEN`. Le mode quotidien refuse de commencer sa collecte si ces variables manquent. La vérification du corpus précède la publication ; le pointeur distant est promu seulement après chargement et vérification de tous les fragments. Les salles déjà ouvertes gardent leur snapshot.
+Les deux dernières commandes écrivent dans Supabase et nécessitent `SUPABASE_PROJECT_REF` et `SUPABASE_ACCESS_TOKEN`. Le mode quotidien refuse de commencer sa collecte si ces variables manquent. Les écritures sont regroupées en lots dont le corps JSON est borné à 900 000 octets ; un refus de taille 413/503 provoque une subdivision du lot. La vérification du corpus précède la publication ; le pointeur distant est promu seulement après chargement et vérification de tous les fragments. Les salles déjà ouvertes gardent leur snapshot.
 
 Le workflow `statistics.yml` sait maintenant utiliser ce collecteur directement (`STATISTICS_SOURCE=lolalytics`, valeur par défaut dans le workflow). Le mode `export` reste disponible avec `STATISTICS_IMPORT_URL`. La planification existante de 06:17 UTC, soit **07:17 en Suisse en novembre**, garde sa condition `STATISTICS_REFRESH_ENABLED=true`. Ce travail n’a pas modifié les variables/secrets GitHub ni activé de planification distante.
 
-La CI exécute désormais aussi la suite Python. Vérifications de cette session : **30 tests Python, 44 tests TypeScript/PostgreSQL, neuf parcours navigateur, build réussi**. Les tests de reprise, cache altéré/expiré, 429/403, échec avant publication et immutabilité sont inclus.
+La CI exécute désormais aussi la suite Python. Vérifications de cette session : **31 tests Python, 44 tests TypeScript/PostgreSQL, neuf parcours navigateur, build réussi**. Les tests de reprise, cache altéré/expiré, 429/403, échec avant publication et immutabilité sont inclus.
 
-Le publisher a aussi été exécuté en **dry-run sur le corpus complet** : 868 instructions générées pour les 865 fragments, taille maximale d’un corps JSON HTTP de 251 702 octets, zéro requête externe. Voir [publisher-dry-run.json](publisher-dry-run.json). Ce contrôle vérifie la préparation de la publication complète ; il ne prétend pas qu’une promotion distante a eu lieu.
+Le publisher a aussi été exécuté en **dry-run sur le corpus complet** : 160 instructions générées pour les 865 fragments, taille maximale d’un corps JSON HTTP de 899 305 octets, zéro requête externe. Voir [publisher-dry-run.json](publisher-dry-run.json). Ce contrôle vérifie la préparation de la publication complète ; il ne prétend pas qu’une promotion distante a eu lieu.
 
 ## Source et statut de livraison
 
 L’accès est **non officiel**. Le site répond sans authentification aux requêtes utilisées par son interface, mais l’[avis de a1](evidence/a1-access-notice.txt) réserve l’API aux visiteurs et limite la réutilisation par des tiers. Le succès technique et le mandat de développement ne constituent pas une licence de données. Cette restriction reste documentée ; aucun droit de redistribution n’est revendiqué. Les anciens rapports s’arrêtaient avant les essais directs de Synergy ; ils sont historiques et ne décrivent plus la capacité technique actuelle.
 
 Le code et les artefacts réels sont préparés et testés localement. Aucune migration n’a été rejouée, aucun code n’a été poussé et aucun dataset n’a été promu sur le service distant pendant cette tâche.
+
+Le build produit aussi `/deployment.json` (commit et date du build, sans secret), avec `Cache-Control: no-cache`, afin de vérifier quelle révision Netlify sert réellement.

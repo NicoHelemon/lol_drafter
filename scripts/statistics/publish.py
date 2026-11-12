@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 from pipeline import encoded, verify
 
 
@@ -28,7 +29,7 @@ def query(sql):
         return json.load(response)
 
 
-def publish(directory, execute=query):
+def publish(directory, execute=query, max_batch_bytes=900_000, progress=None):
     manifest, groups = verify(directory)  # No remote changes before full validation.
     metadata = manifest['metadata']
     if metadata['fictional']:
@@ -43,11 +44,42 @@ def publish(directory, execute=query):
     ready = bool(rows and rows[0]['ready'])
     if not ready:
         execute(f"insert into public.statistics_snapshots(id,metadata) values({sid},{meta}::jsonb) on conflict do nothing")
+        prefix = "insert into public.statistics_shards(snapshot_id,candidate_key,pairs) values"
+        suffix = " on conflict(snapshot_id,candidate_key) do update set pairs=excluded.pairs"
+        base_size = len(json.dumps({'query': prefix + suffix}).encode())
+        batch, size = [], base_size
+        uploaded = 0
+
+        def write_batch(rows):
+            nonlocal uploaded
+            sql = prefix + ','.join(rows) + suffix
+            try:
+                execute(sql)
+            except HTTPError as error:
+                reason = error.read().decode('utf-8', errors='replace').lower()
+                if (len(rows) > 1 and (error.code == 413 or
+                        (error.code == 503 and any(s in reason for s in
+                         ('request size too large', 'payload too large'))))):
+                    middle = len(rows) // 2
+                    write_batch(rows[:middle]); write_batch(rows[middle:])
+                    return
+                raise
+            uploaded += len(rows)
+            if progress:
+                progress(uploaded, len(groups))
+
         for key, pairs in sorted(groups.items()):
-            # Idempotent retry of an unfinished publish; ready snapshots reject edits.
-            execute(f"insert into public.statistics_shards(snapshot_id,candidate_key,pairs) "
-                    f"values({sid},{literal(key)},{literal(encoded(pairs).decode())}::jsonb) "
-                    "on conflict(snapshot_id,candidate_key) do update set pairs=excluded.pairs")
+            row = f"({sid},{literal(key)},{literal(encoded(pairs).decode())}::jsonb)"
+            row_size = len(json.dumps(row).encode()) - 2
+            if base_size + row_size > max_batch_bytes:
+                raise ValueError('A shard exceeds the configured publication request limit')
+            extra = row_size + bool(batch)
+            if batch and size + extra > max_batch_bytes:
+                write_batch(batch); batch, size = [], base_size
+                extra = row_size
+            batch.append(row); size += extra
+        if batch:
+            write_batch(batch)
     # Completeness verification AND pointer change in one database transaction.
     # Old current stays valid on any HTTP or SQL failure before/inside this query.
     execute(f"""begin;

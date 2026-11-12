@@ -1,7 +1,7 @@
 {
-  "statements": 868,
-  "maxRequestBodyBytes": 251702,
-  "totalRequestBodyBytes": 127788433,
+  "statements": 160,
+  "maxRequestBodyBytes": 899305,
+  "totalRequestBodyBytes": 127673737,
   "externalRequests": 0,
   "snapshotId": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb",
   "shards": 865,
