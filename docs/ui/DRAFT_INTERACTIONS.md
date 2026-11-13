@@ -77,12 +77,13 @@ Les tests SQL emploient PostgreSQL/PGlite ; les parcours navigateur locaux
 emploient la démo et des identités explicitement synthétiques. Ils ne sont pas
 présentés comme une validation Realtime du nouveau schéma Supabase hébergé.
 
-Les commits intermédiaires sont conservés sur la branche dédiée. La livraison
-groupée consiste à vérifier le projet, appliquer uniquement 009, puis publier
-le frontend en un seul lot, selon le feu vert de production donné par le
-propriétaire. Recharger les anciens onglets pour
-utiliser les nouveaux contrôles. Un test hébergé doit ensuite vérifier une
-acceptation/refus entre deux identités et le score calculé sur le snapshot courant.
+La version `8b42026` a été publiée le 13 novembre 2026, après validation de la
+branche et application de la seule migration 009. Les commits intermédiaires
+ont été conservés sur la branche dédiée ; un seul push groupé a publié le
+frontend, selon le feu vert de production donné par le propriétaire.
+Recharger les anciens onglets pour utiliser les nouveaux contrôles.
+Les preuves après publication sont conservées sur la branche de travail pour
+éviter un nouveau déploiement Netlify uniquement documentaire.
 
 ## Validation
 
@@ -93,6 +94,12 @@ de tiers, refus/expiration, accès, contournement direct, changements concurrent
 et suppression de la salle. Les six nouveaux parcours navigateur couvrent les
 neuf contributions, tailles, hover/focus, zéros/manquants, glisser-déposer,
 clavier, demandes et expiration. Aucun échec résiduel constaté.
+
+Validation hébergée terminée le 13 novembre 2026 : [rapport de production](PRODUCTION_VERIFICATION.md)
+et [preuves structurées](evidence/production-verification.json). Le calcul réel,
+les échanges entre deux identités indépendantes, réception sans sélection,
+refus et expiration passent. Les salles temporaires ont été supprimées ; les
+865 fragments statistiques et le pointeur courant sont inchangés.
 
 Le smoke test hébergé après publication est préparé pour la moyenne et le
 survol. Avec les variables backend déjà configurées :
