@@ -1,4 +1,5 @@
 import Participants from "./components/Participants";
+import PickSwapPrompt from "./components/PickSwapPrompt";
 import SwapPrompt from "./components/SwapPrompt";
 import { roleName } from "./domain/roles";
 import { errorMessage, RoomExpiredError } from "./lib/errors";
@@ -12,6 +13,7 @@ import {
   type State,
   type Team,
   type RoleSwapRequest,
+  type PickSwapRequest,
 } from "./domain/types";
 import { coverage, unavailable } from "./domain/scoring";
 import { place, record } from "./domain/state";
@@ -34,6 +36,9 @@ import {
   respondRoleSwap,
   addCandidate,
   clearStatisticsCache,
+  movePick,
+  readPickSwaps,
+  respondPickSwap,
 } from "./lib/rooms";
 export type Picker =
   | { kind: "pick"; team: Team; role: Role }
@@ -49,6 +54,7 @@ export default function App() {
     [busy, setBusy] = useState(false),
     [picker, setPicker] = useState<Picker | null>(null),
     [swaps, setSwaps] = useState<RoleSwapRequest[]>([]),
+    [pickSwaps, setPickSwaps] = useState<PickSwapRequest[]>([]),
     [online, setOnline] = useState<string[]>([]);
   const [invite, setInvite] = useState(() => location.hash.slice(1));
   const [inviteRoom, setInviteRoom] = useState(
@@ -99,7 +105,7 @@ export default function App() {
     document.title = `${room.name} · ${room.state.phase === "setup" ? "Preparation" : "Draft"}`;
   }, [room?.id, room?.state.phase, invite]);
   useEffect(() => {
-    if (!room) return;
+    if (!room || room.state.phase !== "setup") {setSwaps([]);return;}
     let active = true;
     const refresh = () =>
       readSwaps(room.id)
@@ -115,7 +121,7 @@ export default function App() {
       active = false;
       clearInterval(timer);
     };
-  }, [room?.id, room?.version]);
+  }, [room?.id, room?.version, room?.state.phase]);
   useEffect(() => {
     if (!room) return;
     const timers = swaps
@@ -141,6 +147,27 @@ export default function App() {
       );
     return () => timers.forEach(clearTimeout);
   }, [swaps, uid, room?.id]);
+  useEffect(() => {
+    if (!room || room.state.phase !== 'live') {setPickSwaps([]);return;}
+    let active=true;
+    const refresh=()=>readPickSwaps(room.id).then(requests=>{if(active)setPickSwaps(requests);}).catch(()=>{if(active)setPickSwaps([]);});
+    void refresh();const timer=setInterval(refresh,1000);
+    return()=>{active=false;clearInterval(timer);};
+  },[room?.id,room?.version,room?.state.phase]);
+  async function championMove(team:Team, from:Role, to:Role) {
+    if (!room || busy) return;
+    await run(async()=>{
+      try {setRoom(await movePick(room,team,from,to));}
+      catch(e){setRoom(await readRoom(room.id));throw e;}
+    });
+  }
+  async function championSwapReply(requestId:string,accept:boolean) {
+    if(!room || busy) return;
+    await run(async()=>{
+      try {setRoom(await respondPickSwap(room,requestId,accept));}
+      catch(e){setRoom(await readRoom(room.id));throw e;}
+    });
+  }
   async function swapAction(targetOrRequest: string, accept?: boolean) {
     if (!room) return;
     await run(async () => {
@@ -200,12 +227,16 @@ export default function App() {
   function clearRoom() {
     localStorage.removeItem("draftroom-current");
     localStorage.removeItem("draftroom-demo");
-    if (room) localStorage.removeItem(`draftroom-swaps-${room.id}`);
+    if (room) {
+      localStorage.removeItem(`draftroom-swaps-${room.id}`);
+      localStorage.removeItem(`draftroom-pick-swaps-${room.id}`);
+    }
     setRoom(null);
     setPicker(null);
     setInvite("");
     setInviteRoom(null);
     setSwaps([]);
+    setPickSwaps([]);
     setOnline([]);
     clearStatisticsCache();
     document.title = "Draftroom";
@@ -420,6 +451,8 @@ export default function App() {
               busy={busy}
               change={change}
               setPicker={setPicker}
+              onMove={championMove}
+              pendingRoles={new Set(pickSwaps.flatMap(r=>[r.from_role,r.to_role]))}
             />
           )}
         </main>
@@ -446,6 +479,9 @@ export default function App() {
               onRespond={(accept) => void swapAction(request.id, accept)}
             />
           ))}
+      {state?.phase === 'live' && pickSwaps.filter(r=>[r.requester_id,r.from_player_id,r.to_player_id].includes(uid)).slice(0,1).map(request=>(
+        <PickSwapPrompt key={request.id} request={request} state={state} uid={uid} busy={busy} onRespond={accept=>void championSwapReply(request.id,accept)}/>
+      ))}
       {error && (
         <div className="error" role="alert">
           {error}

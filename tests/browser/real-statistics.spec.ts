@@ -23,12 +23,12 @@ test('imports real source observations and displays Against plus Synergy without
     await page.getByRole('textbox',{name:'Search champions'}).fill(champion);
     await page.getByRole('button',{name:champion,exact:true}).click();
   }
-  await expect(tile).toContainText('+1.36');
-  await tile.click();
-  const details=page.getByRole('dialog',{name:'Score details'});
+  await expect(tile).toContainText('+1.00');
+  await tile.locator('..').hover();
+  const details=page.getByRole('tooltip');
   await expect(details).toContainText('2/2 pairs');
-  await expect(details).toContainText('Against Ambessa');
-  await expect(details).toContainText('With Lee Sin');
+  await expect(details.getByLabel(/Against Top Ambessa/)).toBeVisible();
+  await expect(details.getByLabel(/With Jungle Lee Sin/)).toBeVisible();
   await expect(details).toContainText('-0.10');
   expect(sourceRequests).toEqual([]);
 });

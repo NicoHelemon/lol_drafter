@@ -10,3 +10,10 @@ export interface State {phase:'setup'|'live'; side:'blue'|'red'; dataset:Dataset
 export interface Room {id:string;slug:string;name:string; host_id:string; version:number; state:State}
 
 export interface RoleSwapRequest {id:string;room_id:string;requester_id:string;target_id:string;from_role:Role;to_role:Role;created_at:string;expires_at:string}
+
+export interface PickSwapRequest {
+ id:string; room_id:string; requester_id:string;
+ from_role:Role; to_role:Role; from_player_id:string; to_player_id:string;
+ from_champion_id:string; to_champion_id:string|null;
+ from_accepted:boolean; to_accepted:boolean; created_at:string; expires_at:string;
+}

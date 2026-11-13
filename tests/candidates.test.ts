@@ -14,3 +14,10 @@ it('shows a manually selected champion outside the prepared pool and recalculate
  const s=initialState('p','Player');s.picks.ally=[{championId:'266',role:'Top'}];expect(candidates(['58'],'Top','ally',s).map(c=>c.id)).toContain('266');expect(scoreForTeam('58','Top','ally',s).value).toBeNull();
  s.picks.enemy=[{championId:'122',role:'Top'}];s.dataset.pairs=[{relation:'vs',candidateChampionId:'58',candidateRole:'Top',otherChampionId:'122',otherRole:'Top',delta2:1.25}];expect(scoreForTeam('58','Top','ally',s).value).toBe(1.25);
 });
+
+it('formats the arithmetic mean symmetrically at a half-cent boundary and keeps zero known',async()=>{
+ const {scoreLabel}=await import('../src/domain/candidates');
+ expect(scoreLabel((2.09-.1)/2)).toBe('+1.00');
+ expect(scoreLabel(-((2.09-.1)/2))).toBe('-1.00');
+ expect(scoreLabel(0)).toBe('+0.00');expect(scoreLabel(null)).toBe('N/A');
+});

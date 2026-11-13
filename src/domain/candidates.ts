@@ -48,5 +48,8 @@ export function candidates(
         (names[a.id] ?? a.id).localeCompare(names[b.id] ?? b.id),
     );
 }
-export const scoreLabel = (value: number | null) =>
-  value === null ? "N/A" : `${value >= 0 ? "+" : ""}${value.toFixed(2)}`;
+export const scoreLabel = (value: number | null) => {
+  if (value === null) return 'N/A';
+  const rounded = Math.round((Math.abs(value) + Number.EPSILON) * 100) / 100;
+  return `${value < 0 ? '-' : '+'}${rounded.toFixed(2)}`;
+};

@@ -136,9 +136,7 @@ test("full-width draft integrates pool candidates, score overlays and disabled p
     .click();
   await page.getByRole("textbox", { name: "Search champions" }).fill("Jhin");
   await page.getByRole("button", { name: "Jhin", exact: true }).click();
-  await page
-    .getByLabel("Move Jhin enemy", { exact: true })
-    .selectOption("Jungle");
+  await page.getByRole('region',{name:'Bottom enemy picks'}).locator('[data-champion="202"]').dragTo(page.getByRole('region',{name:'Jungle enemy picks'}));
   await page
     .getByRole("button", { name: "Choose Bottom enemy", exact: true })
     .click();
@@ -183,20 +181,12 @@ test("full-width draft integrates pool candidates, score overlays and disabled p
   await expect(
     top.getByRole("button", { name: "Pick Darius Top ally", exact: true }),
   ).toBeEnabled();
-  await top
-    .getByRole("button", { name: "Score details for Renekton Top ally" })
-    .click();
-  await expect(
-    page.getByRole("dialog", { name: "Score details" }),
-  ).toContainText("Caitlyn");
-  await page.getByRole("button", { name: "Close score details" }).click();
+  await top.locator('[data-champion="58"]').hover();
+  await expect(page.getByRole('tooltip')).toContainText('pairs');
+  await expect(page.getByRole('tooltip').getByLabel(/Against Bottom Caitlyn/)).toBeVisible();
   await page.reload();
-  await expect(page.getByLabel("Move Jhin enemy", { exact: true })).toHaveValue(
-    "Jungle",
-  );
-  await expect(
-    page.getByLabel("Move Caitlyn enemy", { exact: true }),
-  ).toHaveValue("ADC");
+  await expect(page.getByRole('region',{name:'Jungle enemy picks'}).locator('[data-champion="202"]')).toBeVisible();
+  await expect(page.getByRole('region',{name:'Bottom enemy picks'}).locator('[data-champion="51"]')).toBeVisible();
   await expect(
     top.getByRole("button", { name: "Pick Renekton Top ally", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");

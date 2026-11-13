@@ -6,7 +6,7 @@ import { StatisticsCache, persistedState } from '../src/data/shared';
 import { score } from '../src/domain/scoring';
 import type { Room } from '../src/domain/types';
 
-it('real Against and Synergy survive import, shared hydration and weighted scoring in percentage points', async () => {
+it('real Against and Synergy survive import, shared hydration and equal-weight scoring in percentage points', async () => {
   const dataset = importDataset(JSON.stringify(captured), 'json', championIds);
   expect(dataset.fictional).toBe(false);
   expect(dataset.pairs.map(p => p.games).sort((a,b)=>a!-b!)).toEqual([8509, 10562]);
@@ -19,9 +19,9 @@ it('real Against and Synergy survive import, shared hydration and weighted scori
   const cache = new StatisticsCache(read);
   const room:Room = {id:'real-source-test',slug:'test-room',name:'Test room',host_id:'player',version:0,state};
   const hydrated = await cache.hydrate(room);
-  // (0.4 × 2.09 + 0.2 × -0.10) / 0.6 = 1.36 points, not 0.0136.
+  // (2.09 - 0.10) / 2 = 0.995 percentage points.
   const result = score('58', 'Top', hydrated.state);
-  expect(result.value).toBeCloseTo(1.36, 12);
+  expect(result.value).toBeCloseTo(0.995, 12);
   expect(result.known).toBe(2);
   expect(result.contributions.map(p => p.relation)).toEqual(['vs','with']);
   expect(persistedState(hydrated.state).dataset.pairs).toEqual([]);

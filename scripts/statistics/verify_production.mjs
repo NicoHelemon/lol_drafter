@@ -6,16 +6,30 @@ import {chromium} from '@playwright/test';
 import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {gunzipSync} from 'node:zlib';
+import {execFileSync} from 'node:child_process';
 const output=process.argv[2];
 if(!output)throw Error('Pass an output directory');
 await mkdir(output,{recursive:true});
 const base='https://draftroom-lol.netlify.app';
-const snapshot='0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb';
-const pairs=JSON.parse(gunzipSync(await readFile(`statistics-cache/full-2026-11-12/snapshots/${snapshot}/58-Top.json.gz`)));
+let snapshot,pairs;
+if(process.env.SUPABASE_ACCESS_TOKEN && process.env.SUPABASE_PROJECT_REF){
+  // Backend-only canonical expectation; never sends the management token to Chrome.
+  const row=JSON.parse(execFileSync('python3',['-c',`
+import sys,json
+sys.path.insert(0,'scripts/statistics')
+from publish import query
+print(json.dumps(query("select c.snapshot_id,s.pairs from public.statistics_current c join public.statistics_shards s on s.snapshot_id=c.snapshot_id where s.candidate_key='58:Top'")[0]))
+`],{encoding:'utf8'}));
+  snapshot=row.snapshot_id;pairs=row.pairs;
+}else{
+  snapshot='0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb';
+  pairs=JSON.parse(gunzipSync(await readFile(`statistics-cache/full-2026-11-12/snapshots/${snapshot}/58-Top.json.gz`)));
+}
 const against=pairs.find(p=>p.relation==='vs'&&p.otherChampionId==='799'&&p.otherRole==='Top');
 const withAlly=pairs.find(p=>p.relation==='with'&&p.otherChampionId==='64'&&p.otherRole==='Jungle');
-const expected=(.4*against.delta2+.2*withAlly.delta2)/.6;
-const label=`${expected>=0?'+':''}${expected.toFixed(2)}`;
+if(against?.delta2==null||withAlly?.delta2==null)throw Error('Canonical verification pairs are missing');
+const expected=(against.delta2+withAlly.delta2)/2;
+const label=`${expected<0?'-':'+'}${(Math.round((Math.abs(expected)+Number.EPSILON)*100)/100).toFixed(2)}`;
 const browser=await chromium.launch({
   executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||'/usr/bin/chromium',
   // Trust only the known environment proxy CA when Chromium's NSS store lags
@@ -65,14 +79,14 @@ try{
   const score=page.getByRole('region',{name:'Top ally picks'}).locator('[data-champion="58"] .tile-score');
   await score.filter({hasText:label}).waitFor({timeout:30000});
   proof.displayedScore=(await score.innerText()).trim();
-  await score.click();
-  const details=page.getByRole('dialog',{name:'Score details'});
-  await details.getByText('Against Ambessa',{exact:false}).waitFor();
-  await details.getByText('With Lee Sin',{exact:false}).waitFor();
+  await score.locator('..').hover();
+  const details=page.getByRole('tooltip');
+  await details.getByLabel(/Against Top Ambessa/).waitFor();
+  await details.getByLabel(/With Jungle Lee Sin/).waitFor();
   proof.details=await details.innerText();
   if(!proof.details.includes('2/2 pairs'))throw Error('Incomplete source coverage for verification pair');
   await page.screenshot({path:resolve(output,'production-real-statistics.png')});
-  await page.getByRole('button',{name:'Close score details'}).click();
+  await page.getByRole('heading',{name:'Draft board',exact:true}).hover();
   await page.reload({waitUntil:'domcontentloaded'});
   await page.getByRole('region',{name:'Top ally picks'}).locator('[data-champion="58"] .tile-score').filter({hasText:label}).waitFor({timeout:30000});
   proof.reloadPreservedScore=true;
@@ -82,8 +96,6 @@ try{
 }finally{
   if(roomCreated){
     try{
-      const closeDetails=page.getByRole('button',{name:'Close score details'});
-      if(await closeDetails.isVisible())await closeDetails.click();
       const closePicker=page.getByRole('button',{name:'Close',exact:true});
       if(await closePicker.isVisible())await closePicker.click();
       page.once('dialog',d=>d.accept());

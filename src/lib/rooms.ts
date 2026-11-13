@@ -1,7 +1,8 @@
 import { RoomExpiredError } from "./errors";
+import { makePickSwap, moveDraftPick, pickOwners, approvePickSwap, matchesPickSwap } from "../domain/pickSwaps";
 import { addDraftCandidate } from "../domain/draft";
 import { createClient } from "@supabase/supabase-js";
-import type { Room, State, RoleSwapRequest } from "../domain/types";
+import type { Room, State, RoleSwapRequest, PickSwapRequest, Role, Team } from "../domain/types";
 import { initialState, DemoProvider } from "../data/provider";
 import { validateState } from "../domain/state";
 import { StatisticsCache, persistedState, snapshotMetadata } from "../data/shared";
@@ -273,5 +274,54 @@ export async function addCandidate(
   });
   if (error) throw error;
   if (!data) throw new RoomExpiredError();
+  return hydrated(data);
+}
+
+
+export async function readPickSwaps(roomId:string):Promise<PickSwapRequest[]> {
+  if (!supabase) return JSON.parse(localStorage.getItem(`draftroom-pick-swaps-${roomId}`) ?? '[]')
+    .filter((r:PickSwapRequest) => Date.parse(r.expires_at)>Date.now());
+  const {data,error}=await supabase.from('pick_swap_requests').select('*').eq('room_id',roomId).gt('expires_at',new Date().toISOString());
+  if(error) throw error;
+  return data ?? [];
+}
+export async function movePick(room:Room, team:Team, from:Role, to:Role):Promise<Room> {
+  const actor=await identity();
+  if (!supabase) {
+    const current=await readRoom(room.id);
+    if(current.version!==room.version) throw Error('Conflict: room updated. Please try again.');
+    const [a,b]=pickOwners(current.state,from,to);
+    if(team==='ally' && a && b && from!==to) {
+      const pending=await readPickSwaps(room.id);
+      if(pending.some(q=>[q.from_role,q.to_role].some(r=>r===from||r===to))) throw Error('A champion swap is already pending');
+      const request=makePickSwap(current,from,to,actor);
+      localStorage.setItem(`draftroom-pick-swaps-${room.id}`,JSON.stringify([...pending,request]));
+      const next={...current,version:current.version+1};
+      localStorage.setItem('draftroom-demo',JSON.stringify(next));
+      return next;
+    }
+    return saveRoom(current,moveDraftPick(current.state,team,from,to));
+  }
+  const {data,error}=await supabase.rpc('move_draft_pick',{room_id:room.id,team,from_role:from,to_role:to,expected_version:room.version});
+  if(error) throw error;
+  return hydrated(data);
+}
+export async function respondPickSwap(room:Room, requestId:string, accept:boolean):Promise<Room> {
+  if(!supabase) {
+    const current=await readRoom(room.id),actor=await identity(),pending=await readPickSwaps(room.id);
+    const request=pending.find(r=>r.id===requestId);
+    if(!request) return current;
+    const nextRequest=approvePickSwap(request,actor,accept);
+    const valid=matchesPickSwap(request,current.state);
+    const apply=valid && nextRequest?.from_accepted && nextRequest?.to_accepted;
+    const rest=pending.filter(r=>r.id!==requestId);
+    if(nextRequest && valid && !apply) rest.push(nextRequest);
+    localStorage.setItem(`draftroom-pick-swaps-${room.id}`,JSON.stringify(rest));
+    const next={...current,version:current.version+1,state:apply ? moveDraftPick(current.state,'ally',request.from_role,request.to_role) : current.state};
+    localStorage.setItem('draftroom-demo',JSON.stringify(next));
+    return next;
+  }
+  const {data,error}=await supabase.rpc('respond_pick_swap',{room_id:room.id,request_id:requestId,accept});
+  if(error) throw error;
   return hydrated(data);
 }

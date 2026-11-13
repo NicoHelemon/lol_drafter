@@ -7,8 +7,8 @@ import {place,validateState} from '../src/domain/state';
 import {importDataset} from '../src/data/import';
 const pair=(otherRole:Pair['otherRole'],delta2:number|null,relation:Pair['relation']='vs',otherChampionId='202'):Pair=>({candidateChampionId:'58',candidateRole:'Top',otherChampionId,otherRole,relation,delta2});
 describe('Delta 2 scoring',()=>{
- it('keeps all full-draft weight totals at 2',()=>{for(const r of ROLES)expect([...Object.values(WEIGHTS[r].vs),...Object.values(WEIGHTS[r].with)].reduce((a,b)=>a!+b!,0)).toBeCloseTo(2);expect(WEIGHTS.Top.vs.Top).toBe(.4);for(const r of ['Support','ADC'] as const)expect(WEIGHTS.Support.vs[r]).toBe(.3);expect(WEIGHTS.Support.with.ADC).toBe(.3);});
- it('normalizes only available observed pairs, with no base winrate',()=>{const s=initialState('a','A');s.picks.enemy=[{championId:'202',role:'Top'},{championId:'51',role:'ADC'},{championId:'84',role:'Mid'}];s.picks.ally=[{championId:'64',role:'Jungle'}];s.dataset.pairs=[pair('Top',2),pair('ADC',-1,'vs','51'),pair('Mid',null,'vs','84'),pair('Jungle',3,'with','64')];const result=score('58','Top',s);expect(result.value).toBeCloseTo((.4*2-.2+.2*3)/.8);expect(result.known).toBe(3);expect(result.total).toBe(4);});
+ it('uses the same weight for all nine relations of every candidate role',()=>{for(const r of ROLES){const values=[...Object.values(WEIGHTS[r].vs),...Object.values(WEIGHTS[r].with)];expect(values).toHaveLength(9);expect(values.every(w=>w===1)).toBe(true);expect(WEIGHTS[r].with[r]).toBeUndefined();}});
+ it('averages only available observed pairs equally, preserving negative values and missing data',()=>{const s=initialState('a','A');s.picks.enemy=[{championId:'202',role:'Top'},{championId:'51',role:'ADC'},{championId:'84',role:'Mid'}];s.picks.ally=[{championId:'64',role:'Jungle'}];s.dataset.pairs=[pair('Top',2),pair('ADC',-1,'vs','51'),pair('Mid',null,'vs','84'),pair('Jungle',3,'with','64')];const result=score('58','Top',s);expect(result.value).toBeCloseTo((2-1+3)/3);expect(result.known).toBe(3);expect(result.total).toBe(4);expect(result.contributions.map(c=>c.weight)).toEqual([1,1,1,1]);});
  it('returns null with no pairs, but preserves real zero',()=>{const s=initialState('a','A');expect(score('58','Top',s).value).toBeNull();s.picks.enemy=[{championId:'202',role:'Top'}];s.dataset.pairs=[pair('Top',0)];expect(score('58','Top',s).value).toBe(0);});
  it('does not infer reverse directions',()=>{const s=initialState('a','A');s.picks.enemy=[{championId:'202',role:'Top'}];s.dataset.pairs=[{...pair('Top',5),candidateChampionId:'202',otherChampionId:'58'}];expect(score('58','Top',s).value).toBeNull();});
  it('ranks ties alphabetically and removes banned/picked champions',()=>{const s=initialState('a','A');s.bans.enemy[0]='122';expect(rank(['58','122','164'],'Top',s,{'58':'Z','164':'A'}).map(r=>r.id)).toEqual(['164','58']);});
@@ -23,3 +23,17 @@ describe('authorized imports',()=>{
 });
 
 it('starts new players without a role or champion preset',()=>{const s=initialState('player','Player');expect(s.players[0].role).toBeNull();expect(s.players[0].pool).toEqual([]);expect(s.players[0]).not.toHaveProperty('ready');});
+
+it('averages all nine raw relations equally for every role, then excludes a missing observation',()=>{
+ for(const role of ROLES){
+  const s=initialState('p','Player');
+  s.picks.ally=ROLES.map((r,i)=>({role:r,championId:['58','64','103','202','89'][i]}));
+  s.picks.enemy=ROLES.map((r,i)=>({role:r,championId:['122','56','84','51','267'][i]}));
+  const candidate=s.picks.ally.find(p=>p.role===role)!.championId;
+  const context=[...s.picks.enemy.map(p=>({...p,relation:'vs' as const})),...s.picks.ally.filter(p=>p.role!==role).map(p=>({...p,relation:'with' as const}))];
+  s.dataset.pairs=context.map((p,i)=>({candidateChampionId:candidate,candidateRole:role,otherChampionId:p.championId,otherRole:p.role,relation:p.relation,delta2:i-4}));
+  expect(score(candidate,role,s)).toMatchObject({value:0,known:9,total:9});
+  s.dataset.pairs[0].delta2=null;
+  expect(score(candidate,role,s)).toMatchObject({value:.5,known:8,total:9});
+ }
+});
