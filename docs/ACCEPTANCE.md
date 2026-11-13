@@ -19,9 +19,9 @@ Automatisation : `npm test` valide le domaine, les 173 portraits et les RPC/RLS 
 
 - Aucun panneau Recommendations ni option Unassigned role. Le tableau prend toute la largeur disponible, y compris sur mobile.
 - Les deux groupes de bans se trouvent immédiatement sous Draft board.
-- Pour un allié incarné, chaque case affiche les candidats de son pool. [+] ajoute des candidats sans sélectionner ni remplacer le pick actuel. Cliquer un candidat le sélectionne, cliquer un autre le remplace, et recliquer le candidat sélectionné efface uniquement le pick. Le candidat choisi reste le premier, même si son score est inférieur. Le menu d’un pick permet toujours de le déplacer ou de l’échanger avec un autre rôle occupé.
+- Pour un allié incarné, chaque case affiche les candidats de son pool. [+] ajoute des candidats sans sélectionner ni remplacer le pick actuel. Cliquer un candidat le sélectionne, cliquer un autre le remplace, et recliquer le candidat sélectionné efface uniquement le pick. Le candidat choisi reste le premier, même si son score est inférieur. Le pick se déplace par glisser-déposer dans sa propre équipe, ou via ↕ puis une cible au clic/toucher/clavier. Entre deux rôles alliés incarnés, les propriétaires concernés doivent consentir sous cinq secondes. Un rôle destinataire vide reçoit le champion et le donneur perd sa sélection. Les pools et les rôles des joueurs ne sont pas échangés.
 - Les candidats bannis ou pris dans une autre case restent visibles en gris et ne sont pas sélectionnables. Retirer le ban/pick les réactive.
-- Les scores sont visibles en transparence sur les candidats et les picks sélectionnés des deux équipes. Les données manquantes restent N/A ; une indication signale la couverture partielle. Le bouton de score ouvre les contributions, actualisées avec le contexte courant.
+- Les scores sont visibles en transparence sur les candidats et les picks sélectionnés des deux équipes. Les données manquantes restent N/A ; une indication signale la couverture partielle. Le survol ou focus du portrait affiche une miniature de cinq lignes en deux colonnes, avec rôles, portraits et valeurs brutes colorées. Le propre rôle allié est exclu ; les paires inconnues affichent N/A, les emplacements vides un tiret. Aucun clic de score n’est nécessaire.
 - Le panneau des participants indique N/5, les noms et le badge d’hôte, sans postes. Le cadre doré de son rôle est épais de 3 px.
 
 ## Postes anonymes et rôles incarnés
@@ -30,3 +30,5 @@ Automatisation : `npm test` valide le domaine, les 173 portraits et les RPC/RLS 
 - Sur un poste allié occupé par un participant, [+] reste présent et ouvre l’ajout de candidats. Ajouter un candidat ne sélectionne rien et ne change pas le pick actuel, y compris si celui-ci est déjà sélectionné.
 - La sélection et la désélection ne retirent aucun candidat du pool. Après rechargement, les candidats ajoutés et le pick effectif restent cohérents.
 - Le nom du participant apparaît sous le libellé de son rôle, par exemple Jungle puis Mathis.
+
+- Les candidats alliés non sélectionnés et [+] sont plus petits ; le pick garde sa taille initiale. Le score utilise la moyenne à poids égaux des seules observations connues, sans convertir les absences en zéro.

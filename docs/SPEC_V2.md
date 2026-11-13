@@ -1,5 +1,7 @@
 # League of Legends — Collaborative Draft Assistant
 
+> Décision du 13 novembre 2026 : les anciens poids Top/Support sont remplacés par une moyenne arithmétique à poids égaux pour tous les rôles. Le détail des scores apparaît au survol en deux colonnes et les déplacements de picks utilisent le glisser-déposer avec consentement entre joueurs. La spécification historique ci-dessous est à lire avec [DRAFT_INTERACTIONS.md](ui/DRAFT_INTERACTIONS.md).
+
 > **Spécification V2 — actualisée le 11 novembre 2026**, après examen de xPerSki/lolalytics-api, CommunityDragon, Safety et des pages publiques Counter/Build de Lolalytics. Cette V2 remplace la V1 tout en conservant les décisions produit et le score.
 
 ## Mission pour Codex
