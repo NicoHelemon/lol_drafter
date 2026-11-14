@@ -1,0 +1,181 @@
+{
+  "release": "e254702372e4d3170e63bd741344eac003f6bb93",
+  "branchValidation": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43642485671",
+  "mainValidation": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43642785744",
+  "localTests": {
+    "typescriptPostgres": 88,
+    "python": 50,
+    "browser": 22
+  },
+  "beforeMigrations": {
+    "checkedAt": "2026-11-14T21:25:09.862309+00:00",
+    "projectStatus": "ACTIVE_HEALTHY",
+    "counts": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0,
+      "statistics_snapshots": 1,
+      "statistics_current": 1,
+      "statistics_calibrations": 1
+    },
+    "shards": 865,
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+    "backupSha256": "d9650974e8909c38b116ef97a7262044241219dbf0ada756cff0ff4b4865e479"
+  },
+  "database": {
+    "checkedAt": "2026-11-14T21:28:25.770128+00:00",
+    "migrations": [
+      "011",
+      "012"
+    ],
+    "shardsPreserved": 865,
+    "snapshotMetadataPreserved": true,
+    "currentPointerPreserved": true,
+    "calibrationsPreserved": true,
+    "roomsPreserved": {
+      "rooms": true,
+      "room_invites": true,
+      "pick_swap_requests": true
+    },
+    "grants": [
+      {
+        "role": "anon",
+        "can_read": false,
+        "can_insert": false,
+        "can_update": false,
+        "can_move_role": false,
+        "can_call_private_helper": false
+      },
+      {
+        "role": "authenticated",
+        "can_read": true,
+        "can_insert": false,
+        "can_update": false,
+        "can_move_role": true,
+        "can_call_private_helper": false
+      }
+    ],
+    "catalogues": [
+      {
+        "snapshot_id": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+        "entries": 413,
+        "captured_at": "2026-11-14T20:59:41.112125+00:00",
+        "stored_bytes": 9602
+      }
+    ]
+  },
+  "realScoreAndComparison": {
+    "checkedAt": "2026-11-14T21:26:51.568Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "shardRequests": 5,
+    "expectedScore": "+0.97",
+    "k": 2510.0480193943954,
+    "expectedTeam": "+0.40",
+    "expectedCamilleTeam": "+0.27",
+    "deployment": {
+      "commit": "e254702372e4d3170e63bd741344eac003f6bb93",
+      "builtAt": "2026-11-14T21:26:18.586Z"
+    },
+    "roomSlug": "deployment-checks-room",
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+    "fictional": false,
+    "inlinePairs": 0,
+    "displayedScore": "+0.97",
+    "details": "Renekton \u00b7 Top\nIndividual score\n+0.97\nALLIES\nOPPONENTS\n\u00b7\n\u2014\n+1.63\n+0.30\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n2/2 pairs\nAdjusted values \u00b7 equal average\nAdd Renekton \u00b7 Top\nCurrent team\n-0.19\n\u2192\nWith Renekton\n+0.40\nTeam score change\n+0.59 \u2191\nProvisional \u00b7 2/2 picks scored \u00b7 4/4 pairs",
+    "displayedTeam": "OUR TEAM\n+0.40\nProvisional \u00b7 2/5 picks \u00b7 2 scored \u00b7 4/4 pairs",
+    "candidatePreview": "Renekton \u2192 Camille\nCurrent team\n+0.40\n\u2192\nWith Camille\n+0.27\nTeam score change\n-0.13 \u2193\nProvisional \u00b7 2/2 picks scored \u00b7 4/4 pairs",
+    "explanation": "Data: Lolalytics \u00b7 last 14 days \u00b7 Emerald+. Matchups with fewer games are pulled closer to zero. Learned k = 2,510 (half the observed advantage at this many games). Calibration: 14/11/2026; reviewed every 30 days. Scores average these adjusted values equally; team scores average selected champions. They are not win probabilities.",
+    "reloadPreservedScore": true,
+    "reloadPreservedTeamScore": true,
+    "success": true,
+    "testRoomRemoved": true
+  },
+  "twoIndependentIdentities": {
+    "checkedAt": "2026-11-14T21:27:00.870Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "distinctAnonymousIdentities": true,
+    "roleFilteredChampions": 86,
+    "popularityFirst": "Yone",
+    "selectedChampionRemainsVisibleOutsideRole": true,
+    "nativeRoleDragWithConsent": true,
+    "unchangedBeforeAcceptance": true,
+    "championsAndPoolsFollowOwners": true,
+    "enemyAndDatasetPreserved": true,
+    "declinePreservesState": true,
+    "expiryPreservesState": true,
+    "freeRoleMoveWithoutRequest": true,
+    "reloadPreserved": true,
+    "quitRemovedRoom": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0
+    },
+    "success": true,
+    "cleanup": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0
+    }
+  },
+  "historicalMetadataExtraction": {
+    "entries": 865,
+    "zeroGameEntries": 0,
+    "sourceDate": "2026-11-12T19:03:21.023923+00:00",
+    "readOnlyHistoricalCheck": true
+  },
+  "catalogueSources": [
+    {
+      "bytes": 295812,
+      "contentType": "text/html; charset=utf-8",
+      "fetchedAt": "2026-11-14T20:59:37.247219+00:00",
+      "httpDate": "Sat, 14 Nov 2026 20:59:37 GMT",
+      "sha256": "38d33f53b527ef747f75dd293879a8041dda9096b3bae25f7f8d16a09737ddae",
+      "status": 200,
+      "url": "https://lolalytics.com/lol/tierlist/?lane=top&patch=14"
+    },
+    {
+      "bytes": 281653,
+      "contentType": "text/html; charset=utf-8",
+      "fetchedAt": "2026-11-14T20:59:38.194684+00:00",
+      "httpDate": "Sat, 14 Nov 2026 20:59:38 GMT",
+      "sha256": "5ab9443bcff2d350342aa7560784d9a7247ca665f9234dc2edcef7c13d2a353e",
+      "status": 200,
+      "url": "https://lolalytics.com/lol/tierlist/?lane=jungle&patch=14"
+    },
+    {
+      "bytes": 288510,
+      "contentType": "text/html; charset=utf-8",
+      "fetchedAt": "2026-11-14T20:59:39.116495+00:00",
+      "httpDate": "Sat, 14 Nov 2026 20:59:39 GMT",
+      "sha256": "146dff488f0bf4fde620f20d6acbe647d390ce97f767f91507573a8bb3e00a38",
+      "status": 200,
+      "url": "https://lolalytics.com/lol/tierlist/?lane=middle&patch=14"
+    },
+    {
+      "bytes": 270590,
+      "contentType": "text/html; charset=utf-8",
+      "fetchedAt": "2026-11-14T20:59:40.123768+00:00",
+      "httpDate": "Sat, 14 Nov 2026 20:59:40 GMT",
+      "sha256": "37a15c4244326d350048737324e49547d2671a8843c8f87edf48dc086564adee",
+      "status": 200,
+      "url": "https://lolalytics.com/lol/tierlist/?lane=bottom&patch=14"
+    },
+    {
+      "bytes": 282560,
+      "contentType": "text/html; charset=utf-8",
+      "fetchedAt": "2026-11-14T20:59:41.112125+00:00",
+      "httpDate": "Sat, 14 Nov 2026 20:59:41 GMT",
+      "sha256": "d969ff0614709c6d9b76dfc3f3161ed1f604afb4026972dd247a89c6a03cb0e3",
+      "status": 200,
+      "url": "https://lolalytics.com/lol/tierlist/?lane=support&patch=14"
+    }
+  ]
+}

@@ -10,7 +10,7 @@ Vers un rôle sans participant, le déplacement est immédiat. Si ce poste conti
 
 La migration **011** étend les demandes de rôle existantes, sans effacer les salles. Les RPC verrouillent la salle, contrôlent l'identité, la version, les rôles et les sélections au moment du consentement. Les demandes concurrentes de champion/rôle ne peuvent pas se chevaucher. Une sélection modifiée ou un départ invalide la demande concernée. Les triggers bloquent les changements directs et les approbations forgées ; les droits client ne permettent pas d'écrire les consentements.
 
-![Demande en draft, données synthétiques](evidence/live-role-swap.png)
+![Après échange en draft, données synthétiques](evidence/live-role-swap.png)
 
 ## Filtre et popularité
 
@@ -48,4 +48,10 @@ Le haut du survol porte **Individual score**. Un candidat affiche ensuite le rem
 
 Validation locale réussie : **88 tests TypeScript/PostgreSQL**, **50 tests Python**, **22 parcours Playwright**, build TypeScript/Vite et `git diff --check`. Les nouveaux scénarios couvrent consentement, refus, annulation, expiration, rôles libres, sélection vide, concurrence, accès et contournements SQL ; les parcours navigateur couvrent glisser-déposer, clavier, filtres lobby/draft, sélection hors rôle, comparaison et mobile à 390 px. Les tests locaux SQL/PGlite et démo ne prouvent pas à eux seuls la synchronisation Supabase hébergée.
 
-Livraison : validation GitHub Actions, sauvegarde et contrôle des empreintes des données avant les seules migrations 011–012, ajout du catalogue puis une publication frontend groupée selon le feu vert de production déjà donné. Les preuves hébergées seront ajoutées après observation, sur la branche de travail sans déclencher un second déploiement uniquement documentaire.
+Version **`e254702` constatée en production le 14 novembre 2026 à 21:26 UTC**, après [validation de la branche](https://github.com/NicoHelemon/lol_drafter/actions/runs/43642485671) et sauvegarde privée. [CI de main](https://github.com/NicoHelemon/lol_drafter/actions/runs/43642785744) également verte. Seules les migrations 011–012 ont été appliquées ; le catalogue initial occupe 9 602 octets en base. Une seule publication frontend groupée a livré ce lot, selon le feu vert existant.
+
+Vérification hébergée réussie entre **deux identités anonymes indépendantes** : glisser-déposer réel des rôles, aucun changement avant consentement, acceptation avec champion/pool suivant chaque propriétaire, refus, expiration, rôle libre et rechargement. Les filtres lisent les données réelles : 86 champions Top au seuil de 5 %, Yone premier par popularité dans cette capture, sélection de Renekton conservée avec le filtre Mid. Aucun appel Lolalytics depuis les navigateurs.
+
+Le contrôle du score réel vérifie **Renekton → Camille**, équipe **+0,40 → +0,27**, variation **−0,13**, les libellés et le rechargement. Les salles temporaires et leurs dépendances ont été supprimées par Quit ; le contrôle final confirme les **865 empreintes brutes identiques**, le même pointeur, les mêmes métadonnées et le même modèle de calibration. Aucun secret modifié, aucune réinitialisation.
+
+Preuves : [rapport structuré](evidence/live-roles-production-verification.json), [filtres réels](evidence/champion-role-popularity-production.png), [rôles après échange](evidence/live-roles-production.png), [comparaison réelle](evidence/explicit-team-comparison-production.png). Ces preuves sont enregistrées sur la branche de travail, sans publication supplémentaire uniquement documentaire. L'extraction des nouvelles métadonnées a aussi été validée en lecture seule sur les 865 pages archivées du 12 novembre ; ces réponses historiques n'ont pas servi à initialiser le catalogue frais.
