@@ -1,0 +1,53 @@
+{
+  "checkedAt": "2026-11-14T22:56:03.964Z",
+  "site": "https://draftroom-lol.netlify.app",
+  "sourceRequests": 0,
+  "deployment": {
+    "commit": "e0ee7e7018c8066ce53b026f02df9672574fa366",
+    "builtAt": "2026-11-14T22:55:36.834Z"
+  },
+  "distinctAnonymousIdentities": true,
+  "roleFilteredChampions": 86,
+  "popularityFirst": "Yone",
+  "selectedChampionRemainsVisibleOutsideRole": true,
+  "lobbyReopenResetsDefaults": true,
+  "nativeRoleDragWithConsent": true,
+  "unchangedBeforeAcceptance": true,
+  "championsAndPoolsFollowOwners": true,
+  "enemyAndDatasetPreserved": true,
+  "defaultsFollowNewRoleAfterSwap": true,
+  "selectedOffRoleChampionPreserved": true,
+  "rolePopularityDefaultsAcrossPickers": true,
+  "declinePreservesState": true,
+  "expiryPreservesState": true,
+  "freeRoleMoveWithoutRequest": true,
+  "reloadPreserved": true,
+  "quitRemovedRoom": {
+    "rooms": 0,
+    "room_members": 0,
+    "room_invites": 0,
+    "role_swap_requests": 0,
+    "pick_swap_requests": 0
+  },
+  "success": true,
+  "cleanup": {
+    "rooms": 0,
+    "room_members": 0,
+    "room_invites": 0,
+    "role_swap_requests": 0,
+    "pick_swap_requests": 0
+  },
+  "branchValidation": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43650462874",
+  "mainValidation": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43650587984",
+  "suite": {
+    "typescriptPostgres": 88,
+    "python": 50,
+    "browser": 22
+  },
+  "fullPanelGesture": {
+    "source": "6 px from left, 8 px from bottom of the role panel",
+    "target": "8 px from right and bottom of the allied card",
+    "panelCoversFullRowHeight": true
+  },
+  "schemaChanges": false
+}
