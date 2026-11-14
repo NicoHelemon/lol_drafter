@@ -1,6 +1,6 @@
 # Recette partagée
 
-À exécuter sur le site Netlify relié à Supabase, après la migration `202611110006_draft_candidates.sql`.
+À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611140010_statistics_calibration.sql`.
 
 1. Nico crée une salle : titre « Nico’s room », URL `/rooms/nicos-room/setup`, badge HOST à côté de son nom. Un second Nico reçoit une URL distincte, avec suffixe numérique.
 2. Quatre autres profils de navigateur rejoignent via l’invitation. Chacun choisit une case avec Join. Un sixième participant et une invitation incorrecte doivent être refusés.
@@ -21,7 +21,7 @@ Automatisation : `npm test` valide le domaine, les 173 portraits et les RPC/RLS 
 - Les deux groupes de bans se trouvent immédiatement sous Draft board.
 - Pour un allié incarné, chaque case affiche les candidats de son pool. [+] ajoute des candidats sans sélectionner ni remplacer le pick actuel. Cliquer un candidat le sélectionne, cliquer un autre le remplace, et recliquer le candidat sélectionné efface uniquement le pick. Le candidat choisi reste le premier, même si son score est inférieur. Le pick se déplace par glisser-déposer dans sa propre équipe, ou via ↕ puis une cible au clic/toucher/clavier. Entre deux rôles alliés incarnés, les propriétaires concernés doivent consentir sous cinq secondes. Un rôle destinataire vide reçoit le champion et le donneur perd sa sélection. Les pools et les rôles des joueurs ne sont pas échangés.
 - Les candidats bannis ou pris dans une autre case restent visibles en gris et ne sont pas sélectionnables. Retirer le ban/pick les réactive.
-- Les scores sont visibles en transparence sur les candidats et les picks sélectionnés des deux équipes. Les données manquantes restent N/A ; une indication signale la couverture partielle. Le survol ou focus du portrait affiche une miniature de cinq lignes en deux colonnes, avec rôles, portraits et valeurs brutes colorées. Le propre rôle allié est exclu ; les paires inconnues affichent N/A, les emplacements vides un tiret. Aucun clic de score n’est nécessaire.
+- Les scores sont visibles en transparence sur les candidats et les picks sélectionnés des deux équipes. Les données manquantes restent N/A ; une indication signale la couverture partielle. Le survol ou focus du portrait affiche une miniature de cinq lignes en deux colonnes, avec rôles, portraits et valeurs ajustées colorées. Le propre rôle allié est exclu ; les paires inconnues affichent N/A, les emplacements vides un tiret. Aucun clic de score n’est nécessaire.
 - Le panneau des participants indique N/5, les noms et le badge d’hôte, sans postes. Le cadre doré de son rôle est épais de 3 px.
 
 ## Postes anonymes et rôles incarnés
@@ -31,4 +31,11 @@ Automatisation : `npm test` valide le domaine, les 173 portraits et les RPC/RLS 
 - La sélection et la désélection ne retirent aucun candidat du pool. Après rechargement, les candidats ajoutés et le pick effectif restent cohérents.
 - Le nom du participant apparaît sous le libellé de son rôle, par exemple Jungle puis Mathis.
 
-- Les candidats alliés non sélectionnés et [+] sont plus petits ; le pick garde sa taille initiale. Le score utilise la moyenne à poids égaux des seules observations connues, sans convertir les absences en zéro.
+- Les candidats alliés non sélectionnés et [+] sont plus petits ; le pick garde sa taille initiale. Le score utilise la moyenne à poids égaux des seules contributions ajustées connues, sans convertir les absences en zéro.
+
+## Équipes et shrinkage
+
+- Vérifier le score au-dessus de chaque équipe, les nombres de picks/champions calculables et la couverture. Une draft ou couverture incomplète reste Provisional.
+- Survoler un candidat : le panneau montre le nouveau score collectif et sa variation, avec recalcul des autres alliés, sans changer la sélection.
+- Les valeurs brutes restent en données, les contributions affichées utilisent `n/(n+k)`. Aucun compte/preset persistant nouveau.
+- L’explication en bas indique la source réelle, 14 jours et le palier du snapshot, k appris et la date de calibration. Les données sans calibration affichent N/A.

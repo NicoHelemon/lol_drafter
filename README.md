@@ -4,9 +4,11 @@ Application de draft League of Legends pour une équipe de cinq joueurs. React +
 
 ## Base de données
 
-Le schéma courant comprend les migrations `202611110001` à `202611120007` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
+Le schéma courant comprend les migrations `202611110001` à `202611140010` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
 
 La migration **005** interdit les picks sans rôle. La migration **006** ajoute une opération transactionnelle pour enrichir les candidats pendant la draft sans modifier le pick. Ces deux migrations ne suppriment aucune donnée. Sur une installation existante, appliquer uniquement les nouvelles migrations. **Ne pas rejouer 004** : elle réinitialise les salles temporaires.
+
+Les migrations **008**, **009** et **010** ajoutent respectivement la rétention, les échanges de champions consentis et les modèles de shrinkage immuables. La maintenance est indépendante du refresh.
 
 La migration **007** déporte les statistiques dans un cache partagé et immuable, par champion/rôle. Les salles gardent une référence à leur instantané ; leurs données ne sont pas supprimées.
 
@@ -19,7 +21,7 @@ La migration **007** déporte les statistiques dans un cache partagé et immuabl
 - Les deux joueurs voient un popup pendant la demande, avec une barre de temps qui se vide. Le destinataire dispose de Accept / Decline, le demandeur de Cancel. La demande expire après **cinq secondes**. Sans réponse, elle est refusée ; le serveur rejette aussi les acceptations tardives.
 - Les pools restent liés à leur joueur lors d’un échange. L’hôte peut démarrer pendant une demande : le passage en draft la supprime.
 - **Quit** libère le siège. Si l’hôte part, le premier participant restant devient hôte. La dernière sortie supprime la salle, ses membres, son invitation et ses demandes d’échange. Fermer un onglet conserve le siège pour permettre la reconnexion ; il faut utiliser Quit pour partir.
-- La préparation et la draft sont deux pages distinctes. Le draft board occupe toute la largeur, avec les bans en haut. Les postes ennemis et les postes alliés sans joueur associé affichent [+] tant qu’ils sont vides ; un premier pick remplace [+], puis un clic sur le portrait ouvre son remplacement. Pour un poste allié associé à un joueur, [+] ajoute uniquement des candidats depuis le catalogue, sans sélectionner de pick. Un clic sur un candidat le sélectionne ou, s’il est déjà sélectionné, le désélectionne. Cliquer un autre candidat remplace le pick. Le candidat sélectionné reste toujours en première position, quel que soit son score. Le nom du joueur est affiché sous son rôle. Les champions pris ailleurs ou bannis restent visibles en gris. Chaque portrait porte son score en surimpression ; son survol ou son focus clavier affiche les contributions brutes dans une miniature à deux colonnes. Les candidats alliés non sélectionnés et [+] sont plus petits que le pick choisi. Chaque pick doit avoir un rôle ; le glisser-déposer ou le bouton ↕ permettent de le déplacer ou de l’échanger dans la même équipe. Entre deux joueurs alliés incarnés, les propriétaires doivent consentir, avec expiration à cinq secondes. Un joueur sans sélection peut recevoir le champion, en libérant la sélection du donneur. La base est la source de vérité ; Realtime déclenche une relecture canonique, avec reprise après reconnexion.
+- La préparation et la draft sont deux pages distinctes. Le draft board occupe toute la largeur, avec les bans en haut. Les postes ennemis et les postes alliés sans joueur associé affichent [+] tant qu’ils sont vides ; un premier pick remplace [+], puis un clic sur le portrait ouvre son remplacement. Pour un poste allié associé à un joueur, [+] ajoute uniquement des candidats depuis le catalogue, sans sélectionner de pick. Un clic sur un candidat le sélectionne ou, s’il est déjà sélectionné, le désélectionne. Cliquer un autre candidat remplace le pick. Le candidat sélectionné reste toujours en première position, quel que soit son score. Le nom du joueur est affiché sous son rôle. Les champions pris ailleurs ou bannis restent visibles en gris. Chaque portrait porte son score en surimpression ; son survol ou son focus clavier affiche les contributions ajustées dans une miniature à deux colonnes. Les candidats alliés non sélectionnés et [+] sont plus petits que le pick choisi. Chaque pick doit avoir un rôle ; le glisser-déposer ou le bouton ↕ permettent de le déplacer ou de l’échanger dans la même équipe. Entre deux joueurs alliés incarnés, les propriétaires doivent consentir, avec expiration à cinq secondes. Un joueur sans sélection peut recevoir le champion, en libérant la sélection du donneur. La base est la source de vérité ; Realtime déclenche une relecture canonique, avec reprise après reconnexion.
 
 ## Développer
 
@@ -40,7 +42,7 @@ Sans variables Supabase, le site fonctionne en démo locale sur un seul navigate
 
 ## Créer Supabase et déployer sur Netlify
 
-1. Créer un projet Supabase neuf. Appliquer les sept fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611120007`.
+1. Créer un projet Supabase neuf. Appliquer les dix fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611140010`.
 2. Activer **Authentication → Sign In / Providers → Anonymous Sign-Ins**.
 3. Vérifier que `rooms` appartient à la publication `supabase_realtime` dans **Database → Replication**.
 4. Copier `.env.example` vers `.env.local` pour le développement. Renseigner `VITE_SUPABASE_URL` et la clé publique `VITE_SUPABASE_ANON_KEY` (anon ou publishable). Ne jamais utiliser de clé `service_role` ou secrète dans une variable `VITE_*`.
@@ -68,7 +70,7 @@ Le script valide les IDs, noms de fichiers et images PNG carrées avant de rempl
 
 ## Statistiques et score
 
-Depuis la décision du 13 novembre 2026, le score est une moyenne arithmétique à poids égaux des deltas observés, pour tous les rôles : jusqu’à cinq relations Against et quatre Synergy. Les neuf poids sont tous égaux à 1 dans `weights.ts`, et les valeurs connues sont divisées par leur nombre. Il ne s’agit pas d’une probabilité de victoire. Les paires manquantes restent manquantes, sans faux zéro ; aucune paire connue donne N/A. Aucun winrate global, prior ou heuristique de composition n’est ajouté.
+Depuis la décision du 14 novembre 2026, chaque contribution utilise `delta2 × n / (n + k)`, avec un k appris sur le corpus complet et commun à Against/Synergy. Le score reste la moyenne à poids égaux des contributions connues : cinq Against et quatre Synergy au maximum. Le score collectif moyenne les champions sélectionnés calculables ; le survol d’un candidat montre le score collectif après remplacement et sa variation, en recalculant tous les alliés. Les couvertures incomplètes sont signalées. Seules les valeurs ajustées sont affichées, jamais une probabilité de victoire. Une donnée ou une calibration absente produit N/A. Le corpus brut reste intact. Voir [la méthode et les preuves](docs/statistics/SHRINKAGE_TEAM_SCORES.md).
 
 Les **statistiques de démonstration restent fictives**. Le catalogue de portraits n’ajoute aucune statistique. La collecte réelle tourne dans les scripts backend ; le navigateur et le moteur de scoring ne contactent jamais Lolalytics.
 
@@ -83,7 +85,7 @@ python3 scripts/statistics/collect_lolalytics.py --all --output statistics-cache
 python3 -m unittest discover -s tests/statistics -v
 ```
 
-Le pipeline produit des fragments gzip vérifiés, puis le publisher existant permet leur promotion atomique dans Supabase. La collecte est réutilisable et reprend après interruption ; aucune requête Lolalytics n’est déclenchée par un pick ou une salle. Le workflow quotidien supporte `STATISTICS_SOURCE=lolalytics` ; son activation distante reste conditionnée à `STATISTICS_REFRESH_ENABLED=true`. Commandes, preuves et volumes réels : [pipeline réel](docs/statistics/LIVE_PIPELINE.md).
+Le pipeline produit des fragments gzip vérifiés, puis le publisher existant permet leur promotion atomique dans Supabase. La collecte est réutilisable et reprend après interruption ; aucune requête Lolalytics n’est déclenchée par un pick ou une salle. Le workflow quotidien supporte `STATISTICS_SOURCE=lolalytics` ; son activation distante reste conditionnée à `STATISTICS_REFRESH_ENABLED=true`. Le départ cible est 06:00 Europe/Zurich ; les passages automatiques hors de 06:00–08:00 sont refusés. k est réévalué après 30 jours au prochain refresh réussi. Commandes, preuves et volumes réels : [pipeline réel](docs/statistics/LIVE_PIPELINE.md), [scoring et planification actuels](docs/statistics/SHRINKAGE_TEAM_SCORES.md).
 
 ## Structure
 
