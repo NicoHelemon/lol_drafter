@@ -89,6 +89,7 @@ try{
   await details.getByLabel(`Against Top Ambessa: ${format(adjusted(against))}`,{exact:true}).waitFor();
   await details.getByLabel(`With Jungle Lee Sin: ${format(adjusted(withAlly))}`,{exact:true}).waitFor();
   proof.details=await details.innerText();
+  await expect(details).toContainText('Individual score');
   if(!proof.details.includes('2/2 pairs'))throw Error('Incomplete source coverage for verification pair');
   if(!proof.details.includes('Adjusted values')||proof.details.includes('Raw values'))throw Error('Unexpected raw contribution presentation');
   await page.getByRole('region',{name:'Top ally picks'}).getByRole('button',{name:'Pick Renekton Top ally',exact:true}).click();
@@ -97,6 +98,10 @@ try{
   proof.displayedTeam=await team.innerText();
   await page.getByRole('region',{name:'Top ally picks'}).locator('[data-champion="164"]').hover();
   const preview=page.getByRole('tooltip').getByLabel('Team score preview');
+  await expect(preview).toContainText('Renekton → Camille');
+  await expect(preview).toContainText('Current team');
+  await expect(preview).toContainText('With Camille');
+  await expect(preview).toContainText('Team score change');
   await expect(preview).toContainText(format(expectedCamilleTeam));
   await expect(preview).toContainText(format(expectedCamilleTeam-expectedTeam));
   proof.candidatePreview=await preview.innerText();

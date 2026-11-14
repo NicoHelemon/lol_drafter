@@ -1,6 +1,6 @@
 # Recette partagée
 
-À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611140010_statistics_calibration.sql`.
+À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611140012_role_catalogues.sql`.
 
 1. Nico crée une salle : titre « Nico’s room », URL `/rooms/nicos-room/setup`, badge HOST à côté de son nom. Un second Nico reçoit une URL distincte, avec suffixe numérique.
 2. Quatre autres profils de navigateur rejoignent via l’invitation. Chacun choisit une case avec Join. Un sixième participant et une invitation incorrecte doivent être refusés.
@@ -37,5 +37,13 @@ Automatisation : `npm test` valide le domaine, les 173 portraits et les RPC/RLS 
 
 - Vérifier le score au-dessus de chaque équipe, les nombres de picks/champions calculables et la couverture. Une draft ou couverture incomplète reste Provisional.
 - Survoler un candidat : le panneau montre le nouveau score collectif et sa variation, avec recalcul des autres alliés, sans changer la sélection.
+- Vérifier « Individual score », le remplacement explicite « Aatrox → Renekton », puis « Current team → With Renekton » et « Team score change ». Le score collectif actuel, le score après remplacement et leur différence sont trois valeurs distinctes.
 - Les valeurs brutes restent en données, les contributions affichées utilisent `n/(n+k)`. Aucun compte/preset persistant nouveau.
 - L’explication en bas indique la source réelle, 14 jours et le palier du snapshot, k appris et la date de calibration. Les données sans calibration affichent N/A.
+
+## Échanges de rôles en draft et filtres
+
+- Glisser sa propre icône de rôle vers celle d'un autre joueur. Aucun changement avant Accept ; après consentement, chaque joueur conserve son pool et son champion sélectionné, y compris une sélection vide. Les rôles changent, les adversaires restent à leur place. Refuser, annuler ou attendre cinq secondes ne change rien.
+- Vers un rôle libre, le déplacement est immédiat ; son éventuel pick anonyme revient dans l'ancien poste. Vérifier aussi clic/toucher puis cible, clavier et Escape. Une demande de champion et une demande de rôle ne peuvent pas concerner simultanément les mêmes postes.
+- Dans un pool du lobby puis un sélecteur de draft, choisir Top et Popularity. Seuls les champions avec au moins 5 % de leurs parties dans ce rôle apparaissent, plus les sélections existantes. All roles rétablit les choix atypiques ; la recherche textuelle reste active. Vérifier à 390 px sans débordement horizontal.
+- Sans catalogue compatible, tous les champions restent accessibles par ordre alphabétique et le manque de statistiques de rôles est indiqué. Les données de démonstration sont explicitement fictives. Aucun import d'image ni compte/preset persistant ajouté.
