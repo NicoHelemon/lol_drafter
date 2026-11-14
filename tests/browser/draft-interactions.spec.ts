@@ -107,10 +107,14 @@ test('team summary and candidate preview include the changed contributions of ot
  await page.setViewportSize({width:390,height:844});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
-test('dragging your role icon requests consent and keeps the champion with its player after acceptance',async({page})=>{
+test('dragging the full role panel onto an allied card requests consent and carries the champion after acceptance',async({page})=>{
  await seed(page);
- await page.getByRole('button',{name:'Move your Mid role',exact:true}).dragTo(page.getByRole('button',{name:'Move to Top role',exact:true}));
- const dialog=page.getByRole('dialog',{name:'Role swap pending'});
+ const handle=page.getByRole('button',{name:'Move your Mid role',exact:true}),box=(await handle.boundingBox())!;
+ const target=cell(page,'Top'),targetBox=(await target.boundingBox())!;
+ await expect(handle).toContainText('Nico');await expect(handle).toContainText('Mid');
+ expect(box.height).toBeGreaterThanOrEqual((await cell(page,'Mid').boundingBox())!.height);
+ await handle.dragTo(target,{sourcePosition:{x:6,y:box.height-8},targetPosition:{x:targetBox.width-8,y:targetBox.height-8}});
+ await expect(page.getByRole('dialog',{name:'Role swap pending'})).toBeVisible();
  // SwapPrompt uses its established accessible dialog title.
  await expect(page.getByRole('dialog')).toContainText('keeps their selected champion');
  expect((await state(page)).players.find((p:{id:string})=>p.id==='local-player').role).toBe('Mid');
@@ -128,8 +132,13 @@ test('dragging your role icon requests consent and keeps the champion with its p
 });
 test('click/keyboard role targeting moves into a free role and carries anonymous picks back',async({page})=>{
  await seed(page);await page.evaluate(()=>{const r=JSON.parse(localStorage.getItem('draftroom-demo')!);r.state.players=r.state.players.filter((p:{id:string})=>p.id!=='jungle-player');localStorage.setItem('draftroom-demo',JSON.stringify(r));});await page.reload();
- await page.getByRole('button',{name:'Move your Mid role',exact:true}).click();
- await page.getByRole('button',{name:'Move to Jungle role',exact:true}).focus();await page.keyboard.press('Enter');
+ await page.getByRole('button',{name:'Move your Mid role',exact:true}).click({position:{x:4,y:4}});
+ await expect(cell(page,'Jungle')).toHaveClass(/role-drop-target/);
+ await page.keyboard.press('Escape');await expect(cell(page,'Jungle')).not.toHaveClass(/role-drop-target/);
+ await page.getByRole('button',{name:'Move your Mid role',exact:true}).click({position:{x:4,y:4}});
+ const screenshots=process.env.DRAFT_REVIEW_SCREENSHOTS??'test-results';mkdirSync(screenshots,{recursive:true});
+ await page.screenshot({path:`${screenshots}/full-role-panels.png`,fullPage:true,animations:'disabled'});
+ await cell(page,'Jungle').focus();await page.keyboard.press('Enter');
  await expect(cell(page,'Jungle').locator('.tile-selected')).toHaveAttribute('data-champion','103');
  await expect(cell(page,'Mid').locator('.tile-selected')).toHaveAttribute('data-champion','64');
  await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -138,6 +147,8 @@ test('role and popularity filters work in lobby and draft while keeping selected
  await page.goto('/');await page.getByPlaceholder('Your name').fill('Filter check');await page.getByRole('button',{name:'Open local demo',exact:false}).click();
  await page.getByRole('group',{name:'Top role',exact:true}).getByRole('button',{name:'Join',exact:true}).click();
  await page.getByRole('button',{name:'Add champion to Top pool'}).click();
+ await expect(page.getByRole('button',{name:'Filter Top',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('button',{name:'Sort by popularity',exact:true})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'Filter Mid',exact:true}).click();
  await expect(page.getByRole('button',{name:'Ahri',exact:true})).toBeVisible();
  await expect(page.getByRole('button',{name:'Renekton',exact:true})).toHaveCount(0);
@@ -150,8 +161,12 @@ test('role and popularity filters work in lobby and draft while keeping selected
  expect(await page.locator('.champion-grid .champion').first().innerText()).toContain('Camille');
  const screenshots=process.env.DRAFT_REVIEW_SCREENSHOTS??'test-results';mkdirSync(screenshots,{recursive:true});
  await page.screenshot({path:`${screenshots}/champion-filters.png`,fullPage:true,animations:'disabled'});
+ await page.getByRole('button',{name:'Sort alphabetically',exact:true}).click();
+ await page.getByRole('button',{name:'Filter Top',exact:true}).click();
  await page.getByRole('button',{name:'Close',exact:true}).click();await page.getByRole('button',{name:'Start draft'}).click();
  await page.getByRole('button',{name:'Add Top candidates'}).click();
+ await expect(page.getByRole('button',{name:'Filter Top',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('button',{name:'Sort by popularity',exact:true})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'Filter Jungle',exact:true}).click();
  await expect(page.getByRole('button',{name:'Lee Sin',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Sort by popularity',exact:true}).click();
@@ -170,6 +185,18 @@ test('role and popularity filters work in lobby and draft while keeping selected
  const narrow=await controls.evaluateAll(buttons=>buttons.map(b=>b.getBoundingClientRect().top));
  expect(new Set(narrow).size).toBe(1);
  await page.screenshot({path:`${screenshots}/champion-filters-mobile.png`,fullPage:true,animations:'disabled'});
+ await page.getByRole('button',{name:'Close',exact:true}).click();
+ await page.getByRole('button',{name:'Choose Mid enemy',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Filter Mid',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('button',{name:'Sort by popularity',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('button',{name:'Ahri',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Renekton',exact:true})).toHaveCount(0);
+ await page.screenshot({path:`${screenshots}/mid-default-popularity.png`,fullPage:true,animations:'disabled'});
+ await page.getByRole('button',{name:'Close',exact:true}).click();
+ await page.getByRole('button',{name:'Ban 1 ally',exact:true}).click();
+ await expect(page.locator('.role-filter-buttons button[aria-pressed=true]')).toHaveCount(0);
+ await expect(page.getByRole('button',{name:'Sort by popularity',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.locator('.champion-grid button')).toHaveCount(173);
 });
 test('an uncalibrated dataset shows no raw score disguised as an adjusted one',async({page})=>{
  await seed(page);await page.evaluate(()=>{
@@ -177,6 +204,12 @@ test('an uncalibrated dataset shows no raw score disguised as an adjusted one',a
  });await page.reload();
  await expect(cell(page,'Mid').locator('[data-champion="103"] .tile-score')).toContainText('N/A');
  await expect(page.getByRole('note',{name:'How scores work'})).toContainText('unavailable until this dataset has a calibration');
+ await page.getByRole('button',{name:'Add Mid candidates',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Filter Mid',exact:true})).toBeDisabled();
+ await expect(page.locator('.role-filter-buttons button[aria-pressed=true]')).toHaveCount(0);
+ await expect(page.getByRole('button',{name:'Sort alphabetically',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('button',{name:'Sort by popularity',exact:true})).toBeDisabled();
+ await expect(page.locator('.champion-grid button')).toHaveCount(173);
 });
 test('native drag exchanges enemy picks, rejects cross-team drops, and supports keyboard role targeting',async({page})=>{
  await page.setViewportSize({width:1440,height:1360});await seed(page);

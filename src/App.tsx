@@ -555,6 +555,7 @@ export default function App() {
             )}
             <Search
               catalogue={state?.roleCatalogue}
+              initialRole={picker.kind==='pick'||picker.kind==='candidates'?picker.role:picker.kind==='pool'?state?.players.find(p=>p.id===picker.player)?.role:undefined}
               pinned={picker.kind==='pick'?state?.picks[picker.team].filter(p=>p.role===picker.role).map(p=>p.championId):[]}
               selected={
                 picker.kind === "pool" || picker.kind === "candidates"

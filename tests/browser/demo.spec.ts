@@ -7,6 +7,8 @@ async function openDemo(page: Page) {
 }
 async function addPool(page: Page, names: string[]) {
   await page.getByRole("button", { name: "Add champion to Top pool" }).click();
+  // Exercise the full catalogue, including champions absent from demo role metadata.
+  await page.getByRole('button',{name:'Filter Top',exact:true}).click();
   for (const name of names) {
     await page.getByRole("textbox", { name: "Search champions" }).fill(name);
     await page.getByRole("button", { name, exact: true }).click();
@@ -381,6 +383,8 @@ test("anonymous ally and enemy slots replace their plus button with a clickable 
     await cell
       .getByRole("button", { name: `Choose ${role} ${team}`, exact: true })
       .click();
+    await expect(page.getByRole('button',{name:`Filter ${role}`,exact:true})).toHaveAttribute('aria-pressed','true');
+    await page.getByRole('button',{name:`Filter ${role}`,exact:true}).click();
     await page.getByRole("textbox", { name: "Search champions" }).fill(first);
     await page.getByRole("button", { name: first, exact: true }).click();
     await expect(cell.locator(".board-add")).toHaveCount(0);
@@ -391,6 +395,8 @@ test("anonymous ally and enemy slots replace their plus button with a clickable 
         exact: true,
       })
       .click();
+    await expect(page.getByRole('button',{name:`Filter ${role}`,exact:true})).toHaveAttribute('aria-pressed','true');
+    await page.getByRole('button',{name:`Filter ${role}`,exact:true}).click();
     await page.getByRole("textbox", { name: "Search champions" }).fill(second);
     await page.getByRole("button", { name: second, exact: true }).click();
     await expect(
@@ -444,6 +450,7 @@ test("represented allies add candidates without picking, toggle selections, and 
     .getByRole("button", { name: "Add Top candidates", exact: true })
     .click();
   await page.getByRole("textbox", { name: "Search champions" }).fill("Aatrox");
+  await page.getByRole('button',{name:'Filter Top',exact:true}).click();
   await page.getByRole("button", { name: "Aatrox", exact: true }).click();
   await page.getByRole("button", { name: "Close", exact: true }).click();
   await expect(

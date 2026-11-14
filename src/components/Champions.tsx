@@ -26,16 +26,17 @@ export function Search({
   blocked = new Set(),
   onChoose,
   disabled = false,
-  catalogue,pinned=[],
+  catalogue,pinned=[],initialRole,
 }: {
   selected?: string[];
   disabled?: boolean;
   blocked?: Set<string>;
   onChoose: (id: string) => void;
-  catalogue?:RoleCatalogue;pinned?:string[];
+  catalogue?:RoleCatalogue;pinned?:string[];initialRole?:Role|null;
 }) {
   const [q, setQ] = useState("");
-  const [role,setRole]=useState<Role|'all'>('all'),[sort,setSort]=useState<'alphabetical'|'popularity'>('alphabetical');
+  const [chosenRole,setRole]=useState<Role|'all'>(initialRole??'all'),[chosenSort,setSort]=useState<'alphabetical'|'popularity'>('popularity');
+  const role=catalogue?chosenRole:'all',sort=catalogue?chosenSort:'alphabetical';
   const choices=useMemo(()=>catalogueChoices(champions,catalogue,{role,sort,query:q,pinned:[...selected,...pinned]}),[catalogue,role,sort,q,selected,pinned]);
   return (
     <>
@@ -67,6 +68,8 @@ export function Search({
         {choices.map((c) => (
             <button
               key={c.id}
+              aria-label={c.name}
+              aria-describedby={sort==='popularity'&&catalogue?`champion-popularity-${c.id}`:undefined}
               disabled={disabled || blocked.has(c.id)}
               className={
                 selected.includes(c.id) ? "champion selected" : "champion"
@@ -75,7 +78,7 @@ export function Search({
             >
               <Portrait id={c.id} />
               <span>{c.name}</span>
-              {sort==='popularity'&&catalogue&&<small>{c.popularity===undefined?c.games===undefined?'No role data':`${c.games.toLocaleString('en-US')} recorded games`:`${c.popularity.toFixed(2)}% pick`}</small>}
+              {sort==='popularity'&&catalogue&&<small id={`champion-popularity-${c.id}`}>{c.popularity===undefined?c.games===undefined?'No role data':`${c.games.toLocaleString('en-US')} recorded games`:`${c.popularity.toFixed(2)}% pick`}</small>}
               {selected.includes(c.id) && <b aria-hidden="true">✓</b>}
             </button>
           ))}
