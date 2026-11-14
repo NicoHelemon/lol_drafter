@@ -57,3 +57,11 @@ Vérification hébergée réussie entre **deux identités anonymes indépendante
 Le contrôle du score réel vérifie **Renekton → Camille**, équipe **+0,40 → +0,27**, variation **−0,13**, les libellés et le rechargement. Les salles temporaires et leurs dépendances ont été supprimées par Quit ; le contrôle final confirme les **865 empreintes brutes identiques**, le même pointeur, les mêmes métadonnées et le même modèle de calibration. Aucun secret modifié, aucune réinitialisation.
 
 Preuves : [rapport structuré](evidence/live-roles-production-verification.json), [filtres réels](evidence/champion-role-popularity-production.png), [rôles après échange](evidence/live-roles-production.png), [comparaison réelle](evidence/explicit-team-comparison-production.png). Ces preuves sont enregistrées sur la branche de travail, sans publication supplémentaire uniquement documentaire. L'extraction des nouvelles métadonnées a aussi été validée en lecture seule sur les 865 pages archivées du 12 novembre ; ces réponses historiques n'ont pas servi à initialiser le catalogue frais.
+
+### Affinement par icônes, demandé après la première publication
+
+Version **`0557439` constatée à 21:35 UTC** : cinq icônes de rôle, puis A–Z et popularité sur une ligne. [CI de branche](https://github.com/NicoHelemon/lol_drafter/actions/runs/43643432794) et [CI de main](https://github.com/NicoHelemon/lol_drafter/actions/runs/43643562390) vertes. Le parcours existant a été adapté pour vérifier l'exclusivité du tri, le retour à tous les rôles, le clavier et l'alignement à 390/320 px. Build et tests ciblés passent ; la CI reprend les 88 tests TypeScript/PostgreSQL, 50 Python et 22 parcours navigateur.
+
+Contrôle hébergé réussi avec le catalogue réel : **173 → 86 champions Top → 173** après second clic, sept boutons alignés à 320 px, tri exclusif et A–Z au clavier. Les scores réels et le rechargement restent corrects, aucun appel source depuis le navigateur et salle temporaire supprimée. Aucun nouveau changement de schéma ou de données statistiques pour cet affinement.
+
+Preuves : [JSON](evidence/champion-filter-icons-production.json), [desktop](evidence/champion-filter-icons-production.png), [mobile à 320 px](evidence/champion-filter-icons-production-mobile.png). Les preuves finales restent sur la branche de travail ; le dernier commit de production reste `0557439`.

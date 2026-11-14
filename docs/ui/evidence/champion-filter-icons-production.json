@@ -1,0 +1,80 @@
+{
+  "checkedAt": "2026-11-14T21:35:33.978Z",
+  "site": "https://draftroom-lol.netlify.app",
+  "sourceRequests": 0,
+  "shardRequests": 5,
+  "expectedScore": "+0.97",
+  "k": 2510.0480193943954,
+  "expectedTeam": "+0.40",
+  "expectedCamilleTeam": "+0.27",
+  "deployment": {
+    "commit": "05574395efb93d4d495cd55245130e92a8f42f48",
+    "builtAt": "2026-11-14T21:35:02.209Z"
+  },
+  "roomSlug": "deployment-checks-room",
+  "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+  "fictional": false,
+  "inlinePairs": 0,
+  "iconFilters": {
+    "buttons": 7,
+    "unfiltered": 173,
+    "topFiltered": 86,
+    "toggleRestoresAll": true,
+    "exclusiveSort": true,
+    "keyboard": true,
+    "singleLine320px": true
+  },
+  "displayedScore": "+0.97",
+  "details": "Renekton \u00b7 Top\nIndividual score\n+0.97\nALLIES\nOPPONENTS\n\u00b7\n\u2014\n+1.63\n+0.30\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n2/2 pairs\nAdjusted values \u00b7 equal average\nAdd Renekton \u00b7 Top\nCurrent team\n-0.19\n\u2192\nWith Renekton\n+0.40\nTeam score change\n+0.59 \u2191\nProvisional \u00b7 2/2 picks scored \u00b7 4/4 pairs",
+  "displayedTeam": "OUR TEAM\n+0.40\nProvisional \u00b7 2/5 picks \u00b7 2 scored \u00b7 4/4 pairs",
+  "candidatePreview": "Renekton \u2192 Camille\nCurrent team\n+0.40\n\u2192\nWith Camille\n+0.27\nTeam score change\n-0.13 \u2193\nProvisional \u00b7 2/2 picks scored \u00b7 4/4 pairs",
+  "explanation": "Data: Lolalytics \u00b7 last 14 days \u00b7 Emerald+. Matchups with fewer games are pulled closer to zero. Learned k = 2,510 (half the observed advantage at this many games). Calibration: 14/11/2026; reviewed every 30 days. Scores average these adjusted values equally; team scores average selected champions. They are not win probabilities.",
+  "reloadPreservedScore": true,
+  "reloadPreservedTeamScore": true,
+  "success": true,
+  "testRoomRemoved": true,
+  "branchValidation": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43643432794",
+  "mainValidation": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43643562390",
+  "finalDatabaseVerification": {
+    "checkedAt": "2026-11-14T21:36:45.966124+00:00",
+    "migrations": [
+      "011",
+      "012"
+    ],
+    "shardsPreserved": 865,
+    "snapshotMetadataPreserved": true,
+    "currentPointerPreserved": true,
+    "calibrationsPreserved": true,
+    "roomsPreserved": {
+      "rooms": true,
+      "room_invites": true,
+      "pick_swap_requests": true
+    },
+    "grants": [
+      {
+        "role": "anon",
+        "can_read": false,
+        "can_insert": false,
+        "can_update": false,
+        "can_move_role": false,
+        "can_call_private_helper": false
+      },
+      {
+        "role": "authenticated",
+        "can_read": true,
+        "can_insert": false,
+        "can_update": false,
+        "can_move_role": true,
+        "can_call_private_helper": false
+      }
+    ],
+    "catalogues": [
+      {
+        "snapshot_id": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+        "entries": 413,
+        "captured_at": "2026-11-14T20:59:41.112125+00:00",
+        "stored_bytes": 9602
+      }
+    ]
+  }
+}
