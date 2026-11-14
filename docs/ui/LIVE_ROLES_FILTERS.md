@@ -4,7 +4,7 @@ Demande du 14 novembre 2026, branche dédiée `feat/draft-role-filters`. Les dé
 
 ## Échange de rôles
 
-Le joueur glisse **sa propre icône de rôle** vers un autre poste. Clic/toucher puis cible, clavier et Escape permettent le même parcours. Entre deux joueurs, la demande existante Accept / Decline / Cancel est réutilisée : cinq secondes, expiration vérifiée côté serveur, aucun déplacement avant acceptation. Chaque joueur conserve son pool et son champion sélectionné. Une sélection vide suit aussi son propriétaire. Les rôles des adversaires restent fixes.
+Le joueur glisse **son panneau de rôle complet** (icône, libellé et pseudo), sur toute la hauteur de la ligne, vers un autre panneau ou une case alliée. Les panneaux et cases cibles sont signalés pendant le déplacement ; le fond des cases accepte aussi clic/toucher puis cible et clavier. Escape annule ce choix. Entre deux joueurs, la demande existante Accept / Decline / Cancel est réutilisée : cinq secondes, expiration vérifiée côté serveur, aucun déplacement avant acceptation. Chaque joueur conserve son pool et son champion sélectionné. Une sélection vide suit aussi son propriétaire. Les rôles des adversaires restent fixes.
 
 Vers un rôle sans participant, le déplacement est immédiat. Si ce poste contient déjà un pick anonyme, celui-ci revient dans le poste libéré. Glisser un **portrait** reste une opération différente : elle échange uniquement les champions selon les règles de consentement déjà présentes.
 
@@ -15,6 +15,8 @@ La migration **011** étend les demandes de rôle existantes, sans effacer les s
 ## Filtre et popularité
 
 Tous les sélecteurs communs aux pools, candidats, picks et bans proposent **cinq icônes de rôle et deux icônes de tri**, sur une seule ligne, en remplacement des deux menus de la première livraison. Le rôle et le tri actifs sont signalés en doré ; les boutons ont des noms accessibles, des infobulles et fonctionnent au clavier. Cliquer à nouveau le rôle actif retire le filtre et revient à **All roles**, sans ajouter une huitième icône.
+
+À chaque ouverture, **le rôle associé et le tri par popularité sont actifs** : le rôle actuel du propriétaire pour son pool, et le rôle de la case pour les candidats/picks alliés ou adversaires. Fermer puis rouvrir rétablit ces valeurs après un changement manuel. Un ban, sans rôle associé, démarre tous rôles/popularité. Sans catalogue, le sélecteur reste tous rôles/alphabétique ; si les métadonnées arrivent ensuite, les valeurs par défaut demandées sont conservées. Les statistiques de popularité restent accessibles comme description des boutons de champion.
 
 Le filtre retient un champion lorsque **au moins 5 % de ses propres parties** se jouent dans ce rôle (`lanePercent`), plutôt qu'un seuil de popularité globale qui masquerait des champions peu joués. Le seuil reste une règle d'interface ; **aucun seuil ne filtre le corpus pairwise**. All roles garde les choix atypiques accessibles. Les champions déjà sélectionnés restent visibles même hors filtre ; la recherche textuelle s'applique toujours.
 
