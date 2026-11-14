@@ -14,11 +14,13 @@ La migration **011** étend les demandes de rôle existantes, sans effacer les s
 
 ## Filtre et popularité
 
-Tous les sélecteurs communs aux pools, candidats, picks et bans proposent **Role** et **Sort**. Le filtre retient un champion lorsque **au moins 5 % de ses propres parties** se jouent dans ce rôle (`lanePercent`), plutôt qu'un seuil de popularité globale qui masquerait des champions peu joués. Le seuil reste une règle d'interface ; **aucun seuil ne filtre le corpus pairwise**. All roles garde les choix atypiques accessibles. Les champions déjà sélectionnés restent visibles même hors filtre ; la recherche textuelle s'applique toujours.
+Tous les sélecteurs communs aux pools, candidats, picks et bans proposent **cinq icônes de rôle et deux icônes de tri**, sur une seule ligne, en remplacement des deux menus de la première livraison. Le rôle et le tri actifs sont signalés en doré ; les boutons ont des noms accessibles, des infobulles et fonctionnent au clavier. Cliquer à nouveau le rôle actif retire le filtre et revient à **All roles**, sans ajouter une huitième icône.
+
+Le filtre retient un champion lorsque **au moins 5 % de ses propres parties** se jouent dans ce rôle (`lanePercent`), plutôt qu'un seuil de popularité globale qui masquerait des champions peu joués. Le seuil reste une règle d'interface ; **aucun seuil ne filtre le corpus pairwise**. All roles garde les choix atypiques accessibles. Les champions déjà sélectionnés restent visibles même hors filtre ; la recherche textuelle s'applique toujours.
 
 Dans un rôle, Popularity trie par nombre de parties dans ce rôle, avec le vrai `% pick` en complément. All roles trie par somme des parties **observées** dans le catalogue, libellées « recorded games » ; une donnée absente n'est pas inventée comme zéro. Le tri alphabétique reste disponible. Sans catalogue compatible, le sélecteur garde tous les champions par ordre alphabétique et explique l'absence de statistiques de rôles. La démo utilise des statistiques explicitement fictives.
 
-![Filtres, données synthétiques](evidence/champion-role-filters.png)
+![Filtres par icônes, données synthétiques](evidence/champion-filter-icons.png)
 
 ### Provenance et actualisation
 

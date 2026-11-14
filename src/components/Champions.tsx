@@ -3,6 +3,7 @@ import { champions, byId } from "../data/provider";
 import {catalogueChoices,ROLE_SHARE_MIN} from '../domain/catalogue';
 import {ROLES,type Role,type RoleCatalogue} from '../domain/types';
 import {roleName} from '../domain/roles';
+import {RoleIcon} from './RoleIcon';
 export const names = Object.fromEntries(champions.map((c) => [c.id, c.name]));
 export function Portrait({ id }: { id: string }) {
   const [failed, setFailed] = useState(false);
@@ -46,14 +47,21 @@ export function Search({
         onChange={(e) => setQ(e.target.value)}
       />
       <div className="champion-filters">
-        <label>Role<select aria-label="Filter by role" value={role} disabled={!catalogue} onChange={e=>setRole(e.target.value as Role|'all')}>
-          <option value="all">All roles</option>{ROLES.map(r=><option key={r} value={r}>{roleName(r)}</option>)}
-        </select></label>
-        <label>Sort<select aria-label="Sort champions" value={sort} onChange={e=>setSort(e.target.value as 'alphabetical'|'popularity')}>
-          <option value="alphabetical">Alphabetical</option><option value="popularity" disabled={!catalogue}>Popularity</option>
-        </select></label>
+        <div className="role-filter-buttons" role="group" aria-label="Filter by role">
+          {ROLES.map(r=><button key={r} type="button" aria-label={`Filter ${roleName(r)}`} aria-pressed={role===r}
+            title={role===r?`${roleName(r)} · click again to show all roles`:roleName(r)} disabled={!catalogue}
+            onClick={()=>setRole(current=>current===r?'all':r)}><RoleIcon role={r}/></button>)}
+        </div>
+        <div className="sort-filter-buttons" role="group" aria-label="Sort champions">
+          <button type="button" aria-label="Sort alphabetically" title="Alphabetical" aria-pressed={sort==='alphabetical'} onClick={()=>setSort('alphabetical')}>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><text x="3" y="10">A</text><text x="3" y="22">Z</text><path d="M18 3v18m-4-4 4 4 4-4"/></svg>
+          </button>
+          <button type="button" aria-label="Sort by popularity" title="Popularity" aria-pressed={sort==='popularity'} disabled={!catalogue} onClick={()=>setSort('popularity')}>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20V14h3v6zm6 0V9h3v11zm6 0V3h3v17z" className="popularity-bars"/></svg>
+          </button>
+        </div>
       </div>
-      <p className="picker-filter-note" role="status">{choices.length} champions{role!=='all'&&catalogue?` · At least ${ROLE_SHARE_MIN}% of their games in this role. Selected champions stay visible.`:''}
+      <p className="picker-filter-note" role="status">{choices.length} champions{role!=='all'&&catalogue?` · ${roleName(role)} · At least ${ROLE_SHARE_MIN}% of their games in this role. Click the active role to show all.`:catalogue?' · All roles':''}
         {!catalogue&&' · Role popularity data unavailable; showing all champions.'}</p>
       <div className="champion-grid">
         {choices.map((c) => (
