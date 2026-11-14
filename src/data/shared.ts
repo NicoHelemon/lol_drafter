@@ -1,4 +1,5 @@
-import type { Dataset, Pair, Room, ShrinkageModel } from '../domain/types';
+import type { Dataset, Pair, Room, ShrinkageModel,RoleCatalogue } from '../domain/types';
+import {validateCatalogue} from '../domain/catalogue';
 import {validateModel} from '../domain/shrinkage';
 import { championIds } from './provider';
 import { importDataset } from './import';
@@ -16,11 +17,14 @@ export class StatisticsCache {
   private now: () => number;
   private models=new Map<string,Promise<ShrinkageModel|undefined>>();
   private readCalibration?: (snapshot:string)=>Promise<unknown>;
-  constructor(private read: ReadShards, options: { capacity?: number; ttlMs?: number; now?: () => number; readCalibration?:(snapshot:string)=>Promise<unknown> } = {}) {
+  private catalogues=new Map<string,Promise<RoleCatalogue|undefined>>();
+  private readCatalogue?: (snapshot:string)=>Promise<unknown>;
+  constructor(private read: ReadShards, options: { capacity?: number; ttlMs?: number; now?: () => number; readCalibration?:(snapshot:string)=>Promise<unknown>;readCatalogue?:(snapshot:string)=>Promise<unknown> } = {}) {
     this.capacity = options.capacity ?? 128;
     this.ttlMs = options.ttlMs ?? 30 * 60_000;
     this.now = options.now ?? Date.now;
     this.readCalibration=options.readCalibration;
+    this.readCatalogue=options.readCatalogue;
     if (!Number.isInteger(this.capacity) || this.capacity < 1 || !Number.isFinite(this.ttlMs) || this.ttlMs <= 0) throw Error('Invalid cache limits');
   }
 
@@ -28,6 +32,7 @@ export class StatisticsCache {
     this.entries.clear();
     this.pending.clear();
     this.models.clear();
+    this.catalogues.clear();
   }
 
   async hydrate(room: Room): Promise<Room> {
@@ -35,6 +40,15 @@ export class StatisticsCache {
     if (!dataset.snapshotId) return room;
     if (!/^[a-f0-9]{64}$/.test(dataset.snapshotId)) throw Error('Invalid snapshot identity');
     let model=room.state.shrinkage;
+    let catalogue=room.state.roleCatalogue;
+    if(this.readCatalogue){
+      const sid=dataset.snapshotId;
+      if(!this.catalogues.has(sid)){
+        const request=this.readCatalogue(sid).then(raw=>raw==null?undefined:validateCatalogue(raw,championIds)).catch(e=>{this.catalogues.delete(sid);throw e;});
+        this.catalogues.set(sid,request);while(this.catalogues.size>this.capacity)this.catalogues.delete(this.catalogues.keys().next().value!);
+      }
+      catalogue=await this.catalogues.get(sid)!;if(!catalogue)this.catalogues.delete(sid);
+    }
     if(this.readCalibration){
       const sid=dataset.snapshotId;
       if(!this.models.has(sid)){
@@ -91,12 +105,12 @@ export class StatisticsCache {
       }
     }
     const pairs = (await Promise.all(keys.map(key => values.get(key)!))).flat();
-    return { ...room, state: { ...room.state, shrinkage:model, dataset: { ...dataset, pairs } } };
+    return { ...room, state: { ...room.state, shrinkage:model,roleCatalogue:catalogue, dataset: { ...dataset, pairs } } };
   }
 }
 
 export function persistedState(state: Room['state']): Room['state'] {
-  const {shrinkage:_,...stored}=state;
+  const {shrinkage:_,roleCatalogue:__,...stored}=state;
   // Loaded pairs are local working data; never send them back in room edits.
   return state.dataset.snapshotId
     ? { ...stored, dataset: { ...state.dataset, pairs: [] } }

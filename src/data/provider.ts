@@ -21,4 +21,4 @@ export function demoDataset():Dataset {
  }
  return {id:'fictional-v1',patch:'Demo',tier:'Synthetic',source:'Synthetic demo data',importedAt:'2026-11-11T00:00:00Z',fictional:true,pairs};
 }
-export function initialState(id:string,name:string):State{return {phase:'setup',side:'blue',dataset:demoDataset(),shrinkage:{...DEMO_MODEL},players:[{id,name,role:null,pool:[]}],picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},history:[]};}
+export function initialState(id:string,name:string):State{return {phase:'setup',side:'blue',dataset:demoDataset(),shrinkage:{...DEMO_MODEL},roleCatalogue:{schemaVersion:1,source:'Synthetic demo role data',capturedAt:'2026-11-14T00:00:00Z',context:{windowDays:14,tier:'synthetic'},fictional:true,entries:ROLES.flatMap(role=>demoCoverage[role].map(championId=>({championId,role,lanePercent:100,pickPercent:Number(championId)%12,games:1000+Number(championId)})))},players:[{id,name,role:null,pool:[]}],picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},history:[]};}

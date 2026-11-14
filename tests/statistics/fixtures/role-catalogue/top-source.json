@@ -1,0 +1,74 @@
+{
+  "url": "https://lolalytics.com/lol/tierlist/?lane=top&patch=14",
+  "fetchedAt": "2026-11-14T20:59:37.247219+00:00",
+  "sourceSha256": "38d33f53b527ef747f75dd293879a8041dda9096b3bae25f7f8d16a09737ddae",
+  "samples": [
+    {
+      "cid": 103,
+      "row": {
+        "rank": 5,
+        "tier": 2,
+        "lane": "top",
+        "defaultLane": "middle",
+        "pctLane": 2.64,
+        "wr": 54.2,
+        "avgWrDelta": 0.89,
+        "pr": 0.31,
+        "br": 3.61,
+        "pbi": 1,
+        "games": 8372,
+        "topRank": 19,
+        "topWr": "57.07",
+        "topGames": 4121,
+        "topDelta": 2.87,
+        "topElo": 919
+      },
+      "placeholder": false
+    },
+    {
+      "cid": 164,
+      "row": {
+        "rank": 8,
+        "tier": 3,
+        "lane": "top",
+        "defaultLane": "top",
+        "pctLane": 80.91,
+        "wr": 52.17,
+        "avgWrDelta": 1.11,
+        "pr": 4.5,
+        "br": 1.74,
+        "pbi": 2,
+        "games": 121761,
+        "topRank": 43,
+        "topWr": "56.68",
+        "topGames": 3682,
+        "topDelta": 4.51,
+        "topElo": 871
+      },
+      "placeholder": false
+    },
+    {
+      "cid": 58,
+      "row": {
+        "rank": 70,
+        "tier": 9,
+        "lane": "top",
+        "defaultLane": "top",
+        "pctLane": 95.4,
+        "wr": 51.16,
+        "avgWrDelta": 1.63,
+        "pr": 6.26,
+        "br": 4.45,
+        "pbi": -3,
+        "games": 169302,
+        "topRank": 157,
+        "topWr": "53.87",
+        "topGames": 3013,
+        "topDelta": 2.71,
+        "topElo": 590
+      },
+      "placeholder": false
+    }
+  ],
+  "note": "Pruned real row values; Qwik references regenerated, not an independent DOM comparison."
+}

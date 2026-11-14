@@ -193,7 +193,7 @@ def collect(directory, all_candidates=False, candidates=None, interval=1., fetch
         team_raw, team_record = fetcher.get(team_url)
         synergy = parse_team(team_raw, registry[slug], lane)
         pairs = audit['observations'] + synergy
-        return slug, lane, pairs, html_record, team_record
+        return slug, lane, pairs, html_record, team_record,audit.get('roleStatistics')
     def collect_target(target):
         if stop.is_set():
             # Do not raise the same exception instance in hundreds of queued
@@ -205,9 +205,11 @@ def collect(directory, all_candidates=False, candidates=None, interval=1., fetch
             failures.append(error); stop.set()
             raise
     pool = ThreadPoolExecutor(max_workers=workers)
+    catalogue_rows=[]
     try:
         for index, result in enumerate(pool.map(collect_target, targets), 1):
-            slug, lane, pairs, html_record, team_record = result
+            slug, lane, pairs, html_record, team_record,role_stats = result
+            if role_stats is not None:catalogue_rows.append(role_stats)
             all_pairs.extend(pairs)
             counts = dict(Counter(p['relation'] for p in pairs))
             report['completed'][f'{registry[slug]}:{ROLES[lane]}'] = dict(
@@ -222,6 +224,11 @@ def collect(directory, all_candidates=False, candidates=None, interval=1., fetch
     document = dict(id='lolalytics-' + report['startedAt'], patch='14d', tier='Emerald+',
                     source=report['source'], importedAt=finished, fictional=False,
                     context=CONTEXT, pairs=all_pairs)
+    if all_candidates and len(catalogue_rows)!=len(targets):
+        raise ValueError('Incomplete role catalogue; current snapshot preserved')
+    if catalogue_rows:
+        from role_catalogue import document as role_document
+        document['roleCatalogue']=role_document(catalogue_rows,finished)
     manifest = build(document, directory / 'snapshots')
     atomic_write(directory / 'dataset.json', encoded(document))
     report.update(finishedAt=finished, snapshotId=manifest['metadata']['snapshotId'],

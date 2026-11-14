@@ -58,6 +58,7 @@ export default function SwapPrompt({
         <div className="swap-prompt-symbol">
           <SwapIcon />
         </div>
+        {request.phase==='live'&&<p className="role-carry-note">Each player keeps their selected champion and champion pool.</p>}
         <div
           className="swap-timer"
           role="progressbar"

@@ -15,13 +15,17 @@ interface Props {
   change: (fn: (s: State) => State) => Promise<void>;
   setPicker: (p: Picker) => void;
   onMove: (team: Team, from: Role, to: Role) => Promise<void>;
+  onRoleMove:(to:Role)=>Promise<void>;
   pendingRoles?: Set<Role>;
 }
 type DragPick = { team: Team; role: Role; championId: string; tap?: boolean };
-export default function DraftPage({ state, uid, busy, change, setPicker, onMove, pendingRoles = new Set() }: Props) {
+export default function DraftPage({ state, uid, busy, change, setPicker, onMove,onRoleMove, pendingRoles = new Set() }: Props) {
   const associatedPlayers = new Map(state.players.map(player => [player.role, player]));
   const [activeTooltip,setActiveTooltip] = useState<string|null>(null);
   const [dragged, setDragged] = useState<DragPick | null>(null), [over, setOver] = useState<string | null>(null);
+  const [roleDrag,setRoleDrag]=useState<Role|null>(null),[roleOver,setRoleOver]=useState<Role|null>(null);
+  const myRole=state.players.find(p=>p.id===uid)?.role;
+  useEffect(()=>{if(roleDrag&&roleDrag!==myRole){setRoleDrag(null);setRoleOver(null);}},[myRole,roleDrag]);
   useEffect(() => {
     if (dragged && !state.picks[dragged.team].some(p => p.role === dragged.role && p.championId === dragged.championId)) {
       setDragged(null); setOver(null);
@@ -29,7 +33,7 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
   }, [state.picks, dragged]);
   useEffect(() => {
     const dismiss = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') { setActiveTooltip(null); setDragged(null); setOver(null); }
+      if (event.key === 'Escape') { setActiveTooltip(null); setDragged(null); setOver(null);setRoleDrag(null);setRoleOver(null); }
     };
     window.addEventListener('keydown', dismiss);
     return () => window.removeEventListener('keydown', dismiss);
@@ -47,7 +51,10 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('application/x-draftroom-pick', JSON.stringify({team, role, championId}));
     setDragged({team, role, championId});
+    setRoleDrag(null);
   }
+  const roleTarget=(role:Role)=>!!roleDrag&&roleDrag===myRole&&role!==roleDrag&&!busy&&!pendingRoles.has(role)&&!pendingRoles.has(roleDrag);
+  function finishRole(role:Role){if(roleTarget(role)){setRoleDrag(null);setRoleOver(null);void onRoleMove(role);}}
   return <section aria-label="Draft" className="draft-page" onKeyDown={e => {
     if (e.key === 'Escape') { setDragged(null); setOver(null); }
   }}>
@@ -67,12 +74,22 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
           </div>
         </section>)}
       </div>
-      <p className="draft-move-hint" id="pick-move-help" role="status">{dragged
+      <p className="draft-move-hint" id="pick-move-help" role="status">{roleDrag ? 'Choose a role. You keep your champion; another player must accept an exchange.' : dragged
         ? `Move ${names[dragged.championId]}: choose another ${dragged.team === 'ally' ? 'allied' : 'opponent'} role. Escape to cancel.`
-        : 'Drag selected champions between roles. Hover a candidate for adjusted matchups and its effect on the team score.'}</p>
+        : 'Drag your role icon to change roles with your champion. Drag portraits to move champions only. Hover candidates to compare team scores.'}</p>
       <div className="board-head"><span>ROLE</span><TeamSummary team="ally" state={state}/><TeamSummary team="enemy" state={state}/></div>
       {ROLES.map(role => <div className="board-row" key={role}>
-        <span className="role-label"><RoleIcon role={role} />{roleName(role)}
+        <span className={`role-label${roleTarget(role)?' role-drop-target':''}${roleOver===role?' role-drop-over':''}`}>
+          <button className="draft-role-handle" aria-label={myRole===role?`Move your ${roleName(role)} role`:`Move to ${roleName(role)} role`}
+            title={myRole===role?'Drag or click to change role with your champion':'Choose this role'}
+            disabled={busy||pendingRoles.has(role)||(myRole!==role&&!roleTarget(role))}
+            draggable={myRole===role&&!busy&&!pendingRoles.has(role)} aria-pressed={roleDrag===role}
+            onClick={()=>myRole===role?setRoleDrag(old=>old?null:role):finishRole(role)}
+            onDragStart={e=>{if(myRole!==role){e.preventDefault();return;}e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('application/x-draftroom-role',role);setRoleDrag(role);setDragged(null);setActiveTooltip(null);}}
+            onDragEnd={()=>{setRoleDrag(null);setRoleOver(null);}}
+            onDragOver={e=>{if(roleTarget(role)){e.preventDefault();e.dataTransfer.dropEffect='move';setRoleOver(role);}}}
+            onDragLeave={()=>setRoleOver(null)}
+            onDrop={e=>{e.preventDefault();if(e.dataTransfer.types.includes('application/x-draftroom-role'))finishRole(role);}}><RoleIcon role={role}/></button>{roleName(role)}
           {associatedPlayers.get(role) && <small className="role-player" title={associatedPlayers.get(role)!.name}>{associatedPlayers.get(role)!.name}</small>}
         </span>
         {(['ally','enemy'] as Team[]).map(team => {

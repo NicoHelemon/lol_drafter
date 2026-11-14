@@ -135,10 +135,14 @@ def inspect(raw, url):
     if type(candidate) is not int or candidate <= 0:
         raise ValueError('Invalid candidate identity')
     observations, counts, rejected = normalize_groups(groups, 'vs', candidate, state['lane'], COLUMNS)
+    role_stats=None
+    if 'n' in header and 'pr' in header:
+        from role_catalogue import entry
+        role_stats=entry(candidate,ROLES[state['lane']],refs.read(root['nav'])['lanes'][state['lane']],header['pr'],header['n'])
     return dict(schemaVersion=1, kind='experimental-public-html-audit', sourceUrl=url,
                 sourceSha256=hashlib.sha256(raw).hexdigest(), observedContext=state,
                 queueId=420, candidateChampionId=str(candidate), candidateRole=ROLES[state['lane']], columns=COLUMNS, sourceCounts=counts, rejected=dict(rejected),
-                candidateLaneDistribution=refs.read(root['nav']),
+                candidateLaneDistribution=refs.read(root['nav']),roleStatistics=role_stats,
                 observations=observations, counts=dict(Counter(p['otherRole'] for p in observations)),
                 zeroCount=sum(p['delta2'] == 0 for p in observations),
                 nullCount=sum(p['delta2'] is None for p in observations),

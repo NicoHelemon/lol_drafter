@@ -1,4 +1,5 @@
 import { RoomExpiredError } from "./errors";
+import {exchangeLiveRoles,makeRoleSwap,matchesRoleSwap} from '../domain/roleSwaps';
 import { makePickSwap, moveDraftPick, pickOwners, approvePickSwap, matchesPickSwap } from "../domain/pickSwaps";
 import { addDraftCandidate } from "../domain/draft";
 import { createClient } from "@supabase/supabase-js";
@@ -15,7 +16,11 @@ const statistics = new StatisticsCache(async (snapshot, keys) => {
     .select('candidate_key,pairs').eq('snapshot_id', snapshot).in('candidate_key', keys);
   if (error) throw error;
   return data ?? [];
-},{readCalibration:async(snapshot)=>{
+},{readCatalogue:async(snapshot)=>{
+  if(!supabase)throw Error('Shared role catalogue requires Supabase');
+  const {data,error}=await supabase.from('statistics_role_catalogues').select('catalogue').eq('snapshot_id',snapshot).maybeSingle();
+  if(error)throw error;return data?.catalogue;
+},readCalibration:async(snapshot)=>{
   if(!supabase)throw Error('Shared calibration requires Supabase');
   const {data,error}=await supabase.from('statistics_calibrations').select('model').eq('snapshot_id',snapshot).maybeSingle();
   if(error)throw error;
@@ -223,7 +228,7 @@ export async function readSwaps(roomId: string): Promise<RoleSwapRequest[]> {
   if (!supabase)
     return JSON.parse(
       localStorage.getItem(`draftroom-swaps-${roomId}`) ?? "[]",
-    );
+    ).filter((q:RoleSwapRequest)=>Date.parse(q.expires_at)>Date.now());
   const { data, error } = await supabase
     .from("role_swap_requests")
     .select("*")
@@ -252,8 +257,17 @@ export async function respondRoleSwap(
   requestId: string,
   accept: boolean,
 ): Promise<Room> {
-  if (!supabase)
-    throw Error("Role swaps require a shared room with another player");
+  if (!supabase){
+    const current=await readRoom(room.id),actor=await identity(),pending=await readSwaps(room.id),q=pending.find(r=>r.id===requestId);
+    if(!q)return current;
+    if((accept&&actor!==q.target_id)||(!accept&&![q.requester_id,q.target_id].includes(actor)))throw Error('Only the requested player can accept');
+    localStorage.setItem(`draftroom-swaps-${room.id}`,JSON.stringify(pending.filter(r=>r.id!==q.id)));
+    const state=accept&&matchesRoleSwap(q,current.state) ? current.state.phase==='live'
+      ? exchangeLiveRoles(current.state,q.from_role,q.to_role)
+      : {...current.state,players:current.state.players.map(p=>p.id===q.requester_id?{...p,role:q.to_role}:p.id===q.target_id?{...p,role:q.from_role}:p)}
+      :current.state;
+    return saveRoom(current,state);
+  }
   const { data, error } = await supabase.rpc("respond_role_swap", {
     room_id: room.id,
     request_id: requestId,
@@ -262,6 +276,26 @@ export async function respondRoleSwap(
   if (error) throw error;
   if (!data) throw new RoomExpiredError();
   return hydrated(data);
+}
+
+export async function moveLiveRole(room:Room,to:Role):Promise<Room> {
+ if(!supabase){
+  const current=await readRoom(room.id),actor=await identity();
+  if(current.version!==room.version)throw Error('Conflict: room updated. Please try again.');
+  const me=current.state.players.find(p=>p.id===actor);
+  if(!me?.role||current.state.phase!=='live')throw Error('Choose a role during preparation first');
+  if(me.role===to)return current;
+  const pending=await readSwaps(room.id),picks=await readPickSwaps(room.id);
+  if([...pending,...picks].some(q=>[q.from_role,q.to_role].some(r=>r===me.role||r===to)))throw Error('A swap is already pending');
+  if(current.state.players.some(p=>p.role===to)){
+   const q=makeRoleSwap(current,actor,to);
+   localStorage.setItem(`draftroom-swaps-${room.id}`,JSON.stringify([...pending,q]));
+   const next={...current,version:current.version+1};localStorage.setItem('draftroom-demo',JSON.stringify(next));return next;
+  }
+  return saveRoom(current,exchangeLiveRoles(current.state,me.role,to));
+ }
+ const {data,error}=await supabase.rpc('move_live_role',{room_id:room.id,to_role:to,expected_version:room.version});
+ if(error)throw error;return hydrated(data);
 }
 
 export async function addCandidate(

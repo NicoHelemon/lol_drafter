@@ -22,6 +22,7 @@ it('fetches pool shards only, preserves zero, and recalculates picks and bans wi
   expect(r.state.dataset.pairs).toEqual([pair]);
   expect(persistedState(r.state).dataset.pairs).toEqual([]);
   expect(persistedState(r.state).shrinkage).toBeUndefined();
+  expect(persistedState(r.state).roleCatalogue).toBeUndefined();
   expect(r.state.dataset.pairs).toEqual([pair]);
   // A pick from a prepared pool was already fetched. A ban never needs a shard.
   r.state.picks.ally = [{ championId: '58', role: 'Top' }];
@@ -30,6 +31,17 @@ it('fetches pool shards only, preserves zero, and recalculates picks and bans wi
   expect(read).toHaveBeenCalledTimes(1);
   r.state.picks.enemy = [{ championId: '122', role: 'Top' }];
   expect(score('58', 'Top', r.state).value).toBe(0);
+});
+
+it('loads role metadata once per immutable snapshot and never persists it in a room mutation',async()=>{
+ const catalogue=initialState('p','P').roleCatalogue!;
+ const readCatalogue=vi.fn(async()=>catalogue),read=vi.fn(async()=>[]);
+ const cache=new StatisticsCache(read,{readCatalogue});
+ const [a,b]=await Promise.all([cache.hydrate(room()),cache.hydrate(room())]);
+ expect(a.state.roleCatalogue).toEqual(catalogue);expect(b.state.roleCatalogue).toEqual(catalogue);
+ expect(readCatalogue).toHaveBeenCalledTimes(1);expect(persistedState(a.state).roleCatalogue).toBeUndefined();
+ await cache.hydrate(room('b'.repeat(64)));expect(readCatalogue).toHaveBeenCalledTimes(2);
+ cache.clear();await cache.hydrate(room());expect(readCatalogue).toHaveBeenCalledTimes(3);
 });
 
 it('pins calibration to the snapshot, deduplicates reads and retries absent or malformed models',async()=>{

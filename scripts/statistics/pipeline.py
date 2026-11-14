@@ -107,6 +107,11 @@ def build(document, destination):
         atomic_write(directory / filename, compressed)
         manifest['shards'][key] = dict(file=filename, sha256=digest(raw), pairs=len(rows),
                                       bytes=len(raw), gzipBytes=len(compressed))
+    if document.get('roleCatalogue'):
+        from role_catalogue import validate as validate_catalogue
+        catalogue=encoded(validate_catalogue(document['roleCatalogue']))
+        atomic_write(directory/'role-catalogue.json',catalogue)
+        manifest['roleCatalogueSha256']=digest(catalogue)
     atomic_write(directory / 'manifest.json', encoded(manifest))
     verify(directory)
     atomic_write(Path(destination) / 'current.json', encoded({'snapshotId': snapshot_id}))
@@ -118,6 +123,11 @@ def verify(directory):
     manifest = json.loads((directory / 'manifest.json').read_text())
     if manifest.get('schemaVersion') != 1 or not manifest.get('shards'):
         raise ValueError('Invalid snapshot manifest')
+    if manifest.get('roleCatalogueSha256'):
+        from role_catalogue import validate as validate_catalogue
+        raw=(directory/'role-catalogue.json').read_bytes()
+        if digest(raw)!=manifest['roleCatalogueSha256']:raise ValueError('Corrupt role catalogue')
+        validate_catalogue(json.loads(raw))
     pairs = []
     for key, shard in manifest['shards'].items():
         filename = shard['file']

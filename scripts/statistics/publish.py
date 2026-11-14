@@ -55,6 +55,14 @@ def publish(directory, execute=query, max_batch_bytes=900_000, progress=None):
           order by (c.model->>'fittedAt')::timestamptz desc limit 1""")
         model = previous[0]['model'] if previous and reusable(previous[0]['model'], metadata) else fit(*summarize(groups), metadata)
     model_sql = literal(encoded(model).decode())
+    catalogue_sql=''
+    if manifest.get('roleCatalogueSha256'):
+        catalogue=literal((Path(directory)/'role-catalogue.json').read_text())
+        catalogue_sql=f"""insert into public.statistics_role_catalogues(snapshot_id,catalogue) values({sid},{catalogue}::jsonb) on conflict do nothing;
+          do $catalogue$ begin
+            if (select catalogue from public.statistics_role_catalogues where snapshot_id={sid}) is distinct from {catalogue}::jsonb
+            then raise exception 'Role catalogue conflict';end if;
+          end $catalogue$;"""
     if not ready:
         execute(f"insert into public.statistics_snapshots(id,metadata) values({sid},{meta}::jsonb) on conflict do nothing")
         prefix = "insert into public.statistics_shards(snapshot_id,candidate_key,pairs) values"
@@ -113,6 +121,7 @@ def publish(directory, execute=query, max_batch_bytes=900_000, progress=None):
         if (select model from public.statistics_calibrations where snapshot_id={sid}) is distinct from {model_sql}::jsonb
         then raise exception 'Calibration conflict';end if;
       end $model$;
+      {catalogue_sql}
       update public.statistics_snapshots set ready=true where id={sid} and not ready;
       insert into public.statistics_current(singleton,snapshot_id) values(true,{sid})
         on conflict(singleton) do update set snapshot_id=excluded.snapshot_id;

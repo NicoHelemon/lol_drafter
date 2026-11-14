@@ -1,0 +1,52 @@
+{
+  "url": "https://lolalytics.com/lol/tierlist/?lane=middle&patch=14",
+  "fetchedAt": "2026-11-14T20:59:39.116495+00:00",
+  "sourceSha256": "146dff488f0bf4fde620f20d6acbe647d390ce97f767f91507573a8bb3e00a38",
+  "samples": [
+    {
+      "cid": 103,
+      "row": {
+        "rank": 3,
+        "tier": 2,
+        "lane": "middle",
+        "defaultLane": "middle",
+        "pctLane": 95.65,
+        "wr": 53.06,
+        "avgWrDelta": 1.63,
+        "pr": 11.22,
+        "br": 3.61,
+        "pbi": 16,
+        "games": 303478,
+        "topRank": 19,
+        "topWr": "57.07",
+        "topGames": 4121,
+        "topDelta": 4.01,
+        "topElo": 919
+      },
+      "placeholder": false
+    },
+    {
+      "cid": 58,
+      "row": {
+        "rank": 71,
+        "tier": 11,
+        "lane": "middle",
+        "defaultLane": "top",
+        "pctLane": 4.33,
+        "wr": 51.94,
+        "avgWrDelta": 2.23,
+        "pr": 0.28,
+        "br": 4.45,
+        "pbi": 0,
+        "games": 7689,
+        "topRank": 157,
+        "topWr": "53.87",
+        "topGames": 3013,
+        "topDelta": 1.93,
+        "topElo": 590
+      },
+      "placeholder": false
+    }
+  ],
+  "note": "Pruned real row values; Qwik references regenerated, not an independent DOM comparison."
+}

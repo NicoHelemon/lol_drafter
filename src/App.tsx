@@ -39,6 +39,7 @@ import {
   movePick,
   readPickSwaps,
   respondPickSwap,
+  moveLiveRole,
 } from "./lib/rooms";
 export type Picker =
   | { kind: "pick"; team: Team; role: Role }
@@ -97,7 +98,7 @@ export default function App() {
   }, [room?.id]);
   useEffect(() => {
     setPicker(null);
-  }, [room?.state.phase]);
+  }, [room?.state.phase,room?.state.players.map(p=>`${p.id}:${p.role}`).join('|')]);
   useEffect(() => {
     if (!room) return;
     const path = `/rooms/${room.slug}/${room.state.phase === "setup" ? "setup" : "draft"}${invite ? "#" + invite : ""}`;
@@ -105,7 +106,7 @@ export default function App() {
     document.title = `${room.name} · ${room.state.phase === "setup" ? "Preparation" : "Draft"}`;
   }, [room?.id, room?.state.phase, invite]);
   useEffect(() => {
-    if (!room || room.state.phase !== "setup") {setSwaps([]);return;}
+    if (!room) {setSwaps([]);return;}
     let active = true;
     const refresh = () =>
       readSwaps(room.id)
@@ -160,6 +161,10 @@ export default function App() {
       try {setRoom(await movePick(room,team,from,to));}
       catch(e){setRoom(await readRoom(room.id));throw e;}
     });
+  }
+  async function roleMove(to:Role){
+    if(!room||busy)return;
+    await run(async()=>{try{setRoom(await moveLiveRole(room,to));}catch(e){setRoom(await readRoom(room.id));throw e;}});
   }
   async function championSwapReply(requestId:string,accept:boolean) {
     if(!room || busy) return;
@@ -272,7 +277,7 @@ export default function App() {
       );
       const compatible=dataset.source===room.state.dataset.source && dataset.tier===room.state.dataset.tier
         && JSON.stringify(dataset.context)===JSON.stringify(room.state.dataset.context);
-      setRoom(await saveRoom(room, { ...room.state, dataset, shrinkage:compatible?room.state.shrinkage:undefined }));
+      setRoom(await saveRoom(room, { ...room.state, dataset, shrinkage:compatible?room.state.shrinkage:undefined,roleCatalogue:compatible?room.state.roleCatalogue:undefined }));
     });
   }
   function choose(id: string) {
@@ -454,14 +459,15 @@ export default function App() {
               change={change}
               setPicker={setPicker}
               onMove={championMove}
-              pendingRoles={new Set(pickSwaps.flatMap(r=>[r.from_role,r.to_role]))}
+              onRoleMove={roleMove}
+              pendingRoles={new Set([...pickSwaps,...swaps.filter(q=>q.phase==='live')].flatMap(r=>[r.from_role,r.to_role]))}
             />
           )}
         </main>
       )}
-      {state?.phase === "setup" &&
+      {state &&
         swaps
-          .filter((r) => r.target_id === uid || r.requester_id === uid)
+          .filter((r) => (r.phase??'setup')===state.phase&&(r.target_id === uid || r.requester_id === uid))
           .slice(0, 1)
           .map((request) => (
             <SwapPrompt
@@ -548,6 +554,8 @@ export default function App() {
               </div>
             )}
             <Search
+              catalogue={state?.roleCatalogue}
+              pinned={picker.kind==='pick'?state?.picks[picker.team].filter(p=>p.role===picker.role).map(p=>p.championId):[]}
               selected={
                 picker.kind === "pool" || picker.kind === "candidates"
                   ? (state?.players.find((p) => p.id === picker.player)?.pool ??

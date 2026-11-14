@@ -154,3 +154,17 @@ it('protects calibrated models, hides incomplete ones, and cascades them with sn
  const ready=(await db.query<{snapshot_id:string}>('select snapshot_id from public.statistics_current')).rows[0].snapshot_id;
  expect((await as<{n:number}>(ids[0],'select count(*)::int n from public.statistics_calibrations where snapshot_id=$1',[ready])).n).toBe(1);
 });
+
+it('protects role catalogues through RLS and immutability and removes them with expired snapshots',async()=>{
+ const sid='8'.repeat(64),state=initialState('x','X'),meta={...state.dataset,pairs:undefined,snapshotId:sid};
+ await db.query('insert into public.statistics_snapshots(id,metadata) values($1,$2)',[sid,JSON.stringify(meta)]);
+ await db.query('insert into public.statistics_role_catalogues values($1,$2)',[sid,JSON.stringify(state.roleCatalogue)]);
+ expect((await as<{n:number}>(ids[0],'select count(*)::int n from public.statistics_role_catalogues where snapshot_id=$1',[sid])).n).toBe(0);
+ await expect(as(ids[0],'update public.statistics_role_catalogues set catalogue=$2 where snapshot_id=$1',[sid,JSON.stringify(state.roleCatalogue)])).rejects.toThrow('permission');
+ await db.query('update public.statistics_snapshots set ready=true where id=$1',[sid]);
+ expect((await as<{n:number}>(ids[0],'select count(*)::int n from public.statistics_role_catalogues where snapshot_id=$1',[sid])).n).toBe(1);
+ await expect(db.query('update public.statistics_role_catalogues set catalogue=$2 where snapshot_id=$1',[sid,JSON.stringify(state.roleCatalogue)])).rejects.toThrow('immutable');
+ await db.query("update public.statistics_snapshots set retired_at=now()-interval '2 hours' where id=$1",[sid]);
+ await db.query('select public.maintain_statistics(false)');
+ expect((await db.query<{n:number}>('select count(*)::int n from public.statistics_role_catalogues where snapshot_id=$1',[sid])).rows[0].n).toBe(0);
+});
