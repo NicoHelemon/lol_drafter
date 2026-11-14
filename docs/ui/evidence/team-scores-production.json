@@ -1,0 +1,133 @@
+{
+  "releaseCommit": "ebcd2c0d6f45288ee85ce211de543823150447d7",
+  "validation": {
+    "typescriptPostgresql": 77,
+    "browser": 19,
+    "python": 47,
+    "build": "passed",
+    "actionlint": "1.7.12",
+    "branchCI": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43621027543",
+    "mainCI": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43621233981",
+    "readOnlyWorkflow": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43620636942"
+  },
+  "migration": {
+    "checkedAt": "2026-11-14T17:27:17.553219+00:00",
+    "migration": "010",
+    "shardsPreserved": 865,
+    "snapshotMetadataPreserved": true,
+    "currentPointerPreserved": true,
+    "roomsPreserved": {
+      "rooms": true,
+      "room_invites": true,
+      "role_swap_requests": true,
+      "pick_swap_requests": true
+    },
+    "grants": [
+      {
+        "role": "anon",
+        "can_read": false,
+        "can_insert": false,
+        "can_update": false
+      },
+      {
+        "role": "authenticated",
+        "can_read": true,
+        "can_insert": false,
+        "can_update": false
+      }
+    ],
+    "calibrations": []
+  },
+  "calibration": {
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+    "applied": true,
+    "model": {
+      "k": 2510.0480193943954,
+      "method": "normal-normal-v1",
+      "fittedAt": "2026-11-14T17:27:22.587879+00:00",
+      "contextKey": "7e684cc79517dd6d2ef4dd463e44b1f09d95b3a1ecaed6101fb6128fc6dcc7e6",
+      "reviewAfter": "2026-12-14T17:27:22.587879+00:00",
+      "observations": 782306,
+      "noiseVariance": 2500,
+      "priorVariance": 0.9959968816067432,
+      "relationCounts": {
+        "vs": 430717,
+        "with": 351589
+      },
+      "trainingSnapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3"
+    }
+  },
+  "hostedScore": {
+    "checkedAt": "2026-11-14T17:29:03.041Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "shardRequests": 5,
+    "expectedScore": "+0.97",
+    "k": 2510.0480193943954,
+    "expectedTeam": "+0.40",
+    "expectedCamilleTeam": "+0.27",
+    "deployment": {
+      "commit": "ebcd2c0d6f45288ee85ce211de543823150447d7",
+      "builtAt": "2026-11-14T17:28:03.820Z"
+    },
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+    "fictional": false,
+    "inlinePairs": 0,
+    "displayedScore": "+0.97",
+    "details": "Renekton \u00b7 Top\n+0.97\nALLIES\nOPPONENTS\n\u00b7\n\u2014\n+1.63\n+0.30\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n\u2014\n2/2 pairs\nAdjusted values \u00b7 equal average\nTeam with Renekton\n+0.40\nChange for the whole team\n+0.59\nProvisional \u00b7 2/2 picks scored \u00b7 4/4 pairs",
+    "displayedTeam": "OUR TEAM\n+0.40\nProvisional \u00b7 2/5 picks \u00b7 2 scored \u00b7 4/4 pairs",
+    "candidatePreview": "Team with Camille\n+0.27\nChange for the whole team\n-0.13\nProvisional \u00b7 2/2 picks scored \u00b7 4/4 pairs",
+    "explanation": "Data: Lolalytics \u00b7 last 14 days \u00b7 Emerald+. Matchups with fewer games are pulled closer to zero. Learned k = 2,510 (half the observed advantage at this many games). Calibration: 14/11/2026; reviewed every 30 days. Scores average these adjusted values equally; team scores average selected champions. They are not win probabilities.",
+    "reloadPreservedScore": true,
+    "reloadPreservedTeamScore": true,
+    "success": true,
+    "testRoomRemoved": true
+  },
+  "finalDatabase": {
+    "checkedAt": "2026-11-14T17:31:04.700024+00:00",
+    "migration": "010",
+    "shardsPreserved": 865,
+    "snapshotMetadataPreserved": true,
+    "currentPointerPreserved": true,
+    "roomsPreserved": {
+      "rooms": true,
+      "room_invites": true,
+      "role_swap_requests": true,
+      "pick_swap_requests": true
+    },
+    "grants": [
+      {
+        "role": "anon",
+        "can_read": false,
+        "can_insert": false,
+        "can_update": false
+      },
+      {
+        "role": "authenticated",
+        "can_read": true,
+        "can_insert": false,
+        "can_update": false
+      }
+    ],
+    "calibrations": [
+      {
+        "snapshot_id": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+        "model": {
+          "k": 2510.0480193943954,
+          "method": "normal-normal-v1",
+          "fittedAt": "2026-11-14T17:27:22.587879+00:00",
+          "contextKey": "7e684cc79517dd6d2ef4dd463e44b1f09d95b3a1ecaed6101fb6128fc6dcc7e6",
+          "reviewAfter": "2026-12-14T17:27:22.587879+00:00",
+          "observations": 782306,
+          "noiseVariance": 2500,
+          "priorVariance": 0.9959968816067432,
+          "relationCounts": {
+            "vs": 430717,
+            "with": 351589
+          },
+          "trainingSnapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3"
+        }
+      }
+    ]
+  }
+}

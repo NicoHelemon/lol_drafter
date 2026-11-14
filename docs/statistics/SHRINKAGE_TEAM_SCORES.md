@@ -4,6 +4,11 @@ Demande du 14 novembre 2026, branche `feat/team-scores-shrinkage`.
 Les comptes et présélections persistantes restent hors de ce lot.
 Ces décisions remplacent celles des anciens rapports concernant le score brut.
 
+**Livré en production le 14 novembre 2026**, commit `ebcd2c0`. Migration 010
+appliquée, k appris enregistré et navigateur hébergé vérifié. Les preuves après
+livraison restent sur la branche dédiée pour éviter un déploiement Netlify
+supplémentaire uniquement documentaire.
+
 ## Calcul présenté aux joueurs
 
 Chaque contribution devient `delta2 × n / (n + k)`, avec le nombre de parties
@@ -129,3 +134,46 @@ ne transmet pas le jeton de gestion au navigateur et quitte la salle ensuite.
 Les captures de démonstration utilisent des observations et un k synthétiques.
 
 ![Aperçu du score collectif d'un candidat](../ui/evidence/team-candidate-preview.png)
+
+## Livraison et contrôle hébergé
+
+La [CI finale de branche](https://github.com/NicoHelemon/lol_drafter/actions/runs/43621027543)
+et la [CI de main](https://github.com/NicoHelemon/lol_drafter/actions/runs/43621233981)
+sont vertes. Netlify sert le commit `ebcd2c0d6f45288ee85ce211de543823150447d7`.
+Un seul push groupé sur main a publié le lot. Le workflow statistique est actif ;
+son contenu est identique à celui vérifié par le précontrôle en lecture seule.
+
+Avant 010 : projet ACTIVE_HEALTHY, sauvegarde privée protégée, zéro salle,
+un snapshot courant et 865 fragments. Seule 010 a été appliquée. L'outil de
+calibration a ensuite inséré le modèle du snapshot courant, sans collecte,
+réécriture de données ni changement de pointeur. Les clients authentifiés
+peuvent lire le modèle, mais ni l'insérer ni le modifier ; anon ne peut pas le lire.
+
+Le modèle enregistré utilise **k = 2 510,0480193943954**, appris sur les
+782 306 observations mentionnées ci-dessus. La prochaine réévaluation interviendra
+sur un refresh réussi après 30 jours, ou lors d'un changement de contexte.
+
+Dans une salle privée temporaire sur le vrai site :
+
+- Renekton Top, contre Ambessa Top et avec Lee Sin Jungle : **+0,97 ajusté**,
+  conforme au calcul indépendant depuis les données canoniques.
+- Renekton sélectionné avec Lee Sin : **score d'équipe +0,40**, couverture 4/4,
+  marqué provisoire car deux champions seulement sont sélectionnés.
+- Survol de Camille : **équipe +0,27**, impact **−0,13**, conforme au recalcul
+  incluant la nouvelle contribution de Lee Sin.
+- Le panneau montre uniquement les contributions ajustées. L'explication
+  indique Lolalytics, 14 jours, Emerald+, k et la date de calibration.
+- Scores individuels et collectif conservés après rechargement.
+- Cinq lectures de fragments Supabase ; zéro requête navigateur à Lolalytics.
+- La salle temporaire a été quittée puis supprimée.
+
+Les **865 empreintes SHA-256**, les métadonnées des snapshots, le pointeur et
+les tables de salles sont identiques à la sauvegarde après migration,
+calibration et tests hébergés. Aucun compte/preset persistant ajouté.
+La collecte réelle n'a pas été relancée pendant ce lot. Le prochain passage
+automatique à 06:00 devra encore être observé ; sa ponctualité n'est pas garantie
+par les tests ou le passage manuel de précontrôle.
+
+[Preuves structurées](../ui/evidence/team-scores-production.json), sans jeton ni invitation.
+
+![Contrôle hébergé avec données réelles et k appris](../ui/evidence/team-adjusted-production.png)
