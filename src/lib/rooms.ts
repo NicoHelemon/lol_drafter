@@ -15,7 +15,12 @@ const statistics = new StatisticsCache(async (snapshot, keys) => {
     .select('candidate_key,pairs').eq('snapshot_id', snapshot).in('candidate_key', keys);
   if (error) throw error;
   return data ?? [];
-});
+},{readCalibration:async(snapshot)=>{
+  if(!supabase)throw Error('Shared calibration requires Supabase');
+  const {data,error}=await supabase.from('statistics_calibrations').select('model').eq('snapshot_id',snapshot).maybeSingle();
+  if(error)throw error;
+  return data?.model;
+}});
 const hydrated = (room: Room) => statistics.hydrate(room);
 export const clearStatisticsCache = () => statistics.clear();
 let identityPromise: Promise<string> | null = null;
@@ -65,7 +70,7 @@ export async function createRoom(
     state.dataset = snapshotMetadata(snapshot.data.metadata);
   }
   const { data, error } = await supabase.rpc("create_room", {
-    initial_state: state,
+    initial_state: persistedState(state),
     invite_token: token,
   });
   if (error) throw error;

@@ -7,6 +7,8 @@ import { candidates } from '../domain/candidates';
 import { record } from '../domain/state';
 import { names, Portrait } from '../components/Champions';
 import DraftChampion from '../components/DraftChampion';
+import TeamSummary from '../components/TeamSummary';
+import StatisticsNote from '../components/StatisticsNote';
 import type { Picker } from '../App';
 interface Props {
   state: State; uid: string; busy: boolean;
@@ -67,8 +69,8 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
       </div>
       <p className="draft-move-hint" id="pick-move-help" role="status">{dragged
         ? `Move ${names[dragged.championId]}: choose another ${dragged.team === 'ally' ? 'allied' : 'opponent'} role. Escape to cancel.`
-        : 'Drag selected champions between roles. Hover a champion for its matchups.'}</p>
-      <div className="board-head"><span>ROLE</span><b className="blue">OUR TEAM</b><b className="red">OPPONENTS</b></div>
+        : 'Drag selected champions between roles. Hover a candidate for adjusted matchups and its effect on the team score.'}</p>
+      <div className="board-head"><span>ROLE</span><TeamSummary team="ally" state={state}/><TeamSummary team="enemy" state={state}/></div>
       {ROLES.map(role => <div className="board-row" key={role}>
         <span className="role-label"><RoleIcon role={role} />{roleName(role)}
           {associatedPlayers.get(role) && <small className="role-player" title={associatedPlayers.get(role)!.name}>{associatedPlayers.get(role)!.name}</small>}
@@ -115,6 +117,7 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
         })}
       </div>)}
       <details className="history"><summary>History · {state.history.length} events</summary>{state.history.map((h,i) => <p key={i}>{h}</p>)}</details>
+      <StatisticsNote state={state}/>
     </section>
   </section>;
 }

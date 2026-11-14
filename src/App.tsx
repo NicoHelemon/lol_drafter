@@ -270,7 +270,9 @@ export default function App() {
         championIds,
         metadata,
       );
-      setRoom(await saveRoom(room, { ...room.state, dataset }));
+      const compatible=dataset.source===room.state.dataset.source && dataset.tier===room.state.dataset.tier
+        && JSON.stringify(dataset.context)===JSON.stringify(room.state.dataset.context);
+      setRoom(await saveRoom(room, { ...room.state, dataset, shrinkage:compatible?room.state.shrinkage:undefined }));
     });
   }
   function choose(id: string) {
@@ -424,11 +426,11 @@ export default function App() {
             hostId={room.host_id}
             online={online}
           />
-          <p className="dataset-note">
+          {state!.phase==='setup'&&<p className="dataset-note">
             {state!.dataset.fictional
               ? "Fictional demo data"
               : `${state!.dataset.source} · ${state!.dataset.patch} / ${state!.dataset.tier}`}{" "}
-          </p>
+          </p>}
           {state!.phase === "setup" ? (
             <SetupPage
               state={state!}

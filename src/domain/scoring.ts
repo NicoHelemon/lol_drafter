@@ -1,5 +1,6 @@
 import {type Dataset,type Role,type State,type Pair} from './types';
 import {WEIGHTS} from './weights';
+import {adjustedDelta} from './shrinkage';
 export const pairKey = (p:Pick<Pair,'relation'|'candidateChampionId'|'candidateRole'|'otherChampionId'|'otherRole'>)=>[p.relation,p.candidateChampionId,p.candidateRole,p.otherChampionId,p.otherRole].join('|');
 export interface Contribution {relation:'vs'|'with'; championId:string; role:Role; delta2:number|null; weight:number}
 export function score(candidateChampionId:string,candidateRole:Role,state:State,index=new Map(state.dataset.pairs.map(p=>[pairKey(p),p]))) {
@@ -8,7 +9,7 @@ export function score(candidateChampionId:string,candidateRole:Role,state:State,
   if(!pick.role || (relation==='with'&&pick.role===candidateRole)) continue;
   const weight=WEIGHTS[candidateRole][relation][pick.role]!;
   const p=index.get(pairKey({relation,candidateChampionId,candidateRole,otherChampionId:pick.championId,otherRole:pick.role}));
-  contributions.push({relation,championId:pick.championId,role:pick.role,delta2:p?.delta2??null,weight});
+  contributions.push({relation,championId:pick.championId,role:pick.role,delta2:adjustedDelta(p,state.shrinkage),weight});
  }
  const known=contributions.filter(c=>c.delta2!==null), denominator=known.reduce((n,c)=>n+c.weight,0);
  return {value:denominator?known.reduce((n,c)=>n+c.weight*c.delta2!,0)/denominator:null,known:known.length,total:contributions.length,contributions};

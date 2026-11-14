@@ -99,6 +99,7 @@ test("host starts immediately with no assigned role or selected champions", asyn
 test("full-width draft integrates pool candidates, score overlays and disabled picked or banned champions", async ({
   page,
 }) => {
+  await page.setViewportSize({width:1440,height:1360});
   await openDemo(page);
   await page
     .getByRole("group", { name: "Top role" })

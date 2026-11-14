@@ -1,4 +1,5 @@
-import type { Dataset, Pair, Room } from '../domain/types';
+import type { Dataset, Pair, Room, ShrinkageModel } from '../domain/types';
+import {validateModel} from '../domain/shrinkage';
 import { championIds } from './provider';
 import { importDataset } from './import';
 
@@ -13,22 +14,38 @@ export class StatisticsCache {
   private capacity: number;
   private ttlMs: number;
   private now: () => number;
-  constructor(private read: ReadShards, options: { capacity?: number; ttlMs?: number; now?: () => number } = {}) {
+  private models=new Map<string,Promise<ShrinkageModel|undefined>>();
+  private readCalibration?: (snapshot:string)=>Promise<unknown>;
+  constructor(private read: ReadShards, options: { capacity?: number; ttlMs?: number; now?: () => number; readCalibration?:(snapshot:string)=>Promise<unknown> } = {}) {
     this.capacity = options.capacity ?? 128;
     this.ttlMs = options.ttlMs ?? 30 * 60_000;
     this.now = options.now ?? Date.now;
+    this.readCalibration=options.readCalibration;
     if (!Number.isInteger(this.capacity) || this.capacity < 1 || !Number.isFinite(this.ttlMs) || this.ttlMs <= 0) throw Error('Invalid cache limits');
   }
 
   clear() {
     this.entries.clear();
     this.pending.clear();
+    this.models.clear();
   }
 
   async hydrate(room: Room): Promise<Room> {
     const dataset = room.state.dataset;
     if (!dataset.snapshotId) return room;
     if (!/^[a-f0-9]{64}$/.test(dataset.snapshotId)) throw Error('Invalid snapshot identity');
+    let model=room.state.shrinkage;
+    if(this.readCalibration){
+      const sid=dataset.snapshotId;
+      if(!this.models.has(sid)){
+        const request=this.readCalibration(sid).then(raw=>raw==null ? undefined : validateModel(raw)).catch(e=>{this.models.delete(sid);throw e;});
+        this.models.set(sid,request);
+        while(this.models.size>this.capacity)this.models.delete(this.models.keys().next().value!);
+      }
+      model=await this.models.get(sid)!;
+      // A missing calibration may be installed later; never pin the absence.
+      if(!model)this.models.delete(sid);
+    }
     const keys = [...new Set([
       ...room.state.players.flatMap(p => p.role ? p.pool.map(id => `${id}:${p.role}`) : []),
       ...Object.values(room.state.picks).flat().map(p => `${p.championId}:${p.role}`),
@@ -74,15 +91,16 @@ export class StatisticsCache {
       }
     }
     const pairs = (await Promise.all(keys.map(key => values.get(key)!))).flat();
-    return { ...room, state: { ...room.state, dataset: { ...dataset, pairs } } };
+    return { ...room, state: { ...room.state, shrinkage:model, dataset: { ...dataset, pairs } } };
   }
 }
 
 export function persistedState(state: Room['state']): Room['state'] {
+  const {shrinkage:_,...stored}=state;
   // Loaded pairs are local working data; never send them back in room edits.
   return state.dataset.snapshotId
-    ? { ...state, dataset: { ...state.dataset, pairs: [] } }
-    : state;
+    ? { ...stored, dataset: { ...state.dataset, pairs: [] } }
+    : stored;
 }
 
 export function snapshotMetadata(raw: unknown): Dataset {

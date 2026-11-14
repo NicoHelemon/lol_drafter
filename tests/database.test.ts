@@ -5,6 +5,7 @@ import {beforeAll,afterAll,it,expect} from 'vitest';
 import {initialState} from '../src/data/provider';
 import {place} from '../src/domain/state';
 import type {Room,State} from '../src/domain/types';
+import {DEMO_MODEL} from '../src/domain/shrinkage';
 import {StatisticsCache,persistedState,snapshotMetadata} from '../src/data/shared';
 const ids=Array.from({length:6},(_,i)=>`00000000-0000-4000-8000-00000000000${i+1}`),token='a'.repeat(72);
 let db:PGlite;
@@ -98,7 +99,7 @@ with tempfile.TemporaryDirectory() as folder:
  print(json.dumps(dict(queries=queries,result=result)))
 `],{encoding:'utf8'})) as {queries:string[];result:{snapshotId:string}};
  const before=(await db.query('select * from public.statistics_current')).rows;
- await db.exec(plan.queries[1]); // Register metadata, deliberately leave shards missing.
+ await db.exec(plan.queries.find(q=>q.startsWith('insert into public.statistics_snapshots'))!); // Deliberately leave shards missing.
  await expect(db.exec(plan.queries.at(-1)!)).rejects.toThrow('Incomplete snapshot');
  await db.exec('rollback');
  expect((await db.query('select * from public.statistics_current')).rows).toEqual(before);
@@ -138,4 +139,18 @@ with tempfile.TemporaryDirectory() as folder:
  const hydrated=await cache.hydrate(r);
  expect(hydrated.state.dataset.pairs.map(p=>p.delta2).sort((a,b)=>a!-b!)).toEqual([-0.1,2.09]);
  expect(persistedState(hydrated.state).dataset.pairs).toEqual([]);
+});
+
+it('protects calibrated models, hides incomplete ones, and cascades them with snapshot retention',async()=>{
+ const sid='9'.repeat(64),meta={...initialState('x','X').dataset,pairs:undefined,snapshotId:sid};
+ await db.query('insert into public.statistics_snapshots(id,metadata) values($1,$2)',[sid,JSON.stringify(meta)]);
+ await expect(db.query('insert into public.statistics_calibrations values($1,$2)',[sid,'{}'])).rejects.toThrow('check');
+ await db.query('insert into public.statistics_calibrations values($1,$2)',[sid,JSON.stringify(DEMO_MODEL)]);
+ expect((await as<{n:number}>(ids[0],'select count(*)::int n from public.statistics_calibrations where snapshot_id=$1',[sid])).n).toBe(0);
+ await expect(as(ids[0],'insert into public.statistics_calibrations values($1,$2)',[sid,JSON.stringify(DEMO_MODEL)])).rejects.toThrow('permission');
+ await expect(db.query('update public.statistics_calibrations set model=$2 where snapshot_id=$1',[sid,JSON.stringify(DEMO_MODEL)])).rejects.toThrow('immutable');
+ await db.query('delete from public.statistics_snapshots where id=$1',[sid]);
+ expect((await db.query<{n:number}>('select count(*)::int n from public.statistics_calibrations where snapshot_id=$1',[sid])).rows[0].n).toBe(0);
+ const ready=(await db.query<{snapshot_id:string}>('select snapshot_id from public.statistics_current')).rows[0].snapshot_id;
+ expect((await as<{n:number}>(ids[0],'select count(*)::int n from public.statistics_calibrations where snapshot_id=$1',[ready])).n).toBe(1);
 });

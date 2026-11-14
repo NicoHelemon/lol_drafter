@@ -6,6 +6,7 @@ import { ROLES, type Role, type State, type Team } from '../domain/types';
 import { roleName } from '../domain/roles';
 import { RoleIcon } from './RoleIcon';
 import { names, Portrait } from './Champions';
+import {candidateImpact} from '../domain/teamScore';
 
 export default function ContributionTooltip({ id, champion, role, team, state, result, anchor }: {
   id: string; champion: string; role: Role; team: Team; state: State; result: CandidateScore; anchor: HTMLElement;
@@ -26,6 +27,8 @@ export default function ContributionTooltip({ id, champion, role, team, state, r
     return () => { window.removeEventListener('resize', update); window.removeEventListener('scroll', update, true); };
   }, [anchor, result]);
   const other: Team = team === 'ally' ? 'enemy' : 'ally';
+  const impact=candidateImpact(champion,role,team,state);
+  const selected=state.picks[team].some(p=>p.role===role&&p.championId===champion);
   function cell(rowRole: Role, relation: 'with' | 'vs') {
     const ownRole = relation === 'with' && rowRole === role;
     const pick = ownRole ? undefined : state.picks[relation === 'with' ? team : other].find(p => p.role === rowRole && p.championId !== champion);
@@ -41,6 +44,11 @@ export default function ContributionTooltip({ id, champion, role, team, state, r
     <div className="contribution-heading"><strong>{names[champion]} <span>· {roleName(role)}</span></strong><b>{scoreLabel(result.value)}</b></div>
     <div className="contribution-columns"><span>Allies</span><span>Opponents</span></div>
     <div className="contribution-matrix">{ROLES.map(rowRole => <div className="contribution-row" key={rowRole}>{cell(rowRole, 'with')}{cell(rowRole, 'vs')}</div>)}</div>
-    <div className="contribution-footer">{result.known}/{result.total} pairs <span>Raw values · equal average</span></div>
+    <div className="contribution-footer">{result.known}/{result.total} pairs <span>Adjusted values · equal average</span></div>
+    {impact&&<div className="team-impact" aria-label="Team score preview">
+      <div><span>{selected?'Current team':`Team with ${names[champion]}`}</span><b>{scoreLabel(impact.after.value)}</b></div>
+      {!selected&&<div><span>Change for the whole team</span><b className={impact.change===null?'muted':impact.change<0?'negative':impact.change>0?'positive':'neutral'}>{scoreLabel(impact.change)}</b></div>}
+      <small>{impact.after.provisional?'Provisional · ':''}{impact.after.scored}/{impact.after.picks} picks scored · {impact.after.known}/{impact.after.total} pairs</small>
+    </div>}
   </div>, document.body);
 }

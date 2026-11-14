@@ -3,6 +3,7 @@ import { StatisticsCache, persistedState } from '../src/data/shared';
 import { initialState } from '../src/data/provider';
 import { score } from '../src/domain/scoring';
 import type { Pair, Room } from '../src/domain/types';
+import {DEMO_MODEL} from '../src/domain/shrinkage';
 
 const sid = 'a'.repeat(64);
 function room(snapshotId = sid): Room {
@@ -20,6 +21,7 @@ it('fetches pool shards only, preserves zero, and recalculates picks and bans wi
   expect(read).toHaveBeenCalledWith(sid, ['58:Top']);
   expect(r.state.dataset.pairs).toEqual([pair]);
   expect(persistedState(r.state).dataset.pairs).toEqual([]);
+  expect(persistedState(r.state).shrinkage).toBeUndefined();
   expect(r.state.dataset.pairs).toEqual([pair]);
   // A pick from a prepared pool was already fetched. A ban never needs a shard.
   r.state.picks.ally = [{ championId: '58', role: 'Top' }];
@@ -28,6 +30,21 @@ it('fetches pool shards only, preserves zero, and recalculates picks and bans wi
   expect(read).toHaveBeenCalledTimes(1);
   r.state.picks.enemy = [{ championId: '122', role: 'Top' }];
   expect(score('58', 'Top', r.state).value).toBe(0);
+});
+
+it('pins calibration to the snapshot, deduplicates reads and retries absent or malformed models',async()=>{
+ const read=vi.fn(async()=>[]);
+ const calibration=vi.fn(async(snapshot:string)=>({...DEMO_MODEL,k:snapshot===sid?625:1250,priorVariance:snapshot===sid?4:2}));
+ const cache=new StatisticsCache(read,{readCalibration:calibration});
+ const [a,b]=await Promise.all([cache.hydrate(room()),cache.hydrate(room())]);
+ expect(a.state.shrinkage?.k).toBe(625);expect(b.state.shrinkage?.k).toBe(625);expect(calibration).toHaveBeenCalledTimes(1);
+ expect((await cache.hydrate(room('b'.repeat(64)))).state.shrinkage?.k).toBe(1250);
+ const missing=vi.fn(async()=>null as unknown);
+ const pending=new StatisticsCache(read,{readCalibration:missing});
+ expect((await pending.hydrate(room())).state.shrinkage).toBeUndefined();
+ missing.mockResolvedValue({...DEMO_MODEL,k:-10});await expect(pending.hydrate(room())).rejects.toThrow('calibration');
+ missing.mockResolvedValue(DEMO_MODEL);expect((await pending.hydrate(room())).state.shrinkage?.k).toBe(625);
+ cache.clear();await cache.hydrate(room());expect(calibration).toHaveBeenCalledTimes(3);
 });
 
 it('pins each room to its snapshot and never mixes data across refreshes', async () => {

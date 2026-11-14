@@ -1,10 +1,11 @@
 import {test,expect,type Page} from '@playwright/test';
 import {makePickSwap} from '../../src/domain/pickSwaps';
 import {ROLES,type Room,type State} from '../../src/domain/types';
+import {DEMO_MODEL} from '../../src/domain/shrinkage';
 import {mkdirSync} from 'node:fs';
 test.use({viewport:{width:1440,height:1360}});
 function fixture(options:{emptyReceiver?:boolean;missing?:boolean}={}) {
- const state:State={phase:'live',side:'blue',players:[],picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},history:[],dataset:{id:'synthetic-hover-fixture',patch:'Test',tier:'Emerald+',source:'Synthetic browser fixture',importedAt:new Date().toISOString(),fictional:true,pairs:[]}};
+ const state:State={shrinkage:{...DEMO_MODEL},phase:'live',side:'blue',players:[],picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},history:[],dataset:{id:'synthetic-hover-fixture',patch:'Test',tier:'Emerald+',source:'Synthetic browser fixture',importedAt:new Date().toISOString(),fictional:true,pairs:[]}};
  state.players=[{id:'local-player',name:'Nico',role:'Mid',pool:['103','7','61']},
   {id:'top-player',name:'Chloe',role:'Top',pool:['31']},
   {id:'jungle-player',name:'Alex',role:'Jungle',pool:['64']},
@@ -15,8 +16,8 @@ function fixture(options:{emptyReceiver?:boolean;missing?:boolean}={}) {
  state.dataset={...state.dataset,id:'synthetic-hover-fixture',source:'Synthetic browser fixture',fictional:true,pairs:[]};
  for(const candidate of ['103','7','61']){
   const offset=candidate==='7'?2:candidate==='61'?1:0;
-  state.picks.enemy.forEach((p,i)=>state.dataset.pairs.push({relation:'vs',candidateChampionId:candidate,candidateRole:'Mid',otherChampionId:p.championId,otherRole:p.role,delta2:[-2.82,3.41,-.72,0,1.5][i]+offset,games:10}));
-  state.picks.ally.filter(p=>p.role!=='Mid').forEach((p,i)=>state.dataset.pairs.push({relation:'with',candidateChampionId:candidate,candidateRole:'Mid',otherChampionId:p.championId,otherRole:p.role,delta2:[1.6,-.1,2.25,1.17][i]+offset,games:20}));
+  state.picks.enemy.forEach((p,i)=>state.dataset.pairs.push({relation:'vs',candidateChampionId:candidate,candidateRole:'Mid',otherChampionId:p.championId,otherRole:p.role,delta2:[-2.82,3.41,-.72,0,1.5][i]+offset,games:625}));
+  state.picks.ally.filter(p=>p.role!=='Mid').forEach((p,i)=>state.dataset.pairs.push({relation:'with',candidateChampionId:candidate,candidateRole:'Mid',otherChampionId:p.championId,otherRole:p.role,delta2:[1.6,-.1,2.25,1.17][i]+offset,games:625}));
  }
  if(options.missing)state.dataset.pairs=state.dataset.pairs.filter(p=>!(p.candidateChampionId==='103'&&p.relation==='with'&&p.otherRole==='Top'));
  return {id:'browser-draft',slug:'draft-ui-room',name:"Nico's room",host_id:'local-player',version:0,state} satisfies Room;
@@ -34,7 +35,7 @@ async function seed(page:Page,options:{emptyReceiver?:boolean;missing?:boolean;r
 const cell=(page:Page,role:string,team='ally')=>page.getByRole('region',{name:`${role} ${team} picks`,exact:true});
 const state=(page:Page)=>page.evaluate(()=>JSON.parse(localStorage.getItem('draftroom-demo')!).state);
 
-test('compact candidates keep the selected size and hover shows nine raw, role-aligned contributions',async({page})=>{
+test('compact candidates keep the selected size and hover shows nine adjusted, role-aligned contributions',async({page})=>{
  await page.setViewportSize({width:1440,height:1360});await seed(page);
  const mid=cell(page,'Mid'),selected=mid.locator('[data-champion="103"]'),candidate=mid.locator('[data-champion="7"]');
  expect((await selected.boundingBox())!.width).toBe(72);
@@ -42,11 +43,11 @@ test('compact candidates keep the selected size and hover shows nine raw, role-a
  expect((await mid.getByRole('button',{name:'Add Mid candidates'}).boundingBox())!.width).toBe(52);
  expect(await mid.locator('.draft-champion-tile').first().getAttribute('data-champion')).toBe('103');
  await selected.hover();const tooltip=page.getByRole('tooltip');
- await expect(tooltip).toContainText('9/9 pairs');await expect(tooltip).toContainText('+0.70');
+ await expect(tooltip).toContainText('9/9 pairs');await expect(tooltip).toContainText('+0.35');
  await expect(tooltip.locator('.contribution-row')).toHaveCount(5);
  await expect(tooltip.locator('.portrait')).toHaveCount(9);
- await expect(tooltip.getByLabel(/With Top Cho.Gath/)).toContainText('+1.60');
- await expect(tooltip.getByLabel(/Against Top Darius/)).toContainText('-2.82');
+ await expect(tooltip.getByLabel(/With Top Cho.Gath/)).toContainText('+0.80');
+ await expect(tooltip.getByLabel(/Against Top Darius/)).toContainText('-1.41');
  await expect(tooltip.getByLabel(/Against Top Darius/).locator('b')).toHaveClass('negative');
  await expect(tooltip.getByLabel(/With Top Cho.Gath/).locator('b')).toHaveClass('positive');
  await expect(tooltip.getByLabel(/Against Bottom Caitlyn/).locator('b')).toHaveClass('neutral');
@@ -77,6 +78,38 @@ test('hover preserves missing values and real zeros, and opening it does not cha
  await expect(tooltip.getByLabel(/With Top Cho.Gath/)).toContainText('N/A');
  await expect(tooltip.getByLabel(/Against Bottom Caitlyn/)).toContainText('+0.00');
  expect((await state(page)).picks).toEqual(room.state.picks);
+});
+test('team summary and candidate preview include the changed contributions of other allies',async({page})=>{
+ await seed(page);
+ await page.evaluate(()=>{
+  const r=JSON.parse(localStorage.getItem('draftroom-demo')!);
+  r.state.dataset.pairs.push(...[['103',2],['7',8]].map(([id,delta])=>({relation:'with',candidateChampionId:'31',candidateRole:'Top',otherChampionId:id,otherRole:'Mid',delta2:delta,games:625})));
+  localStorage.setItem('draftroom-demo',JSON.stringify(r));
+ });
+ await page.reload();
+ const summary=page.getByRole('group',{name:'Our team score',exact:true});
+ await expect(summary).toContainText('+0.67');await expect(summary).toContainText('Provisional');
+ await expect(summary).toContainText('10/45 pairs');await expect(summary).toContainText('2 scored');
+ const before=(await state(page)).picks;
+ await cell(page,'Mid').locator('[data-champion="7"]').hover();
+ const preview=page.getByRole('tooltip').getByLabel('Team score preview');
+ await expect(preview).toContainText('Team with LeBlanc');await expect(preview).toContainText('+2.67');
+ await expect(preview).toContainText('+2.00');
+ expect((await state(page)).picks).toEqual(before);
+ const screenshots=process.env.DRAFT_REVIEW_SCREENSHOTS ?? 'test-results';mkdirSync(screenshots,{recursive:true});
+ await page.screenshot({path:`${screenshots}/team-candidate-preview.png`,fullPage:true});
+ await cell(page,'Mid').getByRole('button',{name:'Pick LeBlanc Mid ally',exact:true}).click();
+ await expect(summary).toContainText('+2.67');
+ await expect(page.getByRole('note',{name:'How scores work'})).toContainText('Demo k = 625');
+ await page.setViewportSize({width:390,height:844});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('an uncalibrated dataset shows no raw score disguised as an adjusted one',async({page})=>{
+ await seed(page);await page.evaluate(()=>{
+  const r=JSON.parse(localStorage.getItem('draftroom-demo')!);delete r.state.shrinkage;localStorage.setItem('draftroom-demo',JSON.stringify(r));
+ });await page.reload();
+ await expect(cell(page,'Mid').locator('[data-champion="103"] .tile-score')).toContainText('N/A');
+ await expect(page.getByRole('note',{name:'How scores work'})).toContainText('unavailable until this dataset has a calibration');
 });
 test('native drag exchanges enemy picks, rejects cross-team drops, and supports keyboard role targeting',async({page})=>{
  await page.setViewportSize({width:1440,height:1360});await seed(page);

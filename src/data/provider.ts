@@ -1,5 +1,6 @@
 import catalogue from './champions.json';
 import {ROLES,type Dataset,type Pair,type Role,type State} from '../domain/types';
+import {DEMO_MODEL} from '../domain/shrinkage';
 export const champions=catalogue;
 export const championIds=new Set(champions.map(c=>c.id));
 export const byId=Object.fromEntries(champions.map(c=>[c.id,c]));
@@ -20,4 +21,4 @@ export function demoDataset():Dataset {
  }
  return {id:'fictional-v1',patch:'Demo',tier:'Synthetic',source:'Synthetic demo data',importedAt:'2026-11-11T00:00:00Z',fictional:true,pairs};
 }
-export function initialState(id:string,name:string):State{return {phase:'setup',side:'blue',dataset:demoDataset(),players:[{id,name,role:null,pool:[]}],picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},history:[]};}
+export function initialState(id:string,name:string):State{return {phase:'setup',side:'blue',dataset:demoDataset(),shrinkage:{...DEMO_MODEL},players:[{id,name,role:null,pool:[]}],picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},history:[]};}
