@@ -14,6 +14,7 @@ from pipeline import build, verify
 from publish import publish
 from maintenance import health, maintain
 from probe import NoRedirects
+from schedule import require_window
 
 
 def validate_refresh(manifest, previous):
@@ -37,6 +38,7 @@ def validate_refresh(manifest, previous):
 
 
 def publish_refresh(directory, previous):
+    require_window()
     manifest = verify(directory)[0]
     validate_refresh(manifest, previous)
     result = publish(directory)
@@ -48,6 +50,7 @@ def publish_refresh(directory, previous):
 
 
 def refresh():
+    require_window()
     mode = os.environ.get('STATISTICS_SOURCE', 'export')
     if mode not in ('export', 'lolalytics'):
         raise ValueError('STATISTICS_SOURCE must be export or lolalytics')

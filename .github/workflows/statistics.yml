@@ -7,15 +7,28 @@ on:
         type: boolean
         default: false
   schedule:
-    - cron: '17 6 * * *'
+    - cron: '0 6 * * *'
+      timezone: Europe/Zurich
 permissions:
   contents: read
 concurrency:
   group: statistics-refresh
   cancel-in-progress: false
 jobs:
-  validate:
+  schedule:
     if: github.event_name == 'workflow_dispatch' || vars.STATISTICS_REFRESH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      allowed: ${{ steps.window.outputs.allowed }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: window
+        name: Check Swiss morning window before starting backend work
+        run: python3 scripts/statistics/schedule.py
+  validate:
+    needs: schedule
+    if: needs.schedule.outputs.allowed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

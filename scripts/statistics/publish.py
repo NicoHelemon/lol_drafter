@@ -10,6 +10,8 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 from pipeline import encoded, verify
+from calibration import context_key, fit, reusable, summarize
+from schedule import require_window
 
 
 def literal(value):
@@ -30,6 +32,7 @@ def query(sql):
 
 
 def publish(directory, execute=query, max_batch_bytes=900_000, progress=None):
+    require_window()
     manifest, groups = verify(directory)  # No remote changes before full validation.
     metadata = manifest['metadata']
     if metadata['fictional']:
@@ -42,6 +45,16 @@ def publish(directory, execute=query, max_batch_bytes=900_000, progress=None):
     if rows and rows[0]['metadata'] != metadata:
         raise ValueError('Existing snapshot has different metadata')
     ready = bool(rows and rows[0]['ready'])
+    models = execute(f"select model from public.statistics_calibrations where snapshot_id={sid}")
+    if models:
+        model = models[0]['model']
+    else:
+        previous = execute(f"""select c.model from public.statistics_calibrations c
+          join public.statistics_snapshots s on s.id=c.snapshot_id where s.ready
+          and c.model->>'contextKey'={literal(context_key(metadata))}
+          order by (c.model->>'fittedAt')::timestamptz desc limit 1""")
+        model = previous[0]['model'] if previous and reusable(previous[0]['model'], metadata) else fit(*summarize(groups), metadata)
+    model_sql = literal(encoded(model).decode())
     if not ready:
         execute(f"insert into public.statistics_snapshots(id,metadata) values({sid},{meta}::jsonb) on conflict do nothing")
         prefix = "insert into public.statistics_shards(snapshot_id,candidate_key,pairs) values"
@@ -82,19 +95,29 @@ def publish(directory, execute=query, max_batch_bytes=900_000, progress=None):
             write_batch(batch)
     # Completeness verification AND pointer change in one database transaction.
     # Old current stays valid on any HTTP or SQL failure before/inside this query.
+    require_window()
+    scheduled_sql = 'true' if os.environ.get('GITHUB_EVENT_NAME') == 'schedule' else 'false'
     execute(f"""begin;
       select pg_advisory_xact_lock(765432100);
       select id from public.statistics_snapshots where id={sid} for update;
       do $check$ begin
+        if {scheduled_sql} and ((clock_timestamp() at time zone 'Europe/Zurich')::time < time '06:00'
+          or (clock_timestamp() at time zone 'Europe/Zurich')::time >= time '08:00')
+        then raise exception 'Automatic publication outside Swiss morning window';end if;
         if (select count(*) from public.statistics_shards where snapshot_id={sid}) <> {len(groups)}
           or (select coalesce(sum(jsonb_array_length(pairs)),0) from public.statistics_shards where snapshot_id={sid}) <> {manifest['pairCount']}
         then raise exception 'Incomplete snapshot';end if;
       end $check$;
+      insert into public.statistics_calibrations(snapshot_id,model) values({sid},{model_sql}::jsonb) on conflict do nothing;
+      do $model$ begin
+        if (select model from public.statistics_calibrations where snapshot_id={sid}) is distinct from {model_sql}::jsonb
+        then raise exception 'Calibration conflict';end if;
+      end $model$;
       update public.statistics_snapshots set ready=true where id={sid} and not ready;
       insert into public.statistics_current(singleton,snapshot_id) values(true,{sid})
         on conflict(singleton) do update set snapshot_id=excluded.snapshot_id;
       commit;""")
-    return {'snapshotId': metadata['snapshotId'], 'shards': len(groups), 'pairs': manifest['pairCount']}
+    return {'snapshotId': metadata['snapshotId'], 'shards': len(groups), 'pairs': manifest['pairCount'], 'calibration':model}
 
 
 if __name__ == '__main__':
