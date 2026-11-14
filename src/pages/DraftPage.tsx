@@ -51,7 +51,7 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('application/x-draftroom-pick', JSON.stringify({team, role, championId}));
     setDragged({team, role, championId});
-    setRoleDrag(null);
+    setRoleDrag(null);setRoleOver(null);
   }
   const roleTarget=(role:Role)=>!!roleDrag&&roleDrag===myRole&&role!==roleDrag&&!busy&&!pendingRoles.has(role)&&!pendingRoles.has(roleDrag);
   function finishRole(role:Role){if(roleTarget(role)){setRoleDrag(null);setRoleOver(null);void onRoleMove(role);}}
@@ -83,8 +83,8 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
             title={myRole===role?'Drag or click to change role with your champion':'Choose this role'}
             disabled={busy||pendingRoles.has(role)||(myRole!==role&&!roleTarget(role))}
             draggable={myRole===role&&!busy&&!pendingRoles.has(role)} aria-pressed={roleDrag===role}
-            onClick={()=>myRole===role?setRoleDrag(old=>old?null:role):finishRole(role)}
-            onDragStart={e=>{if(myRole!==role){e.preventDefault();return;}e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('application/x-draftroom-role',role);setRoleDrag(role);setDragged(null);setActiveTooltip(null);}}
+            onClick={()=>{if(myRole===role){setRoleDrag(old=>old?null:role);setRoleOver(null);setDragged(null);setOver(null);setActiveTooltip(null);}else finishRole(role);}}
+            onDragStart={e=>{if(myRole!==role){e.preventDefault();return;}e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('application/x-draftroom-role',role);setRoleDrag(role);setRoleOver(null);setDragged(null);setOver(null);setActiveTooltip(null);}}
             onDragEnd={()=>{setRoleDrag(null);setRoleOver(null);}}
             onDragOver={e=>{if(roleTarget(role)){e.preventDefault();e.dataTransfer.dropEffect='move';setRoleOver(role);}}}
             onDragLeave={e=>{if(!(e.relatedTarget instanceof Node)||!e.currentTarget.contains(e.relatedTarget))setRoleOver(null);}}
@@ -109,7 +109,7 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
               {pick && <div className="pick-actions">
                 <button aria-label={`Move ${names[pick.championId]} ${team}`} title="Move champion: choose a role" disabled={busy || pending}
                   aria-pressed={dragged?.tap && dragged.team === team && dragged.role === role}
-                  onClick={() => setDragged(old => old?.role === role && old.team === team ? null : {team,role,championId:pick.championId,tap:true})}>↕</button>
+                  onClick={() => {setRoleDrag(null);setRoleOver(null);setDragged(old => old?.role === role && old.team === team ? null : {team,role,championId:pick.championId,tap:true});}}>↕</button>
                 <button aria-label={`Remove ${names[pick.championId]} ${team}`} disabled={busy || pending} onClick={() => void change(s => {
                   s.picks[team] = s.picks[team].filter(p => p.championId !== pick.championId);
                   return record(s,`Pick removed · ${names[pick.championId]}`);

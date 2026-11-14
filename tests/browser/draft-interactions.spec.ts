@@ -135,6 +135,13 @@ test('click/keyboard role targeting moves into a free role and carries anonymous
  await page.getByRole('button',{name:'Move your Mid role',exact:true}).click({position:{x:4,y:4}});
  await expect(cell(page,'Jungle')).toHaveClass(/role-drop-target/);
  await page.keyboard.press('Escape');await expect(cell(page,'Jungle')).not.toHaveClass(/role-drop-target/);
+ await cell(page,'Mid').getByRole('button',{name:'Move Ahri ally',exact:true}).click();
+ await expect(cell(page,'Jungle')).toHaveClass(/drop-available/);
+ await page.getByRole('button',{name:'Move your Mid role',exact:true}).click({position:{x:4,y:4}});
+ await expect(cell(page,'Jungle')).not.toHaveClass(/drop-available/);
+ await cell(page,'Mid').getByRole('button',{name:'Move Ahri ally',exact:true}).click();
+ await expect(cell(page,'Jungle')).not.toHaveClass(/role-drop-target/);
+ await expect(cell(page,'Jungle')).toHaveClass(/drop-available/);
  await page.getByRole('button',{name:'Move your Mid role',exact:true}).click({position:{x:4,y:4}});
  const screenshots=process.env.DRAFT_REVIEW_SCREENSHOTS??'test-results';mkdirSync(screenshots,{recursive:true});
  await page.screenshot({path:`${screenshots}/full-role-panels.png`,fullPage:true,animations:'disabled'});
