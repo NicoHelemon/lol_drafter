@@ -24,4 +24,12 @@ Le cache statistique charge les fragments de toutes les listes, alliées et enne
 
 ![Candidats et sélections distincts, démo synthétique](evidence/ten-role-draft-demo.png)
 
-La validation GitHub Actions, l'application de la seule migration 013 après sauvegarde et la recette Supabase hébergée seront consignées après observation. Aucun accès Riot, import OP.GG ou compte persistant ajouté : ces sujets restent au stade de discussion.
+## Production vérifiée
+
+Version **`2850a6c`** constatée sur Netlify le **15 novembre 2026 à 03:13 Europe/Zurich**. [CI de branche](https://github.com/NicoHelemon/lol_drafter/actions/runs/43666521418) et [CI de main](https://github.com/NicoHelemon/lol_drafter/actions/runs/43666762225) vertes, avec 96 tests TypeScript/PostgreSQL, 50 Python et 23 parcours navigateur. Sauvegarde privée préalable, application de la **seule migration 013**, puis une publication frontend groupée. Les deux salles existantes et leurs invitations sont identiques avant/après la migration et au contrôle final. Les 865 empreintes des fragments, le snapshot courant `603d125…`, les métadonnées et le modèle de calibration sont inchangés. Aucun secret modifié, aucune réinitialisation.
+
+Recette réelle réussie entre **deux identités anonymes indépendantes** : préparation synchronisée des listes libres et adverses, prise de Mid avec pool personnel vide supprimant Ahri/Akali préparées, passage en draft sans sélection automatique, dix boutons [+] permanents, picks synchronisés, échange de rôles après consentement avec pools personnels suivant leurs propriétaires et listes partagées intactes, retrait de Lee Sin des candidats sans retrait du pick, rechargement et Quit supprimant uniquement les salles de test et leurs dépendances.
+
+Le contrôle du score réel passe aussi : Renekton **+0,97**, équipe **+0,40**, remplacement par Camille **+0,27**, variation **−0,13**. Les navigateurs n'ont appelé aucun serveur Lolalytics. Preuves : [JSON](evidence/all-role-candidates-production.json), [lobby](evidence/ten-role-lobby-production.png), [draft](evidence/ten-role-draft-production.png).
+
+Les preuves finales restent sur la branche dédiée sans nouveau déploiement uniquement documentaire. Aucun accès Riot, import OP.GG ou compte persistant ajouté : ces sujets restent au stade de discussion.
