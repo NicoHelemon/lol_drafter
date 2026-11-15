@@ -28,5 +28,5 @@ export function place(s:State,team:Team,role:typeof ROLES[number],championId:str
  const next=structuredClone(s), occupied=next.picks[team].find(p=>p.role===role), existing=next.picks[team].find(p=>p.championId===championId);
  if(existing){const old=existing.role;existing.role=role;if(occupied&&occupied!==existing)occupied.role=old;}
  else {if(occupied)next.picks[team]=next.picks[team].filter(p=>p!==occupied);next.picks[team].push({championId,role});}
- validateState(next);return record(next,`${team==='ally'?'Allies':'Opponents'} · ${championId} → ${roleName(role)}`);
+ validateState(next);return record(next,`${team==='ally'?'Ally team':'Enemy team'} · ${championId} → ${roleName(role)}`);
 }

@@ -78,7 +78,7 @@ test('tournament auto-advances actual bans and grouped picks, with spaced side-c
    const highlighted=page.locator(`.team-bans.${team}.current-bans`),banner=page.locator('.draft-progress');
    const box=await highlighted.boundingBox(),bar=await banner.boundingBox();expect(box!.y).toBeGreaterThan(bar!.y+bar!.height+10);
    const visual=await highlighted.evaluate(el=>({border:getComputedStyle(el).borderTopColor,transform:getComputedStyle(el).transform,shadow:getComputedStyle(el).boxShadow}));
-   expect(visual.border).toBe(current.side==='blue'?'rgb(87, 181, 255)':'rgb(255, 113, 133)');expect(visual.transform).toContain('1.05');expect(visual.shadow).not.toBe('none');
+   expect(visual.border).toBe(current.side==='blue'?'rgb(87, 181, 255)':'rgb(255, 113, 133)');await expect.poll(()=>highlighted.evaluate(el=>getComputedStyle(el).transform)).toContain('1.05');expect(visual.shadow).not.toBe('none');
    if(index===0)await page.getByRole('button',{name:'No ban',exact:true}).click();
    else {await page.getByRole('button',{name:`Ban ${current.slot!+1} ${team}`,exact:true}).click();await page.locator('.champion-grid .champion:enabled').first().click();await expect(page.getByRole('dialog')).toHaveCount(0);}
   }

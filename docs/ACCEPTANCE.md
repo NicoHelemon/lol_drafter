@@ -2,7 +2,9 @@
 
 # Recette partagée
 
-À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611150014_guided_draft.sql`.
+> Recette courante : [sélection automatique, cartes complémentaires, Clear et bans multiples](ui/STREAMLINED_DRAFT.md). Les mentions historiques de confirmation ci-dessous sont remplacées par l’avancement au dernier choix du tour. Pas de rétrocompatibilité des salles : remise à zéro autorisée aux mises à jour, statistiques conservées.
+
+À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611150015_automatic_progression.sql`.
 
 1. Nico crée une salle : titre « Nico’s room », URL `/rooms/nicos-room/setup`, badge HOST à côté de son nom. Un second Nico reçoit une URL distincte, avec suffixe numérique.
 2. Quatre autres profils de navigateur rejoignent via l’invitation. Chacun choisit une case avec Join. Un sixième participant et une invitation incorrecte doivent être refusés.

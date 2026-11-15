@@ -1,5 +1,7 @@
 # Modes et progression manuelle
 
+> Historique de la livraison précédente. La sélection termine désormais automatiquement les étapes ; la disposition des camps et Clear sont décrits dans [STREAMLINED_DRAFT.md](STREAMLINED_DRAFT.md).
+
 Demande du 15 novembre 2026. Branche `feat/guided-draft-modes`.
 
 La création choisit l'un des deux boutons exclusifs **Ranked draft / Tournament draft**. Le lobby retire Dataset settings, couverture et import de fichier. Le camp allié se choisit sur une grande carte interactive : diagonale haut gauche → bas droite, bleu en bas à gauche, rouge en haut à droite. Le bleu prend le premier pick selon le schéma classique explicitement demandé. L'hôte choisit le camp ; les autres membres voient son choix synchronisé. Le lobby ranked ne permet aucune préparation des candidats ennemis, y compris via les API ; tournament conserve les dix listes.

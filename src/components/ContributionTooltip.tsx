@@ -43,7 +43,7 @@ export default function ContributionTooltip({ id, champion, role, team, state, r
   }
   return createPortal(<div id={id} ref={panel} className="contribution-tooltip" role="tooltip" style={position}>
     <div className="contribution-heading"><strong>{names[champion]} <span>· {roleName(role)}</span></strong><div className="individual-score"><small>Individual score</small><b>{scoreLabel(result.value)}</b></div></div>
-    <div className="contribution-columns"><span>Allies</span><span>Opponents</span></div>
+    <div className="contribution-columns"><span>Ally team</span><span>Enemy team</span></div>
     <div className="contribution-matrix">{ROLES.map(rowRole => <div className="contribution-row" key={rowRole}>{cell(rowRole, 'with')}{cell(rowRole, 'vs')}</div>)}</div>
     <div className="contribution-footer">{result.known}/{result.total} pairs <span>Adjusted values · equal average</span></div>
     {impact&&<div className="team-impact" aria-label="Team score preview">
