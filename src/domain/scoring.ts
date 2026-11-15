@@ -19,7 +19,7 @@ export function rank(pool:string[],role:Role,state:State,names:Record<string,str
  const used=unavailable(state), index=new Map(state.dataset.pairs.map(p=>[pairKey(p),p]));
  return pool.filter(c=>!used.has(c)).map(id=>({id,...score(id,role,state,index)})).sort((a,b)=>a.value===null&&b.value!==null?1:b.value===null&&a.value!==null?-1:(b.value??0)-(a.value??0)||(names[a.id]??a.id).localeCompare(names[b.id]??b.id));
 }
-export function coverage(dataset:Dataset,players:State['players'],champions:string[]){
+export function coverage(dataset:Dataset,players:{role:Role|null;pool:string[]}[],champions:string[]){
  const keys=new Set(dataset.pairs.filter(p=>p.delta2!==null).map(pairKey)); let total=0,known=0;
  for(const player of players) if(player.role) for(const c of player.pool) for(const o of champions) if(o!==c) for(const role of ['Top','Jungle','Mid','ADC','Support'] as Role[]) for(const relation of ['vs','with'] as const){
   if(relation==='with'&&role===player.role)continue;

@@ -139,3 +139,10 @@ it('deduplicates overlapping concurrent requests, retries failures, and ignores 
   const inflight = pending.hydrate(room()); pending.clear(); await inflight;
   await pending.hydrate(room()); expect(spy).toHaveBeenCalledTimes(2);
 });
+
+it('hydrates enemy and unoccupied ally candidate pools with deduplicated snapshot shards',async()=>{
+ const r=room();r.state.rolePools={ally:{Mid:['103']},enemy:{Top:['58','122'],Mid:['103']}};
+ const read=vi.fn(async()=>[]),cache=new StatisticsCache(read);
+ const hydrated=await cache.hydrate(r);expect(read).toHaveBeenCalledWith(sid,['103:Mid','122:Top','58:Top']);
+ expect(persistedState(hydrated.state).rolePools).toEqual(r.state.rolePools);
+});

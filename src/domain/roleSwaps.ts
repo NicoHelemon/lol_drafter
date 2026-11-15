@@ -1,13 +1,14 @@
 import type {Role,Room,State,RoleSwapRequest} from './types';
 import {ROLES} from './types';
 import {validateState} from './state';
+import {reconcileRolePools} from './rolePools';
 
 export function exchangeLiveRoles(state:State,from:Role,to:Role):State {
  if(state.phase!=='live'||!ROLES.includes(from)||!ROLES.includes(to))throw Error('Live role moves require a draft');
  const next=structuredClone(state);
  for(const p of next.players){if(p.role===from)p.role=to;else if(p.role===to)p.role=from;}
  for(const p of next.picks.ally){if(p.role===from)p.role=to;else if(p.role===to)p.role=from;}
- validateState(next);return next;
+ const reconciled=reconcileRolePools(state,next);validateState(reconciled);return reconciled;
 }
 export function makeRoleSwap(room:Room,actor:string,to:Role,now=Date.now()):RoleSwapRequest {
  const me=room.state.players.find(p=>p.id===actor),other=room.state.players.find(p=>p.role===to);

@@ -193,7 +193,7 @@ test('role and popularity filters work in lobby and draft while keeping selected
  expect(new Set(narrow).size).toBe(1);
  await page.screenshot({path:`${screenshots}/champion-filters-mobile.png`,fullPage:true,animations:'disabled'});
  await page.getByRole('button',{name:'Close',exact:true}).click();
- await page.getByRole('button',{name:'Choose Mid enemy',exact:true}).click();
+ await page.getByRole('button',{name:'Add Mid enemy candidates',exact:true}).click();
  await expect(page.getByRole('button',{name:'Filter Mid',exact:true})).toHaveAttribute('aria-pressed','true');
  await expect(page.getByRole('button',{name:'Sort by popularity',exact:true})).toHaveAttribute('aria-pressed','true');
  await expect(page.getByRole('button',{name:'Ahri',exact:true})).toBeVisible();

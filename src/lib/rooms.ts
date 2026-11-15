@@ -2,6 +2,7 @@ import { RoomExpiredError } from "./errors";
 import {exchangeLiveRoles,makeRoleSwap,matchesRoleSwap} from '../domain/roleSwaps';
 import { makePickSwap, moveDraftPick, pickOwners, approvePickSwap, matchesPickSwap } from "../domain/pickSwaps";
 import { addDraftCandidate } from "../domain/draft";
+import {reconcileRolePools,setRolePool,validatePool} from '../domain/rolePools';
 import { createClient } from "@supabase/supabase-js";
 import type { Room, State, RoleSwapRequest, PickSwapRequest, Role, Team } from "../domain/types";
 import { initialState, DemoProvider } from "../data/provider";
@@ -133,6 +134,7 @@ export async function readRoom(id: string): Promise<Room> {
   return hydrated(data);
 }
 export async function saveRoom(room: Room, next: State): Promise<Room> {
+  next=reconcileRolePools(room.state,next);
   validateState(next);
   if (!supabase) {
     const stored = await readRoom(room.id);
@@ -150,6 +152,12 @@ export async function saveRoom(room: Room, next: State): Promise<Room> {
   if (error) throw error;
   if (!data) throw new RoomExpiredError();
   return hydrated(data);
+}
+export async function setCandidates(room:Room,team:Team,role:Role,pool:string[]):Promise<Room>{
+ validatePool(pool);
+ if(!supabase)return saveRoom(room,setRolePool(room.state,team,role,pool));
+ const {data,error}=await supabase.rpc('set_role_candidates',{room_id:room.id,team,role,champion_ids:pool,expected_version:room.version});
+ if(error)throw error;if(!data)throw new RoomExpiredError();return hydrated(data);
 }
 export function watchRoom(
   id: string,

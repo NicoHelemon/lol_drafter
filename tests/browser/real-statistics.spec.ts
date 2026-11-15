@@ -23,9 +23,11 @@ test('real source observations use an explicitly illustrative calibration withou
   const tile=page.getByRole('region',{name:'Top ally picks'}).locator('[data-champion="58"] .tile-score');
   await expect(tile).toContainText('N/A');
   for(const [role,team,champion] of [['Top','enemy','Ambessa'],['Jungle','ally','Lee Sin']]){
-    await page.getByRole('button',{name:`Choose ${role} ${team}`,exact:true}).click();
+    await page.getByRole('button',{name:`Add ${role}${team==='enemy'?' enemy':''} candidates`,exact:true}).click();
     await page.getByRole('textbox',{name:'Search champions'}).fill(champion);
     await page.getByRole('button',{name:champion,exact:true}).click();
+    await page.getByRole('button',{name:'Close',exact:true}).click();
+    await page.getByRole('region',{name:`${role} ${team} picks`,exact:true}).getByRole('button',{name:`Pick ${champion} ${role} ${team}`,exact:true}).click();
   }
   await expect(tile).toContainText('+0.93');
   await tile.locator('..').hover();

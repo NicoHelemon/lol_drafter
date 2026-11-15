@@ -18,6 +18,12 @@ async function addPool(page: Page, names: string[]) {
   }
   await page.getByRole("button", { name: "Close", exact: true }).click();
 }
+async function addAndPick(page:Page,role:string,team:string,name:string){
+ await page.getByRole('button',{name:`Add ${role}${team==='enemy'?' enemy':''} candidates`,exact:true}).click();
+ await page.getByRole('textbox',{name:'Search champions'}).fill(name);await page.getByRole('button',{name,exact:true}).click();
+ await page.getByRole('button',{name:'Close',exact:true}).click();
+ await page.getByRole('region',{name:`${role} ${team} picks`,exact:true}).getByRole('button',{name:`Pick ${name} ${role} ${team}`,exact:true}).click();
+}
 test("named rooms, host badge, direct joining and the current 173-champion catalogue", async ({
   page,
 }) => {
@@ -134,17 +140,9 @@ test("full-width draft integrates pool candidates, score overlays and disabled p
   expect(bans!.y).toBeGreaterThan(heading!.y);
   expect(bans!.y).toBeLessThan(row!.y);
   expect(board!.width).toBeGreaterThan(1100);
-  await page
-    .getByRole("button", { name: "Choose Bottom enemy", exact: true })
-    .click();
-  await page.getByRole("textbox", { name: "Search champions" }).fill("Jhin");
-  await page.getByRole("button", { name: "Jhin", exact: true }).click();
+  await addAndPick(page,'Bottom','enemy','Jhin');
   await page.getByRole('region',{name:'Bottom enemy picks'}).locator('[data-champion="202"]').dragTo(page.getByRole('region',{name:'Jungle enemy picks'}));
-  await page
-    .getByRole("button", { name: "Choose Bottom enemy", exact: true })
-    .click();
-  await page.getByRole("textbox", { name: "Search champions" }).fill("Caitlyn");
-  await page.getByRole("button", { name: "Caitlyn", exact: true }).click();
+  await addAndPick(page,'Bottom','enemy','Caitlyn');
   await expect(
     top.locator('[data-champion="164"] .tile-score'),
   ).not.toContainText("N/A");
@@ -170,11 +168,7 @@ test("full-width draft integrates pool candidates, score overlays and disabled p
   await expect(
     top.getByRole("button", { name: "Pick Darius Top ally", exact: true }),
   ).toBeEnabled();
-  await page
-    .getByRole("button", { name: "Choose Top enemy", exact: true })
-    .click();
-  await page.getByRole("textbox", { name: "Search champions" }).fill("Darius");
-  await page.getByRole("button", { name: "Darius", exact: true }).click();
+  await addAndPick(page,'Top','enemy','Darius');
   await expect(
     top.getByRole("button", { name: "Pick Darius Top ally", exact: true }),
   ).toBeDisabled();
@@ -370,50 +364,23 @@ test("requester also sees a popup with a draining timer and the other player’s
   await expect(dialog).toHaveCount(0);
 });
 
-test("anonymous ally and enemy slots replace their plus button with a clickable pick", async ({
-  page,
-}) => {
-  await openDemo(page);
-  await page.getByRole("button", { name: "Start draft" }).click();
-  for (const [role, team, first, second] of [
-    ["Jungle", "ally", "Akshan", "Elise"],
-    ["Top", "enemy", "Darius", "Camille"],
-  ] as const) {
-    const cell = page.getByRole("region", { name: `${role} ${team} picks` });
-    await cell
-      .getByRole("button", { name: `Choose ${role} ${team}`, exact: true })
-      .click();
-    await expect(page.getByRole('button',{name:`Filter ${role}`,exact:true})).toHaveAttribute('aria-pressed','true');
-    await page.getByRole('button',{name:`Filter ${role}`,exact:true}).click();
-    await page.getByRole("textbox", { name: "Search champions" }).fill(first);
-    await page.getByRole("button", { name: first, exact: true }).click();
-    await expect(cell.locator(".board-add")).toHaveCount(0);
-    await expect(cell.locator(".draft-champion-tile")).toHaveCount(1);
-    await cell
-      .getByRole("button", {
-        name: `Change ${first} ${role} ${team}`,
-        exact: true,
-      })
-      .click();
-    await expect(page.getByRole('button',{name:`Filter ${role}`,exact:true})).toHaveAttribute('aria-pressed','true');
-    await page.getByRole('button',{name:`Filter ${role}`,exact:true}).click();
-    await page.getByRole("textbox", { name: "Search champions" }).fill(second);
-    await page.getByRole("button", { name: second, exact: true }).click();
-    await expect(
-      cell.getByRole("button", {
-        name: `Change ${second} ${role} ${team}`,
-        exact: true,
-      }),
-    ).toBeVisible();
-    await expect(cell.locator(".draft-champion-tile")).toHaveCount(1);
-    await expect(cell.locator(".board-add")).toHaveCount(0);
-    await cell
-      .getByRole("button", { name: `Remove ${second} ${team}`, exact: true })
-      .click();
-    await expect(
-      cell.getByRole("button", { name: `Choose ${role} ${team}`, exact: true }),
-    ).toBeVisible();
-  }
+test('unoccupied ally and enemy seats keep multiple candidates independently of their selected pick',async({page})=>{
+ await openDemo(page);await page.getByRole('button',{name:'Start draft'}).click();
+ for(const [role,team,first,second] of [['Jungle','ally','Akshan','Elise'],['Top','enemy','Darius','Camille']]){
+  const cell=page.getByRole('region',{name:`${role} ${team} picks`,exact:true});
+  await page.getByRole('button',{name:`Add ${role}${team==='enemy'?' enemy':''} candidates`,exact:true}).click();
+  await expect(page.getByRole('button',{name:`Filter ${role}`,exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('button',{name:`Filter ${role}`,exact:true}).click();
+  for(const name of [first,second]){await page.getByRole('textbox',{name:'Search champions'}).fill(name);await page.getByRole('button',{name,exact:true}).click();}
+  await page.getByRole('button',{name:'Close',exact:true}).click();
+  await expect(cell.locator('.tile-selected')).toHaveCount(0);await expect(cell.locator('.draft-champion-tile')).toHaveCount(2);await expect(cell.locator('.board-add')).toHaveCount(1);
+  await cell.getByRole('button',{name:`Pick ${first} ${role} ${team}`,exact:true}).click();
+  await expect(cell.locator('.tile-selected')).toHaveCount(1);
+  await cell.getByRole('button',{name:`Pick ${second} ${role} ${team}`,exact:true}).click();
+  await expect(cell.getByRole('button',{name:`Pick ${second} ${role} ${team}`,exact:true})).toHaveAttribute('aria-pressed','true');
+  await cell.getByRole('button',{name:`Pick ${second} ${role} ${team}`,exact:true}).click();
+  await expect(cell.locator('.tile-selected')).toHaveCount(0);await expect(cell.locator('.draft-champion-tile')).toHaveCount(2);
+ }
 });
 test("represented allies add candidates without picking, toggle selections, and keep the selected champion first", async ({
   page,

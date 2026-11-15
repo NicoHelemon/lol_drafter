@@ -13,7 +13,7 @@ export interface RolePopularity {championId:string;role:Role;lanePercent:number;
 export interface RoleCatalogue {schemaVersion:1;capturedAt:string;source:string;context:Record<string,string|number>;entries:RolePopularity[];fictional?:boolean}
 export interface Player {id:string; name:string; role:Role|null; pool:string[]}
 export interface Pick {championId:string; role:Role}
-export interface State {phase:'setup'|'live'; side:'blue'|'red'; dataset:Dataset; players:Player[]; picks:Record<Team,Pick[]>; bans:Record<Team,(string|null)[]>; history:string[]; shrinkage?:ShrinkageModel;roleCatalogue?:RoleCatalogue}
+export interface State {phase:'setup'|'live'; side:'blue'|'red'; dataset:Dataset; players:Player[]; picks:Record<Team,Pick[]>; bans:Record<Team,(string|null)[]>; history:string[]; shrinkage?:ShrinkageModel;roleCatalogue?:RoleCatalogue;rolePools?:Partial<Record<Team,Partial<Record<Role,string[]>>>>}
 export interface Room {id:string;slug:string;name:string; host_id:string; version:number; state:State}
 
 export interface RoleSwapRequest {id:string;room_id:string;requester_id:string;target_id:string;from_role:Role;to_role:Role;created_at:string;expires_at:string;phase?:'setup'|'live';from_champion_id?:string|null;to_champion_id?:string|null}

@@ -1,5 +1,6 @@
 import {roleName} from './roles';
 import {ROLES,type State,type Team} from './types';
+import {validatePool} from './rolePools';
 export function validateState(s:State,ids?:Set<string>){
  if(!['setup','live'].includes(s.phase)||!['blue','red'].includes(s.side))throw Error('Invalid state');
  const seen=new Set<string>();
@@ -11,6 +12,14 @@ export function validateState(s:State,ids?:Set<string>){
  }
  if(s.players.length>5||new Set(s.players.map(p=>p.id)).size!==s.players.length)throw Error('Room is full');
  const roles=s.players.map(p=>p.role).filter(Boolean);if(new Set(roles).size!==roles.length)throw Error('Role already taken');
+ for(const p of s.players)validatePool(p.pool,ids);
+ if(s.rolePools!==undefined){
+  if(!s.rolePools||typeof s.rolePools!=='object'||Array.isArray(s.rolePools)||Object.keys(s.rolePools).some(t=>!['ally','enemy'].includes(t)))throw Error('Invalid role pools');
+  for(const pools of Object.values(s.rolePools)){
+   if(!pools||typeof pools!=='object'||Array.isArray(pools)||Object.keys(pools).some(r=>!ROLES.includes(r as typeof ROLES[number])))throw Error('Invalid role pools');
+   for(const pool of Object.values(pools))validatePool(pool,ids);
+  }
+ }
 }
 export function record(s:State,message:string){s.history=[message,...s.history].slice(0,25);return s;}
 export function place(s:State,team:Team,role:typeof ROLES[number],championId:string){

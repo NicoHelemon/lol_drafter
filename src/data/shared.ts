@@ -1,5 +1,6 @@
 import type { Dataset, Pair, Room, ShrinkageModel,RoleCatalogue } from '../domain/types';
 import {validateCatalogue} from '../domain/catalogue';
+import {rolePoolEntries} from '../domain/rolePools';
 import {validateModel} from '../domain/shrinkage';
 import { championIds } from './provider';
 import { importDataset } from './import';
@@ -61,7 +62,7 @@ export class StatisticsCache {
       if(!model)this.models.delete(sid);
     }
     const keys = [...new Set([
-      ...room.state.players.flatMap(p => p.role ? p.pool.map(id => `${id}:${p.role}`) : []),
+      ...rolePoolEntries(room.state).flatMap(p=>p.pool.map(id=>`${id}:${p.role}`)),
       ...Object.values(room.state.picks).flat().map(p => `${p.championId}:${p.role}`),
     ])].sort();
     // Keep this hydration's promises even if a larger request evicts LRU entries.

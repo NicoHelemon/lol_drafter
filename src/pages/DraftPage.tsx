@@ -1,4 +1,4 @@
-import { toggleDraftCandidate } from '../domain/draft';
+import {rolePool,toggleRoleCandidate} from '../domain/rolePools';
 import { useState, useEffect, type DragEvent } from 'react';
 import { ROLES, type State, type Team, type Role } from '../domain/types';
 import { roleName } from '../domain/roles';
@@ -94,7 +94,7 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
         {(['ally','enemy'] as Team[]).map(team => {
           const player = team === 'ally' ? associatedPlayers.get(role) : undefined;
           const pick = state.picks[team].find(p => p.role === role);
-          const options = candidates(player?.pool ?? [],role,team,state,names);
+          const options = candidates(rolePool(state,team,role),role,team,state,names);
           const pending = blockedRole(team,role), available = canDrop(team,role), roleAvailable=team==='ally'&&roleTarget(role), key = `${team}:${role}`;
           return <section key={team} className={`draft-cell ${team}${player?.id === uid ? ' mine' : ''}${available ? ' drop-available' : ''}${over === key ? ' drop-over' : ''}${pending ? ' transfer-pending' : ''}${roleAvailable?' role-drop-target':''}${roleAvailable&&roleOver===role?' role-drop-over':''}`}
             aria-label={`${roleName(role)} ${team} picks`} data-drop-team={team} data-drop-role={role}
@@ -118,16 +118,15 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
             </div>
             <div className="draft-options">
               {options.map(option => <DraftChampion key={option.id} id={option.id} role={role} team={team} state={state} result={option}
-                selected={option.selected} blocked={option.blocked} busy={busy || pending} toggle={!!player}
+                selected={option.selected} blocked={option.blocked} busy={busy || pending} toggle={true}
                 active={activeTooltip===`${team}:${role}:${option.id}`}
                 onActivate={()=>setActiveTooltip(`${team}:${role}:${option.id}`)}
                 onDeactivate={()=>setActiveTooltip(old=>old===`${team}:${role}:${option.id}` ? null : old)}
-                pickLabel={player ? undefined : `Change ${names[option.id]} ${roleName(role)} ${team}`}
-                onPick={() => { if (player) void change(s => toggleDraftCandidate(s,role,option.id)); else setPicker({kind:'pick',team,role}); }}
+                onPick={() => void change(s=>toggleRoleCandidate(s,team,role,option.id))}
                 onDragStart={e => start(e,team,role,option.id)} onDragEnd={() => {setDragged(null);setOver(null);}} dragging={!!dragged} />)}
-              {(player || !pick) && <button className="add-champion board-add"
-                aria-label={player ? `Add ${roleName(role)} candidates` : `Choose ${roleName(role)} ${team}`}
-                disabled={busy || pending} onClick={() => setPicker(player ? {kind:'candidates',player:player.id,role} : {kind:'pick',team,role})}>+</button>}
+              {<button className="add-champion board-add"
+                aria-label={`Add ${roleName(role)}${team==='enemy'?' enemy':''} candidates`}
+                disabled={busy || pending} onClick={() => setPicker({kind:'candidates',team,role})}>+</button>}
             </div>
           </section>;
         })}

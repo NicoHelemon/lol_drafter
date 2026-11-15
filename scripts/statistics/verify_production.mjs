@@ -77,9 +77,11 @@ try{
   await page.getByRole('button',{name:'Close',exact:true}).click();
   await page.getByRole('button',{name:'Start draft'}).click();
   for(const [role,team,name] of [['Top','enemy','Ambessa'],['Jungle','ally','Lee Sin']]){
-    await page.getByRole('button',{name:`Choose ${role} ${team}`,exact:true}).click();
+    await page.getByRole('button',{name:`Add ${role}${team==='enemy'?' enemy':''} candidates`,exact:true}).click();
     await page.getByRole('textbox',{name:'Search champions'}).fill(name);
     await page.getByRole('button',{name,exact:true}).click();
+    await page.getByRole('button',{name:'Close',exact:true}).click();
+    await page.getByRole('region',{name:`${role} ${team} picks`,exact:true}).getByRole('button',{name:`Pick ${name} ${role} ${team}`,exact:true}).click();
   }
   const score=page.getByRole('region',{name:'Top ally picks'}).locator('[data-champion="58"] .tile-score');
   await score.filter({hasText:label}).waitFor({timeout:30000});

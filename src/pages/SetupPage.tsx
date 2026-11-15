@@ -1,6 +1,7 @@
-import { ROLES, type State, type RoleSwapRequest } from "../domain/types";
+import { ROLES, type State, type RoleSwapRequest, type Team, type Role } from "../domain/types";
 import { roleName } from "../domain/roles";
 import { Portrait, names } from "../components/Champions";
+import {rolePool} from "../domain/rolePools";
 import { RoleIcon, SwapIcon } from "../components/RoleIcon";
 interface Props {
   state: State;
@@ -12,7 +13,8 @@ interface Props {
   readiness: { known: number; total: number };
   swaps: RoleSwapRequest[];
   change: (fn: (s: State) => State) => Promise<void>;
-  editPool: (id: string) => void;
+  editPool: (team:Team,role:Role) => void;
+  updatePool:(team:Team,role:Role,pool:string[])=>void;
   onImport: (file?: File) => void;
   requestSwap: (target: string) => void;
 }
@@ -26,29 +28,24 @@ export default function SetupPage({
   readiness,
   swaps,
   change,
-  editPool,
+  editPool,updatePool,
   onImport,
   requestSwap,
 }: Props) {
   const me = state.players.find((p) => p.id === uid);
-  function removeChampion(playerId: string, championId: string) {
-    void change((s) => {
-      const p = s.players.find((p) => p.id === playerId)!;
-      p.pool = p.pool.filter((id) => id !== championId);
-      return s;
-    });
-  }
   return (
     <section aria-label="Room preparation" className="setup-page">
+      {(['ally','enemy'] as Team[]).map(team=><section className={`setup-team ${team}`} key={team}>
+      <h2>{team==='ally'?'Our team':'Opponents'}</h2>
       <section className="roster">
         {ROLES.map((role) => {
-          const p = state.players.find((p) => p.role === role),
-            editable = !!p && p.id === uid,
+          const p = team==='ally'?state.players.find((p) => p.role === role):undefined,
+            pool=rolePool(state,team,role),editable = !p || p.id === uid || host,
             canSwap = !!me?.role && !!p && p.id !== uid;
           return (
             <div
               role="group"
-              aria-label={`${roleName(role)} role`}
+              aria-label={`${roleName(role)}${team==='enemy'?' enemy':''} role`}
               className={"seat " + (p?.id === uid ? "mine" : "")}
               key={role}
             >
@@ -64,18 +61,16 @@ export default function SetupPage({
                   {p.id === uid && <small>you</small>}
                 </div>
               )}
-              {p ? (
-                <>
                   <div className="pool-tiles">
-                    {p.pool.map((id) => (
+                    {pool.map((id) => (
                       <div className="pool-tile" key={id} title={names[id]}>
                         <Portrait id={id} />
                         {editable && (
                           <button
                             className="remove-champion"
-                            aria-label={`Remove ${names[id]} from ${roleName(role)} pool`}
+                            aria-label={`Remove ${names[id]} from ${roleName(role)}${team==='enemy'?' enemy':''} pool`}
                             disabled={busy}
-                            onClick={() => removeChampion(p.id, id)}
+                            onClick={() => updatePool(team,role,pool.filter(c=>c!==id))}
                           >
                             ×
                           </button>
@@ -85,15 +80,15 @@ export default function SetupPage({
                     {editable && (
                       <button
                         className="add-champion"
-                        aria-label={`Add champion to ${roleName(role)} pool`}
+                        aria-label={`Add champion to ${roleName(role)}${team==='enemy'?' enemy':''} pool`}
                         disabled={busy}
-                        onClick={() => editPool(p.id)}
+                        onClick={() => editPool(team,role)}
                       >
                         +
                       </button>
                     )}
                   </div>
-                  {canSwap && (
+                  {canSwap && p && (
                     <button
                       className="swap-overlay"
                       aria-label={`Swap role with ${p.name}`}
@@ -112,8 +107,7 @@ export default function SetupPage({
                       <span>Swap role</span>
                     </button>
                   )}
-                </>
-              ) : (
+              {team==='ally'&&!p&&(
                 <button
                   disabled={busy}
                   onClick={() =>
@@ -130,7 +124,7 @@ export default function SetupPage({
             </div>
           );
         })}
-      </section>
+      </section></section>)}
       <details className="data-details">
         <summary>Dataset settings</summary>
         <div className="data-status">
