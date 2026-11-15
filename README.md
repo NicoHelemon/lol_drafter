@@ -4,7 +4,7 @@ Application de draft League of Legends pour une équipe de cinq joueurs. React +
 
 ## Base de données
 
-Le schéma courant comprend les migrations `202611110001` à `202611150013` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
+Le schéma courant comprend les migrations `202611110001` à `202611150014` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
 
 La migration **005** interdit les picks sans rôle. La migration **006** ajoute une opération transactionnelle pour enrichir les candidats pendant la draft sans modifier le pick. Ces deux migrations ne suppriment aucune donnée. Sur une installation existante, appliquer uniquement les nouvelles migrations. **Ne pas rejouer 004** : elle réinitialise les salles temporaires.
 
@@ -14,8 +14,11 @@ Les migrations **011** et **012** ajoutent les échanges de rôles pendant la dr
 
 La migration **007** déporte les statistiques dans un cache partagé et immuable, par champion/rôle. Les salles gardent une référence à leur instantané ; leurs données ne sont pas supprimées.
 
+La migration **014** ajoute les modes ranked/tournament et la progression manuelle. Les salles temporaires sont remises à zéro lors de cette livraison selon la nouvelle autorisation utilisateur ; les données statistiques sont conservées. Voir [la séquence et les validations](docs/ui/GUIDED_DRAFT.md).
+
 ## Fonctionnement
 
+- La création choisit Ranked draft ou Tournament draft. Le lobby choisit le camp allié sur une carte bleu/rouge ; ranked masque les listes ennemies. Le déroulement est manuel, sans timer : chaque étape de bans/picks est confirmée par l’hôte, avec retour possible. Les listes courtes sont complétées par popularité jusqu’à cinq choix disponibles.
 - L’interface est en anglais. Une salle porte le nom de son créateur, par exemple **Nico’s room**, avec une URL `/rooms/nicos-room/setup`. Les doublons de noms reçoivent un suffixe numérique ; le UUID reste une clé interne.
 - Le panneau des participants indique le nombre de joueurs (`2/5`) et leurs noms, sans leurs rôles. Un badge **HOST** identifie l’hôte, y compris avant qu’il ait choisi un rôle. L’hôte peut démarrer immédiatement, sans Ready ni obligation de remplir les rôles ou pools.
 - **Join** réserve un rôle libre. Les pools commencent vides. Ajouter un portrait avec [+] ou le retirer avec × enregistre directement la modification.
@@ -46,7 +49,7 @@ Sans variables Supabase, le site fonctionne en démo locale sur un seul navigate
 
 ## Créer Supabase et déployer sur Netlify
 
-1. Créer un projet Supabase neuf. Appliquer les treize fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611150013`.
+1. Créer un projet Supabase neuf. Appliquer les quatorze fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611150014`.
 2. Activer **Authentication → Sign In / Providers → Anonymous Sign-Ins**.
 3. Vérifier que `rooms` appartient à la publication `supabase_realtime` dans **Database → Replication**.
 4. Copier `.env.example` vers `.env.local` pour le développement. Renseigner `VITE_SUPABASE_URL` et la clé publique `VITE_SUPABASE_ANON_KEY` (anon ou publishable). Ne jamais utiliser de clé `service_role` ou secrète dans une variable `VITE_*`.

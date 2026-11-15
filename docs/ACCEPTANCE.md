@@ -1,6 +1,8 @@
+> Les recettes historiques libres ci-dessous sont complétées et remplacées pour la progression par [GUIDED_DRAFT.md](ui/GUIDED_DRAFT.md). Les nouvelles salles ont un mode obligatoire et des tours confirmés. Les salles temporaires peuvent être remises à zéro aux mises à jour.
+
 # Recette partagée
 
-À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611150013_all_role_candidates.sql`.
+À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611150014_guided_draft.sql`.
 
 1. Nico crée une salle : titre « Nico’s room », URL `/rooms/nicos-room/setup`, badge HOST à côté de son nom. Un second Nico reçoit une URL distincte, avec suffixe numérique.
 2. Quatre autres profils de navigateur rejoignent via l’invitation. Chacun choisit une case avec Join. Un sixième participant et une invitation incorrecte doivent être refusés.
