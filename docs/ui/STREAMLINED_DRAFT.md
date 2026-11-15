@@ -1,5 +1,7 @@
 # Lobby compact et sélection immédiate
 
+> Les corrections utilisent désormais Undo/Redo et Open draft : voir [OPEN_DRAFT_HISTORY.md](OPEN_DRAFT_HISTORY.md). Previous step et les anciennes priorités de classement sont remplacés.
+
 Demande du 15 novembre 2026, branche `feat/streamlined-lobby-draft`. Ces règles remplacent les confirmations décrites dans [GUIDED_DRAFT.md](GUIDED_DRAFT.md).
 
 ## Interface

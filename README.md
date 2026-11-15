@@ -4,7 +4,7 @@ Application de draft League of Legends pour une équipe de cinq joueurs. React +
 
 ## Base de données
 
-Le schéma courant comprend les migrations `202611110001` à `202611150015` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
+Le schéma courant comprend les migrations `202611110001` à `202611150016` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
 
 La migration **005** interdit les picks sans rôle. La migration **006** ajoute une opération transactionnelle pour enrichir les candidats pendant la draft sans modifier le pick. Ces deux migrations ne suppriment aucune donnée. Sur une installation existante, appliquer uniquement les nouvelles migrations. **Ne pas rejouer 004** : elle réinitialise les salles temporaires.
 
@@ -17,6 +17,8 @@ La migration **007** déporte les statistiques dans un cache partagé et immuabl
 La migration **014** ajoute les modes ranked/tournament et la progression manuelle. Les salles temporaires sont remises à zéro lors de cette livraison selon la nouvelle autorisation utilisateur ; les données statistiques sont conservées. Voir [la séquence et les validations](docs/ui/GUIDED_DRAFT.md).
 
 La migration **015** permet de terminer une étape dans la transaction du dernier choix (y compris par un invité) et ajoute **Clear**, réservé à l’hôte. Les rôles, joueurs, listes explicites et référence statistique restent identiques après Clear. Les bans ranked se sélectionnent en série dans un même menu, puis la draft avance au dixième ban ; **Skip remaining bans** permet de laisser des cases vides. En tournoi, **No ban** laisse passer un tour sans bannir. Voir [les règles et la validation](docs/ui/STREAMLINED_DRAFT.md).
+
+La migration **016** ajoute l'historique partagé Undo/Redo (Ctrl Z / Ctrl Y, réservé à l'hôte, 60 actions) et **Open draft**, irréversible. Le mode libre repart avec un historique vide et autorise les picks/bans hors séquence ; Clear ne rétablit jamais le mode guidé. Les échanges par glisser-déposer et les consentements restent obligatoires. Les cases de draft se classent désormais uniquement par score ajusté. Voir [les règles de l'historique](docs/ui/OPEN_DRAFT_HISTORY.md).
 
 **Politique permanente de livraison : aucune rétrocompatibilité des salles n’est requise. Les salles et leurs participants/invitations/demandes temporaires peuvent être supprimés à chaque mise à jour, avec vérification préalable. Cette autorisation ne concerne pas les statistiques, snapshots, modèles ou catalogues.** Ne pas rejouer une ancienne migration pour ce nettoyage.
 
@@ -53,7 +55,7 @@ Sans variables Supabase, le site fonctionne en démo locale sur un seul navigate
 
 ## Créer Supabase et déployer sur Netlify
 
-1. Créer un projet Supabase neuf. Appliquer les quinze fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611150015`.
+1. Créer un projet Supabase neuf. Appliquer les seize fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611150016`.
 2. Activer **Authentication → Sign In / Providers → Anonymous Sign-Ins**.
 3. Vérifier que `rooms` appartient à la publication `supabase_realtime` dans **Database → Replication**.
 4. Copier `.env.example` vers `.env.local` pour le développement. Renseigner `VITE_SUPABASE_URL` et la clé publique `VITE_SUPABASE_ANON_KEY` (anon ou publishable). Ne jamais utiliser de clé `service_role` ou secrète dans une variable `VITE_*`.
