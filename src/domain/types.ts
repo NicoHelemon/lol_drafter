@@ -11,7 +11,7 @@ export interface ShrinkageModel {
 export interface Dataset {id:string; patch:string; tier:string; source:string; importedAt:string; fictional:boolean; pairs:Pair[]; snapshotId?:string; context?:Record<string,string|number>}
 export interface RolePopularity {championId:string;role:Role;lanePercent:number;pickPercent:number;games:number}
 export interface RoleCatalogue {schemaVersion:1;capturedAt:string;source:string;context:Record<string,string|number>;entries:RolePopularity[];fictional?:boolean}
-export interface Player {id:string; name:string; role:Role|null; pool:string[]}
+export interface Player {observer?:boolean;id:string; name:string; role:Role|null; pool:string[]}
 export interface Pick {championId:string; role:Role}
 export type DraftMode='ranked'|'tournament';
 export interface DraftCheckpoint {picks:Record<Team,string[]>;bans:Record<Team,(string|null)[]>}

@@ -127,7 +127,7 @@ try{
       const closePicker=page.getByRole('button',{name:'Close',exact:true});
       if(await closePicker.isVisible())await closePicker.click();
       page.once('dialog',d=>d.accept());
-      await page.getByRole('button',{name:'Quit',exact:true}).click();
+      await page.getByRole('button',{name:'Quit room',exact:true}).click();
       await page.getByPlaceholder('Your name').waitFor({timeout:15000});
       proof.testRoomRemoved=true;
     }catch(error){proof.cleanupError=error.message;}

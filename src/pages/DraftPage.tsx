@@ -15,7 +15,7 @@ import TeamSummary from '../components/TeamSummary';
 import StatisticsNote from '../components/StatisticsNote';
 import type { Picker } from '../App';
 interface Props {
-  state: State; uid: string; host:boolean; busy: boolean;
+  state: State; uid: string; host:boolean; busy: boolean;readOnly?:boolean;
   change: (fn: (s: State) => State) => Promise<void>;
   setPicker: (p: Picker) => void;
   onMove: (team: Team, from: Role, to: Role) => Promise<void>;
@@ -23,7 +23,7 @@ interface Props {
   pendingRoles?: Set<Role>;undoCount:number;redoCount:number;onHistory:(action:'undo'|'redo')=>void;
 }
 type DragPick = { team: Team; role: Role; championId: string };
-export default function DraftPage({ state, uid, host, busy, change, setPicker, onMove,onRoleMove,undoCount,redoCount,onHistory, pendingRoles = new Set() }: Props) {
+export default function DraftPage({ state, uid, host, busy,readOnly=false, change, setPicker, onMove,onRoleMove,undoCount,redoCount,onHistory, pendingRoles = new Set() }: Props) {
   const associatedPlayers = new Map(state.players.map(player => [player.role, player]));
   const pairIndex=useMemo(()=>new Map(state.dataset.pairs.map(p=>[pairKey(p),p])),[state.dataset.pairs]);
   const [activeTooltip,setActiveTooltip] = useState<string|null>(null);
@@ -43,7 +43,7 @@ export default function DraftPage({ state, uid, host, busy, change, setPicker, o
     window.addEventListener('keydown', dismiss);
     return () => window.removeEventListener('keydown', dismiss);
   }, []);
-  const blockedRole = (team: Team, role: Role) => team === 'ally' && pendingRoles.has(role);
+  const blockedRole = (team: Team, role: Role) => readOnly||team === 'ally' && pendingRoles.has(role);
   const canDrop = (team: Team, role: Role) => !!dragged && !busy && dragged.team === team && dragged.role !== role
     && !blockedRole(team, role) && !blockedRole(team, dragged.role)
     && state.picks[team].some(p => p.role === dragged.role && p.championId === dragged.championId);
@@ -70,17 +70,17 @@ export default function DraftPage({ state, uid, host, busy, change, setPicker, o
         {(['ally','enemy'] as Team[]).map(team => <section className={`team-bans ${team}${state.draftMode&&!state.openDraft&&state.bans[team].some((_,i)=>canBan(state,team,i))?' current-bans':''}`}  aria-label={team === 'ally' ? 'Ally bans' : 'Enemy bans'} key={team}>
           <b>{team === 'ally' ? 'ALLY BANS' : 'ENEMY BANS'}</b><div className="bans">
             {state.bans[team].map((id, slot) => <div key={slot}>
-              <button aria-label={`Ban ${slot + 1} ${team}`} disabled={busy||!canBan(state,team,slot)} onClick={() => setPicker(state.draftMode==='ranked'?{kind:'bans',team}:{kind:'ban',team,slot})}>
+              <button aria-label={`Ban ${slot + 1} ${team}`} disabled={busy||readOnly||!canBan(state,team,slot)} onClick={() => setPicker(state.draftMode==='ranked'?{kind:'bans',team}:{kind:'ban',team,slot})}>
                 {id ? <Portrait id={id} /> : <span>+</span>}
               </button>
-              {id&&state.openDraft && <button className="remove-ban" aria-label={`Remove ban ${names[id]}`} disabled={busy||!canBan(state,team,slot)} onClick={() => void change(s => {
+              {id&&state.openDraft && <button className="remove-ban" aria-label={`Remove ban ${names[id]}`} disabled={busy||readOnly||!canBan(state,team,slot)} onClick={() => void change(s => {
                 s.bans[team][slot] = null; return record(s,`Ban removed · ${names[id]}`);
               })}>×</button>}
             </div>)}
           </div>
         </section>)}
       </div>
-      <p className="draft-move-hint" id="pick-move-help" role="status">{roleDrag ? 'Choose a role. You keep your champion; another player must accept an exchange.' : dragged
+      <p className="draft-move-hint" id="pick-move-help" role="status">{readOnly?'Hover champions to inspect scores.':roleDrag ? 'Choose a role. You keep your champion; another player must accept an exchange.' : dragged
         ? `Move ${names[dragged.championId]}: choose another ${dragged.team === 'ally' ? 'allied' : 'opponent'} role. Escape to cancel.`
         : 'Drag your role panel to change roles with your champion. Drag portraits to move champions only. Hover candidates to compare team scores.'}</p>
       <div className="board-head"><span>ROLE</span><TeamSummary team="ally" state={state}/><TeamSummary team="enemy" state={state}/></div>
@@ -101,7 +101,7 @@ export default function DraftPage({ state, uid, host, busy, change, setPicker, o
           const pick = state.picks[team].find(p => p.role === role);
           const explicit=rolePool(state,team,role),pool=automaticPool(state,team,role);
           const options = candidates(pool,role,team,state,names,pairIndex);
-          const editable=canPick(state,team,pick?.championId);
+          const editable=!readOnly&&canPick(state,team,pick?.championId);
           const pending = blockedRole(team,role), available = canDrop(team,role), roleAvailable=team==='ally'&&roleTarget(role), key = `${team}:${role}`;
           return <section key={team} className={`draft-cell ${team}${player?.id === uid ? ' mine' : ''}${available ? ' drop-available' : ''}${over === key ? ' drop-over' : ''}${pending ? ' transfer-pending' : ''}${state.draftMode&&!state.openDraft&&editable?' current-pick':''}${roleAvailable?' role-drop-target':''}${roleAvailable&&roleOver===role?' role-drop-over':''}`}
             aria-label={`${roleName(role)} ${team} picks`} data-drop-team={team} data-drop-role={role}

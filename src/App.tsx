@@ -49,6 +49,7 @@ export type Picker =
   | {kind:'ban';team:Team;slot:number}
   | {kind:'bans';team:Team};
 export default function App() {
+  const [joinAsObserver,setJoinAsObserver]=useState(false);
   const [draftMode,setDraftMode]=useState<DraftMode>('ranked');
   const [room, setRoom] = useState<Room | null>(null),
     [uid, setUid] = useState(""),
@@ -214,7 +215,9 @@ export default function App() {
       }
     });
   }
-  async function historyAction(action:'undo'|'redo'|'open'){
+  async function historyAction(action:'undo'|'redo'|'open'|'guided'|'lobby'){
+    if(action==='guided'&&!confirm('Restart guided draft from the beginning? Picks, bans and undo history will be cleared. Roles and candidates will stay.'))return;
+    if(action==='lobby'&&!confirm('Return everyone to the lobby? Picks, bans and undo history will be cleared. Roles and allied candidates will stay.'))return;
     if(!room||busy)return;
     await run(async()=>{try{setRoom(await controlDraft(room,action));setPicker(null);setSwaps([]);setPickSwaps([]);}catch(e){setRoom(await readRoom(room.id));throw e;}});
   }
@@ -229,6 +232,7 @@ export default function App() {
   },[room,uid,busy,picker]);
   const state = room?.state,
     host = room?.host_id === uid,
+    readOnly=!!room?.state.players.find(p=>p.id===uid)?.observer&&!host,
     used = state ? unavailable(state) : new Set<string>();
   function expireRoom() {
     clearRoom();
@@ -255,7 +259,7 @@ export default function App() {
 
   }
   async function exitRoom() {
-    if (!room || !confirm("Quit this room?")) return;
+    if (!room || !confirm("Quit this room? Other participants will stay.")) return;
     await run(async () => {
       await leaveRoom(room);
       clearRoom();
@@ -311,6 +315,7 @@ export default function App() {
                 placeholder="Your name"
               />
             </label>
+            {inviteRoom&&<div className="draft-mode-choice" role="group" aria-label="Join as"><button type="button" aria-pressed={!joinAsObserver} onClick={()=>setJoinAsObserver(false)}>Player</button><button type="button" aria-pressed={joinAsObserver} onClick={()=>setJoinAsObserver(true)}>Observer</button></div>}
             {!inviteRoom&&<div className="draft-mode-choice" role="group" aria-label="Draft mode">{(['ranked','tournament'] as DraftMode[]).map(mode=><button type="button" key={mode} aria-pressed={draftMode===mode} onClick={()=>setDraftMode(mode)}>{mode==='ranked'?'Ranked draft':'Tournament draft'}</button>)}</div>}
             <button
               className="primary"
@@ -319,7 +324,7 @@ export default function App() {
                 void run(async () => {
                   if (inviteRoom) {
                     setRoom(
-                      await joinRoom(inviteRoom, invite, nickname.trim()),
+                      await joinRoom(inviteRoom, invite, nickname.trim(),joinAsObserver),
                     );
                   } else {
                     const result = await createRoom(nickname.trim(),draftMode);
@@ -342,13 +347,8 @@ export default function App() {
                   : "Open local demo"}{" "}
               →
             </button>
-            <p className="muted">
-              {supabase
-                ? "No account required · up to five players"
-                : "Local demo · saved on this browser only."}
-            </p>
+            {!supabase&&<p className="muted">Local demo · saved on this browser only.</p>}
           </section>
-          <p className="notice">Demo statistics are fictional.</p>
         </main>
       ) : (
         <main>
@@ -385,12 +385,14 @@ export default function App() {
                   Start draft →
                 </button>
               )}
-              {host&&state!.phase==='live'&&!state!.openDraft&&<button disabled={busy} title="Pick and ban in any order. This cannot be reversed." onClick={()=>void historyAction('open')}>Open draft</button>}
+              {host&&state!.phase==='live'&&!state!.openDraft&&<button disabled={busy} title="Pick and ban in any order." onClick={()=>void historyAction('open')}>Open draft</button>}
+              {host&&state!.phase==='live'&&state!.openDraft&&<button disabled={busy} onClick={()=>void historyAction('guided')}>Guided draft</button>}
               {host&&state!.phase==='live'&&<button disabled={busy} onClick={()=>void run(async()=>{
                 try{setRoom(await clearDraft(room));setPicker(null);setSwaps([]);setPickSwaps([]);}catch(e){setRoom(await readRoom(room.id));throw e;}
               })}>Clear</button>}
+              {host&&state!.phase==='live'&&<button disabled={busy} onClick={()=>void historyAction('lobby')}>Return to lobby</button>}
               <button disabled={busy} onClick={() => void exitRoom()}>
-                Quit
+                Quit room
               </button>
             </div>
           </div>
@@ -399,11 +401,12 @@ export default function App() {
             hostId={room.host_id}
             online={online}
           />
+          {readOnly&&<p className="observer-notice" role="status">Observing · you can follow the room without changing the draft.</p>}
           {state!.phase === "setup" ? (
             <SetupPage
               state={state!}
               uid={uid}
-              host={host}
+              host={host} readOnly={readOnly}
               hostId={room.host_id}
               busy={busy}
               online={online}
@@ -417,7 +420,7 @@ export default function App() {
             <DraftPage
               state={state!}
               uid={uid}
-              host={host}
+              host={host} readOnly={readOnly}
               busy={busy}
               change={change}
               setPicker={setPicker}

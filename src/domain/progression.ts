@@ -65,7 +65,7 @@ export function validateGuidedTransition(before:State,next:State,host:boolean){
  validateGuidedState(next);if(!next.draftMode)return;
  if(before.phase==='setup'){if(next.phase==='live'&&((next.draftStep??0)!==0||(next.draftHistory??[]).length||!same(checkpoint(before),checkpoint(next))))throw Error('Start at the first draft step');return;}
  if(next.side!==before.side)throw Error('Side is locked during the draft');
- if(before.openDraft&&!next.openDraft)throw Error('Open draft is permanent');
+ if(before.openDraft&&!next.openDraft)throw Error('Use the host restart control to return to guided draft');
  if(!before.openDraft&&next.openDraft){if(!host||!same(checkpoint(next),checkpoint(before)))throw Error('Only the host can open the draft without changing picks');return;}
  if(next.openDraft)return;
  const old=before.draftStep??0,n=next.draftStep??0,history=before.draftHistory??[];

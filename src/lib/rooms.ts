@@ -87,7 +87,7 @@ export async function createRoom(
 export async function joinRoom(
   slug: string,
   token: string,
-  name: string,
+  name: string, asObserver=false,
 ): Promise<Room> {
   await identity();
   if (!supabase) throw Error("Shared rooms are unavailable in local demo mode");
@@ -95,6 +95,7 @@ export async function joinRoom(
     room_slug: slug,
     invite_token: token,
     nickname: name,
+    as_observer: asObserver,
   });
   if (error?.message === "Room not found") throw new RoomExpiredError();
   if (error) throw error;

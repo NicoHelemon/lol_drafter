@@ -212,12 +212,12 @@ test("Quit clears the room and does not restore it after reloading", async ({
 }) => {
   await openDemo(page);
   page.once("dialog", (d) => d.dismiss());
-  await page.getByRole("button", { name: "Quit", exact: true }).click();
+  await page.getByRole("button", { name: "Quit room", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Nico's room" }),
   ).toBeVisible();
   page.once("dialog", (d) => d.accept());
-  await page.getByRole("button", { name: "Quit", exact: true }).click();
+  await page.getByRole("button", { name: "Quit room", exact: true }).click();
   await expect(page).toHaveURL("http://127.0.0.1:5173/");
   await page.reload();
   await expect(

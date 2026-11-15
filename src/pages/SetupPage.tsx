@@ -9,7 +9,7 @@ interface Props {
   uid: string;
   host: boolean;
   hostId: string;
-  busy: boolean;
+  busy: boolean;readOnly?:boolean;
   online: string[];
   swaps: RoleSwapRequest[];
   change: (fn: (s: State) => State) => Promise<void>;
@@ -22,7 +22,7 @@ export default function SetupPage({
   uid,
   host,
   hostId,
-  busy,
+  busy,readOnly=false,
   online,
   swaps,
   change,
@@ -36,12 +36,12 @@ export default function SetupPage({
       {((state.draftMode==='ranked'?['ally']:['ally','enemy']) as Team[]).map(team=><section className={`setup-team ${team}`} key={team}>
       <h2>{team==='ally'?'Ally team':'Enemy team'}</h2>
       <div className="side-roster-row">
-      <SideSelector label={team==='ally'?'Ally team side':'Enemy team side'} side={team==='ally'?state.side:state.side==='blue'?'red':'blue'} disabled={busy||!host} onChange={side=>void change(s=>({...s,side:team==='ally'?side:side==='blue'?'red':'blue'}))}/>
+      <SideSelector label={team==='ally'?'Ally team side':'Enemy team side'} side={team==='ally'?state.side:state.side==='blue'?'red':'blue'} disabled={busy||!host||readOnly} onChange={side=>void change(s=>({...s,side:team==='ally'?side:side==='blue'?'red':'blue'}))}/>
       <section className="roster">
         {ROLES.map((role) => {
           const p = team==='ally'?state.players.find((p) => p.role === role):undefined,
-            pool=rolePool(state,team,role),editable = !p || p.id === uid || host,
-            canSwap = !!me?.role && !!p && p.id !== uid;
+            pool=rolePool(state,team,role),editable = !readOnly&&(!p || p.id === uid || host),
+            canSwap = !readOnly&&!!me?.role && !!p && p.id !== uid;
           return (
             <div
               role="group"
@@ -107,7 +107,7 @@ export default function SetupPage({
                       <span>Swap role</span>
                     </button>
                   )}
-              {team==='ally'&&!p&&(
+              {team==='ally'&&!p&&!me?.observer&&(
                 <button
                   disabled={busy}
                   onClick={() =>

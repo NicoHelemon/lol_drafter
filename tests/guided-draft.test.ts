@@ -6,7 +6,7 @@ import {draftStages,stage,teamFor,advanceDraft,backDraft,startDraft,validateGuid
 import {automaticPool} from '../src/domain/automaticCandidates';
 import {setRolePool} from '../src/domain/rolePools';
 import type {Room,State,DraftMode,Team} from '../src/domain/types';
-const ids=['00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000003'];
+const ids=Array.from({length:11},(_,i)=>`00000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`);
 let db:PGlite;
 async function as<T>(uid:string,sql:string,args:unknown[]=[]){await db.exec('savepoint actor');await db.exec(`set role authenticated;set request.jwt.claim.sub='${uid}'`);try{return (await db.query<T>(sql,args)).rows[0];}catch(e){await db.exec('rollback to actor');throw e;}finally{await db.exec('reset role;release actor');}}
 const save=async(r:Room,s:State,uid=ids[0])=>(await as<{r:Room}>(uid,'select public.save_room($1,$2,$3::jsonb) r',[r.id,r.version,JSON.stringify(s)])).r;
@@ -128,13 +128,13 @@ it('undoes and redoes individual choices and grouped turn boundaries without und
  r=await control(r,'undo');expect(r.state.draftStep).toBe(2);expect(r.state.picks).toEqual(partial.picks);r=await control(r,'redo');expect(r.state.draftStep).toBe(3);
  r=await control(r,'undo');s=structuredClone(r.state);s.picks.enemy.push({role:'Mid',championId:'84'});r=await save(r,finishChoice(s));expect(r.redo_count).toBe(0);await fails(()=>control(r,'redo'),'Nothing to redo');
 });
-it('Open draft is irreversible, discards guided history and retains choices through Clear/Undo/Redo',async()=>{
+it('Open draft discards guided history and retains choices through Clear/Undo/Redo until controlled restart',async()=>{
  let r=await room('tournament');r=await save(r,startDraft(r.state));r=await save(r,chooseBan(r.state,'ally',0,'58'));
  r=await control(r,'open');expect(r.state.openDraft).toBe(true);expect(r.state.bans.ally[0]).toBe('58');expect(r.undo_count).toBe(0);expect(r.redo_count).toBe(0);await fails(()=>control(r,'undo'),'Nothing to undo');
  let s=structuredClone(r.state);s.picks.enemy=[{role:'Support',championId:'25'}];r=await save(r,s);s=structuredClone(r.state);s.bans.enemy[4]='122';r=await save(r,s);
  r=await control(r,'undo');expect(r.state.bans.enemy[4]).toBeNull();expect(r.state.picks.enemy).toHaveLength(1);r=await control(r,'redo');const before=structuredClone(r.state);
  r=await control(r,'clear');expect(r.state.openDraft).toBe(true);expect(r.state.picks.enemy).toHaveLength(0);r=await control(r,'undo');expect(r.state.picks).toEqual(before.picks);expect(r.state.bans).toEqual(before.bans);expect(r.state.openDraft).toBe(true);
- s=structuredClone(r.state);s.openDraft=false;await fails(()=>save(r,s),'Open draft is permanent');await fails(()=>control(r,'open'),'already open');
+ s=structuredClone(r.state);s.openDraft=false;await fails(()=>save(r,s),'host restart control');await fails(()=>control(r,'open'),'already open');
 });
 it('keeps the restoration ticket private and controls host-only, member-only and versioned',async()=>{
  let r=await room('tournament');r=(await as<{r:Room}>(ids[1],'select public.join_room($1,$2,$3) r',[r.slug,'a'.repeat(72),'Guest'])).r;r=await save(r,startDraft(r.state));
@@ -151,4 +151,35 @@ it('bounds shared choice history at sixty positions',async()=>{
  let r=await room('ranked');r=await save(r,startDraft(r.state));r=await control(r,'open');
  for(let i=0;i<65;i++){const s=structuredClone(r.state);s.bans.ally[0]=i%2?'58':'164';r=await save(r,s);}
  expect(r.undo_count).toBe(60);for(let i=0;i<60;i++)r=await control(r,'undo');expect(r.undo_count).toBe(0);expect(r.redo_count).toBe(60);await fails(()=>control(r,'undo'),'Nothing to undo');
+});
+it('restarts guided mode only through a host control and clears choices/history while keeping roles and candidates',async()=>{
+ let r=await room('tournament','red');r=await save(r,setRolePool(r.state,'enemy','Top',['122']));r=await save(r,setRolePool(r.state,'ally','Mid',['103','84']));r=await save(r,startDraft(r.state));r=await control(r,'open');
+ let s=structuredClone(r.state);s.picks.enemy=[{role:'Top',championId:'122'}];s.bans.ally[4]='58';r=await save(r,s);const before=structuredClone(r.state);
+ r=await control(r,'guided');expect(r.state.openDraft).toBe(false);expect(r.state.phase).toBe('live');expect(r.state.draftStep).toBe(0);expect(r.state.picks).toEqual({ally:[],enemy:[]});expect(r.state.bans.ally.every(x=>x===null)).toBe(true);expect(r.undo_count).toBe(0);expect(r.redo_count).toBe(0);
+ for(const key of ['players','rolePools','dataset','side','draftMode'] as const)expect(r.state[key]).toEqual(before[key]);await fails(()=>control(r,'undo'),'Nothing to undo');expect(stage(r.state)?.label).toContain('Blue team');
+ r=await control(r,'lobby');expect(r.state.phase).toBe('setup');expect(r.state.rolePools).toEqual(before.rolePools);r=await save(r,startDraft(r.state));expect(r.state.phase).toBe('live');
+});
+it('returns ranked rooms to setup, retaining allies and clearing enemy preparation for the next game',async()=>{
+ let r=await room('ranked');r=await save(r,setRolePool(r.state,'ally','Top',['58']));r=await save(r,startDraft(r.state));r=await control(r,'open');r=await save(r,setRolePool(r.state,'enemy','Mid',['103']));r=await control(r,'lobby');
+ expect(r.state.phase).toBe('setup');expect(r.state.rolePools?.ally?.Top).toEqual(['58']);expect(r.state.rolePools?.enemy).toBeUndefined();expect(r.undo_count).toBe(0);
+});
+const join=async(r:Room,uid:string,observer=false)=>(await as<{r:Room}>(uid,'select public.join_room($1,$2,$3,$4) r',[r.slug,'a'.repeat(72),`Member ${uid.slice(-2)}`,observer])).r;
+it('admits five players plus three observers, preserves undo when observers join, and rejects overflow',async()=>{
+ let r=await room('tournament');for(const uid of ids.slice(1,5))r=await join(r,uid);
+ await fails(()=>join(r,ids[5]),'Room is full');r=await save(r,startDraft(r.state));r=await save(r,chooseBan(r.state,'ally',0,'58'));const undo=r.undo_count;
+ for(const uid of ids.slice(5,8))r=await join(r,uid,true);expect(r.state.players).toHaveLength(8);expect(r.state.players.filter(p=>p.observer)).toHaveLength(3);expect(r.undo_count).toBe(undo);
+ await fails(()=>join(r,ids[8],true),'Room is full');await fails(()=>join(r,ids[8]),'Draft already started');
+ r=await control(r,'undo');expect(r.state.draftStep).toBe(0);expect(r.state.players).toHaveLength(8);
+});
+it('observers can read, heartbeat and quit, but every editing RPC and the private authorization helper are protected',async()=>{
+ let r=await room('tournament');r=await join(r,ids[1],true);const spectator=ids[1];
+ expect((await as<{n:number}>(spectator,'select count(*)::int n from public.rooms where id=$1',[r.id])).n).toBe(1);await as(spectator,'select public.heartbeat($1)',[r.id]);
+ await fails(()=>save(r,setRolePool(r.state,'enemy','Top',['58']),spectator),'Observers can watch');await fails(()=>as(spectator,'select public.set_role_candidates($1,$2,$3,$4,$5)',[r.id,'enemy','Top',['58'],r.version]),'Observers can watch');
+ for(const [rpc,args] of [['move_draft_pick',[r.id,'enemy','Top','Mid',r.version]],['move_live_role',[r.id,'Top',r.version]],['request_role_swap',[r.id,ids[0],r.version]],['respond_role_swap',[r.id,crypto.randomUUID(),true]],['respond_pick_swap',[r.id,crypto.randomUUID(),true]],['add_draft_candidate',[r.id,ids[0],'58',r.version]]] as [string,unknown[]][]){await fails(()=>as(spectator,`select public.${rpc}(${args.map((_,i)=>'$'+(i+1)).join(',')})`,args),'Observers can watch');}
+ await fails(()=>as(spectator,'select public.assert_room_editor($1)',[r.id]),'permission denied');
+ r=await save(r,startDraft(r.state));await fails(()=>control(r,'lobby',spectator),'Only the host');await as(spectator,'select public.leave_room($1)',[r.id]);const remaining=(await db.query<{state:State}>('select state from public.rooms where id=$1',[r.id])).rows[0].state;expect(remaining.players).toHaveLength(1);expect(remaining.players[0].id).toBe(ids[0]);
+});
+it('participant types cannot be forged and host departure prefers a player over an observer',async()=>{
+ let r=await room('tournament');r=await join(r,ids[1],true);r=await join(r,ids[2]);let s=structuredClone(r.state);s.players[1].observer=false;await fails(()=>save(r,s),'Participant type is fixed');
+ s=structuredClone(r.state);s.players[1].role='Top';await fails(()=>save(r,s),'Observers cannot occupy');await as(ids[0],'select public.leave_room($1)',[r.id]);const next=(await db.query<Room>('select * from public.rooms where id=$1',[r.id])).rows[0];expect(next.host_id).toBe(ids[2]);expect(next.state.players).toHaveLength(2);
 });
