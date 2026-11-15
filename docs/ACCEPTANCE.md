@@ -1,12 +1,14 @@
 > Les recettes historiques libres ci-dessous sont complétées et remplacées pour la progression par [GUIDED_DRAFT.md](ui/GUIDED_DRAFT.md). Les nouvelles salles ont un mode obligatoire et des tours confirmés. Les salles temporaires peuvent être remises à zéro aux mises à jour.
 
+> Recette actuelle : [retour guidé confirmé, Return to lobby / Quit room et places d'observation](ui/LOBBY_OBSERVERS.md).
+
 > Recette Undo/Redo, raccourcis, mode libre irréversible et classement : [OPEN_DRAFT_HISTORY.md](ui/OPEN_DRAFT_HISTORY.md). Les références historiques à Previous step et aux boutons de swap ne sont plus applicables.
 
 # Recette partagée
 
 > Recette courante : [sélection automatique, cartes complémentaires, Clear et bans multiples](ui/STREAMLINED_DRAFT.md). Les mentions historiques de confirmation ci-dessous sont remplacées par l’avancement au dernier choix du tour. Pas de rétrocompatibilité des salles : remise à zéro autorisée aux mises à jour, statistiques conservées.
 
-À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611150016_open_draft_history.sql`.
+À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611150017_lobby_observers.sql`.
 
 1. Nico crée une salle : titre « Nico’s room », URL `/rooms/nicos-room/setup`, badge HOST à côté de son nom. Un second Nico reçoit une URL distincte, avec suffixe numérique.
 2. Quatre autres profils de navigateur rejoignent via l’invitation. Chacun choisit une case avec Join. Un sixième participant et une invitation incorrecte doivent être refusés.

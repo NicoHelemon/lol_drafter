@@ -1,5 +1,7 @@
 # Undo / Redo, Open draft et ordre des candidats
 
+> L’irréversibilité historique est remplacée par un retour confirmé à zéro, avec navigation et observateurs : voir [LOBBY_OBSERVERS.md](LOBBY_OBSERVERS.md).
+
 Demande du 15 novembre 2026. Branche `feat/open-draft-undo`. Remplace les règles de correction et de classement des documents antérieurs.
 
 ## Utilisation
