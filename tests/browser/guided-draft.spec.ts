@@ -7,7 +7,7 @@ async function create(page:Page,mode:DraftMode,side:'blue'|'red'='blue'){
  await page.goto('/');await page.getByPlaceholder('Your name').fill('Guided check');
  await page.getByRole('button',{name:mode==='ranked'?'Ranked draft':'Tournament draft',exact:true}).click();
  await page.getByRole('button',{name:'Open local demo'}).click();
- await page.getByRole('button',{name:side==='blue'?'Blue side, first pick':'Red side, second pick',exact:true}).click();
+ await page.getByRole('region',{name:'Ally team side',exact:true}).getByRole('button',{name:side==='blue'?'Blue side, first pick':'Red side, second pick',exact:true}).click();
 }
 const state=(page:Page)=>page.evaluate(()=>JSON.parse(localStorage.getItem('draftroom-demo')!).state as State);
 async function pick(page:Page,team:string){
@@ -18,40 +18,69 @@ async function pick(page:Page,team:string){
  }
  throw Error('No available current pick');
 }
-test('ranked creation, triangular side selector, five automatic candidates and manual ordered progression',async({page})=>{
+test('ranked has a compact square map, batch bans, automatic grouped picks and Clear retaining preparation',async({page})=>{
  await create(page,'ranked','red');
- await expect(page.getByRole('group',{name:/ role$/})).toHaveCount(5);await expect(page.getByText('Dataset settings',{exact:true})).toHaveCount(0);await expect(page.getByText('Import JSON / CSV',{exact:true})).toHaveCount(0);
+ await expect(page.getByRole('group',{name:/ role$/})).toHaveCount(5);
+ await expect(page.getByText('Choose your side',{exact:true})).toHaveCount(0);await expect(page.locator('.dataset-note')).toHaveCount(0);
+ const layout=await page.locator('.side-roster-row').evaluate(row=>{const map=row.querySelector('.side-map')!.getBoundingClientRect(),roles=row.querySelector('.roster')!.getBoundingClientRect();return {square:Math.abs(map.width-map.height),ratio:map.width/(map.width+roles.width),aligned:Math.abs(map.top-roles.top)};});
+ expect(layout.square).toBeLessThan(1);expect(layout.ratio).toBeCloseTo(.2,1);expect(layout.aligned).toBeLessThan(1);
  await expect(page.getByRole('button',{name:'Red side, second pick'})).toHaveAttribute('aria-pressed','true');
+ await page.getByRole('group',{name:'Mid role',exact:true}).getByRole('button',{name:'Join',exact:true}).click();
  await page.getByRole('button',{name:'Add champion to Top pool',exact:true}).click();await page.getByRole('button',{name:'Filter Top',exact:true}).click();await page.getByRole('textbox',{name:'Search champions'}).fill('Ahri');await page.getByRole('button',{name:'Ahri',exact:true}).click();await page.getByRole('button',{name:'Close',exact:true}).click();
+ const prepared=await state(page);
  mkdirSync(folder,{recursive:true});await page.screenshot({path:folder+'/ranked-lobby-side.png',fullPage:true,animations:'disabled'});
  await page.getByRole('button',{name:'Start draft'}).click();await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Both teams');
  for(const region of await page.locator('.draft-cell').all())await expect(region.locator('.draft-champion-tile')).toHaveCount(5);
- await expect(page.getByRole('region',{name:'Top ally picks',exact:true}).locator('.draft-champion-tile').first()).toHaveAttribute('data-champion','103');
  await expect(page.locator('.champion-choice:enabled')).toHaveCount(0);
- await page.getByRole('button',{name:'Ban 1 ally',exact:true}).click();await page.getByRole('textbox',{name:'Search champions'}).fill('Camille');await page.getByRole('button',{name:'Camille',exact:true}).click();
- await page.getByRole('button',{name:'Ban 1 enemy',exact:true}).click();await page.getByRole('textbox',{name:'Search champions'}).fill('Camille');await page.getByRole('button',{name:'Camille',exact:true}).click();
- await page.getByRole('button',{name:'Confirm bans',exact:true}).click();await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Blue team · 1st pick');
- await expect(page.locator('.draft-cell.ally .champion-choice:enabled')).toHaveCount(0);await pick(page,'enemy');await page.getByRole('button',{name:'Confirm pick',exact:true}).click();
- await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Red team · 1st and 2nd picks');await expect(page.getByRole('button',{name:'Confirm 2 picks'})).toBeDisabled();
- await pick(page,'ally');await expect(page.getByRole('button',{name:'Confirm 2 picks'})).toBeDisabled();await pick(page,'ally');
+ for(const team of ['ally','enemy']){
+  await page.getByRole('button',{name:`Ban 1 ${team}`,exact:true}).click();
+  for(const name of ['Aatrox','Ahri','Akali','Akshan','Alistar']){
+   await page.getByRole('textbox',{name:'Search champions'}).fill(name);await page.getByRole('button',{name,exact:true}).click();
+   if(name!=='Alistar'||team==='ally')await expect(page.getByRole('dialog')).toBeVisible();
+  }
+  if(team==='ally')await page.getByRole('button',{name:'Close',exact:true}).click();
+ }
+ await expect(page.getByRole('dialog')).toHaveCount(0);await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Blue team · 1st pick');
+ const square=await page.getByRole('button',{name:'Ban 1 ally',exact:true}).boundingBox();expect(Math.abs(square!.width-square!.height)).toBeLessThan(1);
+ await expect(page.locator('.draft-cell.ally .champion-choice:enabled')).toHaveCount(0);await pick(page,'enemy');
+ await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Red team · 1st and 2nd picks');
+ await pick(page,'ally');await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Red team · 1st and 2nd picks');await pick(page,'ally');
+ await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Blue team · 2nd and 3rd picks');
+ await expect(page.getByRole('button',{name:/^Confirm/})).toHaveCount(0);
  await page.screenshot({path:folder+'/ranked-two-picks.png',fullPage:true,animations:'disabled'});
- await page.getByRole('button',{name:'Confirm 2 picks'}).click();await page.reload();await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Blue team · 2nd and 3rd picks');
- await page.getByRole('button',{name:'Previous step'}).click();await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Red team · 1st and 2nd picks');
+ await page.reload();await page.getByRole('button',{name:'Previous step'}).click();await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Red team · 1st and 2nd picks');
+ await page.getByRole('button',{name:'Clear',exact:true}).click();const cleared=await state(page);
+ expect(cleared.draftStep).toBe(0);expect(cleared.draftHistory).toEqual([]);expect(cleared.picks).toEqual({ally:[],enemy:[]});expect([...cleared.bans.ally,...cleared.bans.enemy].filter(Boolean)).toEqual([]);
+ expect(cleared.players).toEqual(prepared.players);expect(cleared.rolePools).toEqual(prepared.rolePools);expect(cleared.side).toBe('red');
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
-test('tournament follows both alternating ban phases and all pick groups through completion',async({page})=>{
- await create(page,'tournament');await expect(page.getByRole('group',{name:/ role$/})).toHaveCount(10);
- await page.getByRole('button',{name:'Start draft'}).click();
- for(const current of draftStages('tournament')){
-  await expect(page.getByRole('region',{name:'Draft progression'})).toContainText(current.label);
+test('tournament complementary side maps control each other and selected/unselected regions are colored/gray',async({page})=>{
+ await create(page,'tournament');
+ const ally=page.getByRole('region',{name:'Ally team side',exact:true}),enemy=page.getByRole('region',{name:'Enemy team side',exact:true});
+ await expect(ally.getByRole('button',{name:'Blue side, first pick'})).toHaveAttribute('aria-pressed','true');await expect(enemy.getByRole('button',{name:'Red side, second pick'})).toHaveAttribute('aria-pressed','true');
+ await enemy.getByRole('button',{name:'Blue side, first pick'}).click();await expect(ally.getByRole('button',{name:'Red side, second pick'})).toHaveAttribute('aria-pressed','true');
+ await ally.getByRole('button',{name:'Blue side, first pick'}).click();await expect(enemy.getByRole('button',{name:'Red side, second pick'})).toHaveAttribute('aria-pressed','true');
+ expect(await ally.locator('.map-red').evaluate(node=>getComputedStyle(node).fill)).toBe(await enemy.locator('.map-blue').evaluate(node=>getComputedStyle(node).fill));
+ await expect(page.getByRole('heading',{name:'Ally team',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'Enemy team',exact:true})).toBeVisible();
+ mkdirSync(folder,{recursive:true});await page.screenshot({path:folder+'/tournament-lobby-sides.png',fullPage:true,animations:'disabled'});
+ await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('tournament auto-advances actual bans and grouped picks, with spaced side-colored highlights',async({page})=>{
+ await create(page,'tournament');await expect(page.getByRole('group',{name:/ role$/})).toHaveCount(10);await page.getByRole('button',{name:'Start draft'}).click();
+ const stages=draftStages('tournament');
+ for(let index=0;index<stages.length;index++){
+  const current=stages[index];await expect(page.getByRole('region',{name:'Draft progression'})).toContainText(current.label);
   if(current.kind==='pick'){
    const s=await state(page);for(let i=0;i<current.count;i++)await pick(page,teamFor(s,current.side!));
-   await page.getByRole('button',{name:current.count===2?'Confirm 2 picks':'Confirm pick',exact:true}).click();
   }else{
    const s=await state(page),team=teamFor(s,current.side!);
-   await expect(page.getByRole('button',{name:`Ban ${current.slot!+1} ${team}`,exact:true})).toBeEnabled();
    if(current.slot===3){mkdirSync(folder,{recursive:true});await page.screenshot({path:folder+`/tournament-ban-${current.side}.png`,fullPage:true,animations:'disabled'});}
-   await page.getByRole('button',{name:'Confirm no ban',exact:true}).click();
+   const highlighted=page.locator(`.team-bans.${team}.current-bans`),banner=page.locator('.draft-progress');
+   const box=await highlighted.boundingBox(),bar=await banner.boundingBox();expect(box!.y).toBeGreaterThan(bar!.y+bar!.height+10);
+   const visual=await highlighted.evaluate(el=>({border:getComputedStyle(el).borderTopColor,transform:getComputedStyle(el).transform,shadow:getComputedStyle(el).boxShadow}));
+   expect(visual.border).toBe(current.side==='blue'?'rgb(87, 181, 255)':'rgb(255, 113, 133)');expect(visual.transform).toContain('1.05');expect(visual.shadow).not.toBe('none');
+   if(index===0)await page.getByRole('button',{name:'No ban',exact:true}).click();
+   else {await page.getByRole('button',{name:`Ban ${current.slot!+1} ${team}`,exact:true}).click();await page.locator('.champion-grid .champion:enabled').first().click();await expect(page.getByRole('dialog')).toHaveCount(0);}
   }
  }
  await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Draft complete');await expect(page.locator('.tile-selected')).toHaveCount(10);await expect(page.locator('.champion-choice:enabled')).toHaveCount(0);

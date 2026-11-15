@@ -1,5 +1,5 @@
 import { RoomExpiredError } from "./errors";
-import {validateGuidedTransition} from '../domain/progression';
+import {validateGuidedTransition,resetDraft} from '../domain/progression';
 import {exchangeLiveRoles,makeRoleSwap,matchesRoleSwap} from '../domain/roleSwaps';
 import { makePickSwap, moveDraftPick, pickOwners, approvePickSwap, matchesPickSwap } from "../domain/pickSwaps";
 import { addDraftCandidate } from "../domain/draft";
@@ -154,6 +154,20 @@ export async function saveRoom(room: Room, next: State): Promise<Room> {
   if (error) throw error;
   if (!data) throw new RoomExpiredError();
   return hydrated(data);
+}
+export async function clearDraft(room:Room):Promise<Room>{
+ if(room.host_id!==await identity())throw Error('Only the host can clear the draft');
+ if(!supabase){
+  const stored=await readRoom(room.id);
+  if(stored.version!==room.version)throw Error('Conflict: room updated. Please try again.');
+  const updated={...room,version:room.version+1,state:resetDraft(room.state)};
+  updated.state.history=['Draft cleared',...updated.state.history].slice(0,25);
+  localStorage.setItem('draftroom-demo',JSON.stringify(updated));
+  localStorage.removeItem(`draftroom-swaps-${room.id}`);localStorage.removeItem(`draftroom-pick-swaps-${room.id}`);
+  return updated;
+ }
+ const {data,error}=await supabase.rpc('clear_draft',{room_id:room.id,expected_version:room.version});
+ if(error)throw error;if(!data)throw new RoomExpiredError();return hydrated(data);
 }
 export async function setCandidates(room:Room,team:Team,role:Role,pool:string[]):Promise<Room>{
  validatePool(pool);

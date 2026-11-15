@@ -88,7 +88,7 @@ test('team summary and candidate preview include the changed contributions of ot
   localStorage.setItem('draftroom-demo',JSON.stringify(r));
  });
  await page.reload();
- const summary=page.getByRole('group',{name:'Our team score',exact:true});
+ const summary=page.getByRole('group',{name:'Ally team score',exact:true});
  await expect(summary).toContainText('+0.67');await expect(summary).toContainText('Provisional');
  await expect(summary).toContainText('10/45 pairs');await expect(summary).toContainText('2 scored');
  const before=(await state(page)).picks;

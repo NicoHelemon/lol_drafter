@@ -24,7 +24,7 @@ beforeAll(async()=>{
  db=new PGlite();await db.exec(`create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;`);
  for(const id of ids)await db.query('insert into auth.users values($1)',[id]);
- for(const file of readdirSync('supabase/migrations').filter(f=>!f.includes('014_')).sort())await db.exec(readFileSync(`supabase/migrations/${file}`,'utf8'));
+ for(const file of readdirSync('supabase/migrations').filter(f=>f<'202611150014').sort())await db.exec(readFileSync(`supabase/migrations/${file}`,'utf8'));
 },30000);
 afterAll(()=>db.close());beforeEach(()=>db.exec('begin'));afterEach(()=>db.exec('rollback'));
 const pools=async(r:Room,team='enemy',role='Top',pool:unknown=['122','266'],uid=ids[0],version=r.version)=>(await as<{r:Room}>(uid,'select public.set_role_candidates($1,$2,$3,$4::jsonb,$5) r',[r.id,team,role,JSON.stringify(pool),version])).r;

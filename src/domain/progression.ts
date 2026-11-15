@@ -22,6 +22,18 @@ export function canPick(s:State,team:Team,champion?:string){
 export function canBan(s:State,team:Team,slot:number){if(!s.draftMode)return true;const current=stage(s);return current?.kind==='bans'||current?.kind==='ban'&&teamFor(s,current.side!)===team&&current.slot===slot;}
 export function canAdvance(s:State){const current=stage(s);if(!current)return false;if(current.kind!=='pick')return true;const team=teamFor(s,current.side!);return s.picks[team].length===locked(s,team).length+current.count;}
 export function advanceDraft(s:State):State{if(!canAdvance(s))throw Error('Complete the current draft step first');return {...structuredClone(s),draftStep:(s.draftStep??0)+1,draftHistory:[...s.draftHistory??[],checkpoint(s)]};}
+// A grouped turn finishes only after its last pick; ranked bans finish at ten slots.
+export function finishChoice(s:State):State{
+ const current=stage(s);
+ const ready=current?.kind==='pick'?canAdvance(s):current?.kind==='ban'?!!s.bans[teamFor(s,current.side!)][current.slot!]:current?.kind==='bans'?[...s.bans.ally,...s.bans.enemy].every(Boolean):false;
+ return ready?advanceDraft(s):s;
+}
+export function chooseBan(s:State,team:Team,slot:number,id:string|null):State{
+ if(!canBan(s,team,slot))throw Error('This ban belongs to another draft step');
+ const next=structuredClone(s);next.bans[team][slot]=id;
+ return id?finishChoice(next):next;
+}
+export function resetDraft(s:State):State{return {...structuredClone(s),picks:{ally:[],enemy:[]},bans:{ally:Array(5).fill(null),enemy:Array(5).fill(null)},...(s.draftMode?{draftStep:0,draftHistory:[]}: {})};}
 export function backDraft(s:State){if(!s.draftMode||!s.draftStep)throw Error('No previous draft step');const next=structuredClone(s),previous=next.draftHistory!.pop()!;next.draftStep!--;for(const team of ['ally','enemy'] as Team[])next.picks[team]=next.picks[team].filter(p=>previous.picks[team].includes(p.championId));next.bans=previous.bans;return next;}
 export function startDraft(s:State):State{return {...structuredClone(s),phase:'live',...(s.draftMode?{draftStep:0,draftHistory:[]}: {})};}
 const stable=(v:unknown):unknown=>Array.isArray(v)?v.map(stable):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b)).map(([k,x])=>[k,stable(x)])):v;
@@ -53,7 +65,12 @@ export function validateGuidedTransition(before:State,next:State,host:boolean){
  if(next.side!==before.side)throw Error('Side is locked during the draft');
  const old=before.draftStep??0,n=next.draftStep??0,history=before.draftHistory??[];
  if(n===old){if(!same(next.draftHistory??[],history))throw Error('Confirmed draft history is locked');}
- else if(n===old+1){if(!host||!canAdvance(before)||!same(next.draftHistory,[...history,checkpoint(before)])||!same(checkpoint(next),checkpoint(before)))throw Error('Only the host can confirm a completed draft step');}
+ else if(n===old+1){
+  const choice={...next,draftStep:old,draftHistory:history};
+  validateCurrent(choice);
+  if(!host&&same(checkpoint(next),checkpoint(before)))throw Error('Only the host can skip a ban');
+  if(!canAdvance(choice)||!same(next.draftHistory,[...history,checkpoint(next)]))throw Error('Invalid draft completion');
+ }
  else if(n===old-1&&old>0){if(!host||!same(next.draftHistory,history.slice(0,-1))||!same(checkpoint(next),history.at(-1)))throw Error('Invalid previous draft step');}
  else throw Error('Advance one draft step at a time');
  validateCurrent(next);

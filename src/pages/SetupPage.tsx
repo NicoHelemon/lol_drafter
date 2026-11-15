@@ -33,9 +33,10 @@ export default function SetupPage({
   return (
     <section aria-label="Room preparation" className="setup-page">
       {state.draftMode&&<p className="eyebrow">{state.draftMode==='ranked'?'Ranked draft':'Tournament draft'}</p>}
-      <SideSelector side={state.side} disabled={busy||!host} onChange={side=>void change(s=>({...s,side}))}/>
       {((state.draftMode==='ranked'?['ally']:['ally','enemy']) as Team[]).map(team=><section className={`setup-team ${team}`} key={team}>
-      <h2>{team==='ally'?'Our team':'Opponents'}</h2>
+      <h2>{team==='ally'?'Ally team':'Enemy team'}</h2>
+      <div className="side-roster-row">
+      <SideSelector label={team==='ally'?'Ally team side':'Enemy team side'} side={team==='ally'?state.side:state.side==='blue'?'red':'blue'} disabled={busy||!host} onChange={side=>void change(s=>({...s,side:team==='ally'?side:side==='blue'?'red':'blue'}))}/>
       <section className="roster">
         {ROLES.map((role) => {
           const p = team==='ally'?state.players.find((p) => p.role === role):undefined,
@@ -123,7 +124,7 @@ export default function SetupPage({
             </div>
           );
         })}
-      </section></section>)}
+      </section></div></section>)}
 
     </section>
   );

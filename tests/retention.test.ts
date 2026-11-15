@@ -43,7 +43,7 @@ beforeAll(async () => {
     create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
     grant usage on schema auth to authenticated; grant execute on function auth.uid() to authenticated;`);
   for (const id of [user, guest]) await db.query('insert into auth.users values($1)',[id]);
-  for (const file of readdirSync('supabase/migrations').filter(f=>!f.includes('014_')).sort()) await db.exec(readFileSync(`supabase/migrations/${file}`,'utf8'));
+  for (const file of readdirSync('supabase/migrations').filter(f=>f<'202611150014').sort()) await db.exec(readFileSync(`supabase/migrations/${file}`,'utf8'));
 }, 30000);
 afterAll(() => db.close());
 beforeEach(() => db.exec('begin'));
@@ -154,7 +154,7 @@ it('applies 008 to a populated 007 database without deleting rooms or changing s
     await prior.exec(`create role anon; create role authenticated; create schema auth; create table auth.users(id uuid primary key);
       create function auth.uid() returns uuid language sql stable as $$select '${user}'::uuid$$;
       insert into auth.users values('${user}'); grant usage on schema auth to authenticated;`);
-    for (const file of readdirSync('supabase/migrations').filter(f=>!f.includes('014_')).sort().filter(f => f < '202611120008_statistics_retention.sql')) await prior.exec(readFileSync(`supabase/migrations/${file}`,'utf8'));
+    for (const file of readdirSync('supabase/migrations').filter(f=>f<'202611150014').sort().filter(f => f < '202611120008_statistics_retention.sql')) await prior.exec(readFileSync(`supabase/migrations/${file}`,'utf8'));
     await prior.query('select public.create_room($1::jsonb,$2)',[JSON.stringify(initialState(user,'Before migration')),'a'.repeat(72)]);
     const rooms = (await prior.query('select * from public.rooms')).rows;
     const shards = (await prior.query('select * from public.statistics_shards order by candidate_key')).rows;

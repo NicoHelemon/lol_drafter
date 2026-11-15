@@ -67,10 +67,10 @@ export default function DraftPage({ state, uid, host, busy, change, setPicker, o
       <div className="section-heading"><h2>Draft board</h2><span className="badge">LIVE</span></div>
       <DraftProgress state={state} host={host} busy={busy} change={change}/>
       <div className="draft-bans" role="region" aria-label="Bans">
-        {(['ally','enemy'] as Team[]).map(team => <section className={`team-bans ${team}${state.draftMode&&state.bans[team].some((_,i)=>canBan(state,team,i))?' current-bans':''}`}  aria-label={team === 'ally' ? 'Our bans' : 'Opponent bans'} key={team}>
-          <b>{team === 'ally' ? 'OUR BANS' : 'OPPONENT BANS'}</b><div className="bans">
+        {(['ally','enemy'] as Team[]).map(team => <section className={`team-bans ${team}${state.draftMode&&state.bans[team].some((_,i)=>canBan(state,team,i))?' current-bans':''}`}  aria-label={team === 'ally' ? 'Ally bans' : 'Enemy bans'} key={team}>
+          <b>{team === 'ally' ? 'ALLY BANS' : 'ENEMY BANS'}</b><div className="bans">
             {state.bans[team].map((id, slot) => <div key={slot}>
-              <button aria-label={`Ban ${slot + 1} ${team}`} disabled={busy||!canBan(state,team,slot)} onClick={() => setPicker({kind:'ban',team,slot})}>
+              <button aria-label={`Ban ${slot + 1} ${team}`} disabled={busy||!canBan(state,team,slot)} onClick={() => setPicker(state.draftMode==='ranked'?{kind:'bans',team}:{kind:'ban',team,slot})}>
                 {id ? <Portrait id={id} /> : <span>+</span>}
               </button>
               {id && <button className="remove-ban" aria-label={`Remove ban ${names[id]}`} disabled={busy||!canBan(state,team,slot)} onClick={() => void change(s => {

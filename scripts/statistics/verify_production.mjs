@@ -77,14 +77,13 @@ try{
   await page.getByRole('button',{name:'Camille',exact:true}).click();
   await page.getByRole('button',{name:'Close',exact:true}).click();
   await page.getByRole('button',{name:'Start draft'}).click();
-  await page.getByRole('button',{name:'Confirm bans',exact:true}).click();
+  await page.getByRole('button',{name:'Skip remaining bans',exact:true}).click();
   for(const [role,team,name] of [['Top','enemy','Ambessa'],['Jungle','ally','Lee Sin']]){
     await page.getByRole('button',{name:`Add ${role}${team==='enemy'?' enemy':''} candidates`,exact:true}).click();
     await page.getByRole('textbox',{name:'Search champions'}).fill(name);
     await page.getByRole('button',{name,exact:true}).click();
     await page.getByRole('button',{name:'Close',exact:true}).click();
     await page.getByRole('region',{name:`${role} ${team} picks`,exact:true}).getByRole('button',{name:`Pick ${name} ${role} ${team}`,exact:true}).click();
-    if(team==='enemy')await page.getByRole('button',{name:'Confirm pick',exact:true}).click();
   }
   const score=page.getByRole('region',{name:'Top ally picks'}).locator('[data-champion="58"] .tile-score');
   await score.filter({hasText:label}).waitFor({timeout:30000});
@@ -98,7 +97,7 @@ try{
   if(!proof.details.includes('2/2 pairs'))throw Error('Incomplete source coverage for verification pair');
   if(!proof.details.includes('Adjusted values')||proof.details.includes('Raw values'))throw Error('Unexpected raw contribution presentation');
   await page.getByRole('region',{name:'Top ally picks'}).getByRole('button',{name:'Pick Renekton Top ally',exact:true}).click();
-  const team=page.getByRole('group',{name:'Our team score',exact:true});
+  const team=page.getByRole('group',{name:'Ally team score',exact:true});
   await expect(team).toContainText(format(expectedTeam));await expect(team).toContainText('4/4 pairs');
   proof.displayedTeam=await team.innerText();
   await page.getByRole('region',{name:'Top ally picks'}).locator('[data-champion="164"]').hover();
@@ -117,7 +116,7 @@ try{
   await page.reload({waitUntil:'domcontentloaded'});
   await page.getByRole('region',{name:'Top ally picks'}).locator('[data-champion="58"] .tile-score').filter({hasText:label}).waitFor({timeout:30000});
   proof.reloadPreservedScore=true;
-  await expect(page.getByRole('group',{name:'Our team score',exact:true})).toContainText(format(expectedTeam));
+  await expect(page.getByRole('group',{name:'Ally team score',exact:true})).toContainText(format(expectedTeam));
   proof.reloadPreservedTeamScore=true;
   await Promise.all(shardTasks);
   if(proof.sourceRequests!==0||proof.shardRequests===0)throw Error('Unexpected statistics request path');
