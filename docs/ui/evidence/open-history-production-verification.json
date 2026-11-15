@@ -1,0 +1,238 @@
+{
+  "checkedAt": "2026-11-15T18:01:31.801709+00:00",
+  "site": "https://draftroom-lol.netlify.app",
+  "deployment": {
+    "commit": "903077c1684be1f87c7a649a1af6ca6690cdd671",
+    "builtAt": "2026-11-15T17:57:57.352Z"
+  },
+  "ci": {
+    "branch": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43743719451",
+    "main": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43744013350",
+    "result": "success",
+    "typescriptPostgres": 117,
+    "python": 50,
+    "browser": 27,
+    "build": "passed"
+  },
+  "database": {
+    "checkedAt": "2026-11-15T18:01:31.801709+00:00",
+    "migration": "016",
+    "statisticalShardsPreserved": 865,
+    "snapshotPointerPreserved": true,
+    "modelsAndCataloguesPreserved": true,
+    "temporaryTables": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0
+    },
+    "roomResetExplicitlyAuthorized": true,
+    "sharedHistoryRows": 0
+  },
+  "temporaryRoomsDeletedAtUpdate": 1,
+  "hosted": {
+    "checkedAt": "2026-11-15T17:58:34.406Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "modes": [
+      {
+        "mode": "ranked",
+        "alliedSide": "red",
+        "guestChoicesInSharedHistory": true,
+        "atomicUndoRedo": true,
+        "shortcutAndReload": true,
+        "groupedPickBoundary": true,
+        "openIrreversibleBaseline": true,
+        "openPicksAndBansOutsideSequence": true,
+        "noMoveButtons": true,
+        "deleteOnlyWhenOpen": true,
+        "clearUndoPreservesOpenModeAndPools": true,
+        "roleConsentAndHistoryReset": true,
+        "knownScoresChecked": 50,
+        "topAllyExample": {
+          "label": "Top ally picks",
+          "items": [
+            {
+              "id": "54",
+              "value": 1.13,
+              "automatic": false,
+              "selected": true
+            },
+            {
+              "id": "58",
+              "value": 0.36,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "103",
+              "value": 0.18,
+              "automatic": false,
+              "selected": false
+            },
+            {
+              "id": "777",
+              "value": -0.02,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "122",
+              "value": -0.05,
+              "automatic": true,
+              "selected": false
+            }
+          ]
+        },
+        "topEnemyExample": {
+          "label": "Top enemy picks",
+          "items": [
+            {
+              "id": "86",
+              "value": 0.45,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "122",
+              "value": 0.2,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "58",
+              "value": 0.13,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "777",
+              "value": -0.07,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "266",
+              "value": -0.45,
+              "automatic": false,
+              "selected": true
+            }
+          ]
+        }
+      },
+      {
+        "mode": "tournament",
+        "alliedSide": "blue",
+        "guestChoicesInSharedHistory": true,
+        "atomicUndoRedo": true,
+        "shortcutAndReload": true,
+        "groupedPickBoundary": false,
+        "openIrreversibleBaseline": true,
+        "openPicksAndBansOutsideSequence": true,
+        "noMoveButtons": true,
+        "deleteOnlyWhenOpen": true,
+        "clearUndoPreservesOpenModeAndPools": true,
+        "roleConsentAndHistoryReset": true,
+        "knownScoresChecked": 50,
+        "topAllyExample": {
+          "label": "Top ally picks",
+          "items": [
+            {
+              "id": "54",
+              "value": 0.62,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "777",
+              "value": 0.39,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "122",
+              "value": 0.34,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "103",
+              "value": 0.14,
+              "automatic": false,
+              "selected": false
+            },
+            {
+              "id": "266",
+              "value": -0.01,
+              "automatic": true,
+              "selected": false
+            }
+          ]
+        },
+        "topEnemyExample": {
+          "label": "Top enemy picks",
+          "items": [
+            {
+              "id": "122",
+              "value": 0.26,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "58",
+              "value": 0.25,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "266",
+              "value": -0.09,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "777",
+              "value": -0.27,
+              "automatic": true,
+              "selected": false
+            },
+            {
+              "id": "54",
+              "value": -0.86,
+              "automatic": true,
+              "selected": false
+            }
+          ]
+        }
+      }
+    ],
+    "deployment": {
+      "commit": "903077c1684be1f87c7a649a1af6ca6690cdd671",
+      "builtAt": "2026-11-15T17:57:57.352Z"
+    },
+    "success": true,
+    "cleanup": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0,
+      "draft_timelines": 0
+    }
+  },
+  "scoring": {
+    "success": true,
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+    "expectedScore": "+0.97",
+    "displayedScore": "+0.97",
+    "expectedTeam": "+0.40",
+    "expectedCamilleTeam": "+0.27",
+    "k": 2510.0480193943954,
+    "sourceRequests": 0,
+    "shardRequests": 6,
+    "reloadPreservedScore": true,
+    "reloadPreservedTeamScore": true,
+    "testRoomRemoved": true
+  }
+}

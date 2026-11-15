@@ -32,6 +32,23 @@ La RPC `control_draft` vérifie appartenance, hôte et version, verrouille la sa
 
 ## Vérification et livraison
 
-117 tests TypeScript/PostgreSQL, 50 Python et build réussis localement. Les contrôles ajoutés couvrent annulation/rétablissement d'un choix, frontières de tours doubles, invalidation de Redo, conservation des pools, droits/versions, confidentialité de la pile, mode libre irréversible, Clear annulable, nouvelle base après échanges, limite de stockage et classement selon les scores ajustés. Les résultats des 27 parcours navigateur et de la vérification hébergée sont ajoutés après exécution.
+117 tests TypeScript/PostgreSQL, 50 Python et build réussis localement. Les contrôles ajoutés couvrent annulation/rétablissement d'un choix, frontières de tours doubles, invalidation de Redo, conservation des pools, droits/versions, confidentialité de la pile, mode libre irréversible, Clear annulable, nouvelle base après échanges, limite de stockage et classement selon les scores ajustés. Les **27 parcours navigateur** passent également localement et sur GitHub Actions.
 
 La livraison suit l'autorisation permanente : remise à zéro des salles temporaires après vérification/sauvegarde, sans rétrocompatibilité des salles. Données statistiques, secrets et collecte sont préservés.
+
+
+## Livraison vérifiée
+
+Version **`903077c`** observée en production le **15 novembre 2026 à 19:01 Europe/Zurich**. [CI de branche](https://github.com/NicoHelemon/lol_drafter/actions/runs/43743719451) et [CI de main](https://github.com/NicoHelemon/lol_drafter/actions/runs/43744013350) vertes : 117 tests TypeScript/PostgreSQL, 50 Python, 27 parcours navigateur et build.
+
+Seule la migration 016 a été appliquée, après sauvegarde privée et vérification du projet. La salle temporaire existante, son membre et son invitation ont été supprimés dans la transaction autorisée ; les identités Auth anonymes réutilisables ne sont pas supprimées. Après migration **et après recette**, les empreintes des 865 fragments, le snapshot courant, le modèle et le catalogue sont inchangés.
+
+Deux navigateurs indépendants ont vérifié ranked côté allié rouge et tournament côté allié bleu : choix d'un invité dans l'historique partagé, Ctrl Z/Ctrl Y et Redo après rechargement, annulation du deuxième pick d'un tour double, mode libre avec conservation des choix et piles vides, retrait par croix uniquement en mode libre, picks et bans hors séquence, Clear puis Undo sans retour au guidé, conservation des pools et du snapshot, consentement d'un échange de rôles et remise à zéro de l'historique. Les deux salles et leurs piles privées ont été supprimées par Quit.
+
+Le classement décroissant et N/A en dernier ont été contrôlés dans les dix cases de chaque mode : **100 scores numériques réels** vérifiés. La capture montre notamment Viego sélectionné derrière Graves mieux noté, et Aatrox sélectionné après quatre candidats mieux notés ; Ahri explicitement préparée reste derrière Renekton ajouté automatiquement. La taille du pick ne change pas.
+
+![Mode libre et classement en production](evidence/open-draft-production.png)
+
+Recette statistique réelle inchangée : Renekton Top **+0,97**, équipe **+0,40**, remplacement Camille **+0,27**, k publié **2510,0480** ; valeurs et score d'équipe conservés après rechargement. Aucun appel direct à Lolalytics depuis les navigateurs.
+
+[Preuve structurée](evidence/open-history-production-verification.json). Ce constat est sauvegardé sur la branche de travail sans nouvelle publication de production pour le seul ajout de documentation.
