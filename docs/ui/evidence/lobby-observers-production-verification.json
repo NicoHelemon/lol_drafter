@@ -1,0 +1,97 @@
+{
+  "checkedAt": "2026-11-15T23:03:22.930248+00:00",
+  "site": "https://draftroom-lol.netlify.app",
+  "deployment": {
+    "commit": "07f9a0c118c74310314ee64440b9ca6d9e8ddaf5",
+    "builtAt": "2026-11-15T22:50:57.034Z"
+  },
+  "ci": {
+    "branch": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43771170228",
+    "main": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43771529796",
+    "result": "success",
+    "typescriptPostgres": 122,
+    "python": 50,
+    "browser": 29,
+    "build": "passed"
+  },
+  "database": {
+    "checkedAt": "2026-11-15T23:03:22.930248+00:00",
+    "migration": "017",
+    "statisticalShardsPreserved": 865,
+    "snapshotPointerPreserved": true,
+    "modelsAndCataloguesPreserved": true,
+    "temporaryTables": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0,
+      "draft_timelines": 0
+    },
+    "roomResetExplicitlyAuthorized": true,
+    "sharedHistoryRows": 0
+  },
+  "temporaryRoomsDeletedAtUpdate": 4,
+  "hosted": {
+    "checkedAt": "2026-11-15T23:01:27.211Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "modes": [
+      {
+        "mode": "ranked",
+        "liveObserverJoin": true,
+        "threeObserverQuota": true,
+        "observerReadOnlyUI": true,
+        "observerWriteRejectedByServer": true,
+        "observerJoinAndQuitPreserveUndo": true,
+        "confirmedGuidedRestartAndCancel": true,
+        "confirmedLobbyReturnAndCancel": true,
+        "rolesPoolsSnapshotPreserved": true,
+        "rankedEnemyPreparationCleared": true,
+        "allClientsSynchronized": true,
+        "quitPersonalUntilLastMember": true
+      },
+      {
+        "mode": "tournament",
+        "liveObserverJoin": true,
+        "threeObserverQuota": true,
+        "observerReadOnlyUI": true,
+        "observerWriteRejectedByServer": true,
+        "observerJoinAndQuitPreserveUndo": true,
+        "confirmedGuidedRestartAndCancel": true,
+        "confirmedLobbyReturnAndCancel": true,
+        "rolesPoolsSnapshotPreserved": true,
+        "rankedEnemyPreparationCleared": false,
+        "allClientsSynchronized": true,
+        "quitPersonalUntilLastMember": true
+      }
+    ],
+    "deployment": {
+      "commit": "07f9a0c118c74310314ee64440b9ca6d9e8ddaf5",
+      "builtAt": "2026-11-15T22:50:57.034Z"
+    },
+    "success": true,
+    "cleanup": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0,
+      "draft_timelines": 0
+    }
+  },
+  "scoring": {
+    "success": true,
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+    "expectedScore": "+0.97",
+    "displayedScore": "+0.97",
+    "expectedTeam": "+0.40",
+    "expectedCamilleTeam": "+0.27",
+    "k": 2510.0480193943954,
+    "sourceRequests": 0,
+    "shardRequests": 6,
+    "reloadPreservedScore": true,
+    "reloadPreservedTeamScore": true,
+    "testRoomRemoved": true
+  }
+}
