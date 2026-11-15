@@ -1,10 +1,11 @@
 import { RoomExpiredError } from "./errors";
+import {validateGuidedTransition} from '../domain/progression';
 import {exchangeLiveRoles,makeRoleSwap,matchesRoleSwap} from '../domain/roleSwaps';
 import { makePickSwap, moveDraftPick, pickOwners, approvePickSwap, matchesPickSwap } from "../domain/pickSwaps";
 import { addDraftCandidate } from "../domain/draft";
 import {reconcileRolePools,setRolePool,validatePool} from '../domain/rolePools';
 import { createClient } from "@supabase/supabase-js";
-import type { Room, State, RoleSwapRequest, PickSwapRequest, Role, Team } from "../domain/types";
+import type { Room, State, RoleSwapRequest, PickSwapRequest, Role, Team, DraftMode } from "../domain/types";
 import { initialState, DemoProvider } from "../data/provider";
 import { validateState } from "../domain/state";
 import { StatisticsCache, persistedState, snapshotMetadata } from "../data/shared";
@@ -45,10 +46,10 @@ async function resolveIdentity() {
   return result.data.user!.id;
 }
 export async function createRoom(
-  name: string,
+  name: string, mode:DraftMode='ranked',
 ): Promise<{ room: Room; token: string }> {
   const uid = await identity(),
-    state = initialState(uid, name),
+    state = initialState(uid, name,mode),
     token = crypto.randomUUID() + crypto.randomUUID();
   state.dataset = await new DemoProvider().load();
   if (!supabase) {
@@ -136,6 +137,7 @@ export async function readRoom(id: string): Promise<Room> {
 export async function saveRoom(room: Room, next: State): Promise<Room> {
   next=reconcileRolePools(room.state,next);
   validateState(next);
+  if(room.state.draftMode||next.draftMode)validateGuidedTransition(room.state,next,room.host_id===await identity());
   if (!supabase) {
     const stored = await readRoom(room.id);
     if (stored.version !== room.version)

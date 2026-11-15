@@ -6,7 +6,7 @@ async function add(page:Page,button:string,names:string[]){
  await page.getByRole('button',{name:'Close',exact:true}).click();
 }
 test('all ten seats prepare candidates in the lobby, a player overrides their seat, and draft selections stay independent',async({page})=>{
- await page.setViewportSize({width:1440,height:1100});await page.goto('/');await page.getByPlaceholder('Your name').fill('Candidate check');await page.getByRole('button',{name:'Open local demo'}).click();
+ await page.setViewportSize({width:1440,height:1100});await page.goto('/');await page.getByPlaceholder('Your name').fill('Candidate check');await page.getByRole('button',{name:'Open local demo'}).click();await page.evaluate(()=>{const r=JSON.parse(localStorage.getItem('draftroom-demo')!);delete r.state.draftMode;localStorage.setItem('draftroom-demo',JSON.stringify(r));});await page.reload();
  await expect(page.getByRole('group',{name:/ role$/})).toHaveCount(10);
  await expect(page.getByRole('button',{name:/^Add champion to .* pool$/})).toHaveCount(10);
  await add(page,'Add champion to Mid pool',['Ahri','Akali']);

@@ -3,6 +3,7 @@ async function openDemo(page: Page) {
   await page.goto("/");
   await page.getByPlaceholder("Your name").fill("Nico");
   await page.getByRole("button", { name: "Open local demo" }).click();
+  await page.evaluate(()=>{const r=JSON.parse(localStorage.getItem('draftroom-demo')!);delete r.state.draftMode;localStorage.setItem('draftroom-demo',JSON.stringify(r));});await page.reload();
   await expect(page).toHaveURL(/\/rooms\/nicos-room\/setup$/);
 }
 async function addPool(page: Page, names: string[]) {
@@ -492,7 +493,7 @@ test('room expiration closes the picker, clears the saved room and allows a new 
   await expect(page).toHaveURL('/');
   expect(await page.evaluate(() => localStorage.getItem('draftroom-current'))).toBeNull();
   await page.getByPlaceholder('Your name').fill('New host');
-  await page.getByRole('button',{name:'Open local demo'}).click();
+  await page.getByRole('button',{name:'Open local demo'}).click();await page.evaluate(()=>{const r=JSON.parse(localStorage.getItem('draftroom-demo')!);delete r.state.draftMode;localStorage.setItem('draftroom-demo',JSON.stringify(r));});await page.reload();
   await expect(page.getByRole('heading',{name:"New host's room",exact:true})).toBeVisible();
 });
 

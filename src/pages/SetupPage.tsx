@@ -2,6 +2,7 @@ import { ROLES, type State, type RoleSwapRequest, type Team, type Role } from ".
 import { roleName } from "../domain/roles";
 import { Portrait, names } from "../components/Champions";
 import {rolePool} from "../domain/rolePools";
+import SideSelector from "../components/SideSelector";
 import { RoleIcon, SwapIcon } from "../components/RoleIcon";
 interface Props {
   state: State;
@@ -10,12 +11,10 @@ interface Props {
   hostId: string;
   busy: boolean;
   online: string[];
-  readiness: { known: number; total: number };
   swaps: RoleSwapRequest[];
   change: (fn: (s: State) => State) => Promise<void>;
   editPool: (team:Team,role:Role) => void;
   updatePool:(team:Team,role:Role,pool:string[])=>void;
-  onImport: (file?: File) => void;
   requestSwap: (target: string) => void;
 }
 export default function SetupPage({
@@ -25,17 +24,17 @@ export default function SetupPage({
   hostId,
   busy,
   online,
-  readiness,
   swaps,
   change,
   editPool,updatePool,
-  onImport,
   requestSwap,
 }: Props) {
   const me = state.players.find((p) => p.id === uid);
   return (
     <section aria-label="Room preparation" className="setup-page">
-      {(['ally','enemy'] as Team[]).map(team=><section className={`setup-team ${team}`} key={team}>
+      {state.draftMode&&<p className="eyebrow">{state.draftMode==='ranked'?'Ranked draft':'Tournament draft'}</p>}
+      <SideSelector side={state.side} disabled={busy||!host} onChange={side=>void change(s=>({...s,side}))}/>
+      {((state.draftMode==='ranked'?['ally']:['ally','enemy']) as Team[]).map(team=><section className={`setup-team ${team}`} key={team}>
       <h2>{team==='ally'?'Our team':'Opponents'}</h2>
       <section className="roster">
         {ROLES.map((role) => {
@@ -125,53 +124,7 @@ export default function SetupPage({
           );
         })}
       </section></section>)}
-      <details className="data-details">
-        <summary>Dataset settings</summary>
-        <div className="data-status">
-          <i className="dot amber" />
-          <b>
-            {readiness.total && readiness.known === readiness.total
-              ? "Data ready"
-              : readiness.known
-                ? "Partial data"
-                : "Data unavailable"}
-          </b>
-          <span>
-            {readiness.known.toLocaleString("en")} /{" "}
-            {readiness.total.toLocaleString("en")} potential pairs available
-          </span>
-        </div>
-        {host && (
-          <div className="preparation">
-            <label>
-              Side
-              <select
-                value={state.side}
-                onChange={(e) =>
-                  void change((s) => {
-                    s.side = e.target.value as "blue" | "red";
-                    return s;
-                  })
-                }
-              >
-                <option value="blue">Blue</option>
-                <option value="red">Red</option>
-              </select>
-            </label>
-            <label className="file-button">
-              Import JSON / CSV
-              <input
-                type="file"
-                accept=".json,.csv"
-                onChange={(e) => {
-                  onImport(e.target.files?.[0]);
-                  e.target.value = "";
-                }}
-              />
-            </label>
-          </div>
-        )}
-      </details>
+
     </section>
   );
 }

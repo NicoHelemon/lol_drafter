@@ -1,13 +1,15 @@
+import {startDraft} from './domain/progression';
+import type {DraftMode} from './domain/types';
 import Participants from "./components/Participants";
 import PickSwapPrompt from "./components/PickSwapPrompt";
 import SwapPrompt from "./components/SwapPrompt";
-import {rolePool,rolePoolEntries} from "./domain/rolePools";
+import {rolePool} from "./domain/rolePools";
 import { roleName } from "./domain/roles";
 import { errorMessage, RoomExpiredError } from "./lib/errors";
 import SetupPage from "./pages/SetupPage";
 import DraftPage from "./pages/DraftPage";
 import { Search, names, Portrait } from "./components/Champions";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   type Room,
   type Role,
@@ -16,10 +18,8 @@ import {
   type RoleSwapRequest,
   type PickSwapRequest,
 } from "./domain/types";
-import { coverage, unavailable } from "./domain/scoring";
+import { unavailable } from "./domain/scoring";
 import { record } from "./domain/state";
-import { champions, championIds } from "./data/provider";
-import { importDataset } from "./data/import";
 
 import {
   createRoom,
@@ -46,6 +46,7 @@ export type Picker =
   | {kind:'candidates';team:Team;role:Role}
   | {kind:'ban';team:Team;slot:number};
 export default function App() {
+  const [draftMode,setDraftMode]=useState<DraftMode>('ranked');
   const [room, setRoom] = useState<Room | null>(null),
     [uid, setUid] = useState(""),
     [nickname, setNickname] = useState(""),
@@ -213,17 +214,6 @@ export default function App() {
   const state = room?.state,
     host = room?.host_id === uid,
     used = state ? unavailable(state) : new Set<string>();
-  const readiness = useMemo(
-    () =>
-      state
-        ? coverage(
-            state.dataset,
-            rolePoolEntries(state),
-            champions.map((c) => c.id),
-          )
-        : { known: 0, total: 0 },
-    [state?.dataset, state?.players,state?.rolePools],
-  );
   function expireRoom() {
     clearRoom();
     setError(new RoomExpiredError().message);
@@ -253,30 +243,6 @@ export default function App() {
     await run(async () => {
       await leaveRoom(room);
       clearRoom();
-    });
-  }
-  function importFile(file?: File) {
-    if (!file || !room) return;
-    void run(async () => {
-      if (file.size > 12000000) throw Error("File limit: 12 MB");
-      const text = await file.text();
-      let metadata;
-      if (file.name.endsWith(".csv")) {
-        const raw = prompt(
-          "Dataset metadata JSON: id, patch, tier, source, importedAt (ISO), fictional (boolean)",
-        );
-        if (!raw) return;
-        metadata = JSON.parse(raw);
-      }
-      const dataset = importDataset(
-        text,
-        file.name.endsWith(".csv") ? "csv" : "json",
-        championIds,
-        metadata,
-      );
-      const compatible=dataset.source===room.state.dataset.source && dataset.tier===room.state.dataset.tier
-        && JSON.stringify(dataset.context)===JSON.stringify(room.state.dataset.context);
-      setRoom(await saveRoom(room, { ...room.state, dataset, shrinkage:compatible?room.state.shrinkage:undefined,roleCatalogue:compatible?room.state.roleCatalogue:undefined }));
     });
   }
   async function updateCandidates(team:Team,role:Role,pool:string[]){
@@ -326,6 +292,7 @@ export default function App() {
                 placeholder="Your name"
               />
             </label>
+            {!inviteRoom&&<div className="draft-mode-choice" role="group" aria-label="Draft mode">{(['ranked','tournament'] as DraftMode[]).map(mode=><button type="button" key={mode} aria-pressed={draftMode===mode} onClick={()=>setDraftMode(mode)}>{mode==='ranked'?'Ranked draft':'Tournament draft'}</button>)}</div>}
             <button
               className="primary"
               disabled={busy || !nickname.trim()}
@@ -336,7 +303,7 @@ export default function App() {
                       await joinRoom(inviteRoom, invite, nickname.trim()),
                     );
                   } else {
-                    const result = await createRoom(nickname.trim());
+                    const result = await createRoom(nickname.trim(),draftMode);
                     setRoom(result.room);
                     setInvite(result.token);
                     if (result.token)
@@ -392,8 +359,7 @@ export default function App() {
                   disabled={busy}
                   onClick={() =>
                     void change((s) => {
-                      s.phase = "live";
-                      return record(s, "Draft started");
+                      return record(startDraft(s), "Draft started");
                     })
                   }
                 >
@@ -423,18 +389,17 @@ export default function App() {
               hostId={room.host_id}
               busy={busy}
               online={online}
-              readiness={readiness}
               swaps={swaps}
               requestSwap={(id) => void swapAction(id)}
               change={change}
               editPool={(team,role) => setPicker({kind:"candidates",team,role})}
               updatePool={(team,role,pool)=>void updateCandidates(team,role,pool)}
-              onImport={importFile}
             />
           ) : (
             <DraftPage
               state={state!}
               uid={uid}
+              host={host}
               busy={busy}
               change={change}
               setPicker={setPicker}
@@ -495,7 +460,7 @@ export default function App() {
             <Search catalogue={state?.roleCatalogue} initialRole={picker.kind==='candidates'?picker.role:undefined}
               pinned={picker.kind==='candidates'?state?.picks[picker.team].filter(p=>p.role===picker.role).map(p=>p.championId):[]}
               selected={picker.kind==='candidates'?pickerPool:[]}
-              blocked={picker.kind==='candidates'?new Set(pickerPool):used}
+              blocked={picker.kind==='candidates'?new Set(pickerPool):state?.draftMode==='ranked'?new Set([...state.picks.ally,...state.picks.enemy].map(p=>p.championId).concat(state.bans[picker.team].filter((id):id is string=>!!id))):used}
               disabled={busy}
               onChoose={choose}
             />

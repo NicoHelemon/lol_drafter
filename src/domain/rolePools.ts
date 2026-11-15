@@ -1,4 +1,6 @@
 import {ROLES,type Role,type State,type Team} from './types';
+import {automaticPool} from './automaticCandidates';
+import {canPick} from './progression';
 import {place,record} from './state';
 
 export function rolePool(s:State,team:Team,role:Role):string[]{
@@ -25,8 +27,9 @@ export function reconcileRolePools(before:State,next:State):State{
 }
 export function toggleRoleCandidate(s:State,team:Team,role:Role,id:string):State{
  const selected=s.picks[team].find(p=>p.role===role);
+ if(!canPick(s,team,selected?.championId))throw Error('This pick is locked or belongs to another draft step');
  if(selected?.championId===id){const next=structuredClone(s);next.picks[team]=next.picks[team].filter(p=>p.role!==role);return record(next,`Pick cleared · ${role}`);}
- if(!rolePool(s,team,role).includes(id))throw Error('Champion is not a candidate for this role');
+ if(!automaticPool(s,team,role).includes(id))throw Error('Champion is not a candidate for this role');
  return place(s,team,role,id);
 }
 export function rolePoolEntries(s:State){

@@ -146,3 +146,9 @@ it('hydrates enemy and unoccupied ally candidate pools with deduplicated snapsho
  const hydrated=await cache.hydrate(r);expect(read).toHaveBeenCalledWith(sid,['103:Mid','122:Top','58:Top']);
  expect(persistedState(hydrated.state).rolePools).toEqual(r.state.rolePools);
 });
+it('loads automatic candidate statistics even when all role pools are empty',async()=>{
+ const r=room();r.state.players[0].pool=[];r.state.phase='live';r.state.draftMode='ranked';
+ const read=vi.fn(async(_snapshot:string,_keys:string[])=>[]),cache=new StatisticsCache(read);
+ await cache.hydrate(r);const keys=read.mock.calls.flatMap(call=>call[1] as string[]);
+ expect(new Set(keys).size).toBe(25);expect(keys).toContain('164:Top');expect(keys).toContain('412:Support');
+});

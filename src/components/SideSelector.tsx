@@ -1,0 +1,7 @@
+export default function SideSelector({side,disabled,onChange}:{side:'blue'|'red';disabled:boolean;onChange:(side:'blue'|'red')=>void}){
+ return <section className="side-choice" aria-label="Allied side"><div><h2>Choose your side</h2><p>Blue team picks first. Red team picks second.</p></div><div className="side-map" onClick={e=>{if(disabled)return;const box=e.currentTarget.getBoundingClientRect();onChange((e.clientY-box.top)/box.height>(e.clientX-box.left)/box.width?'blue':'red');}}>
+  <svg viewBox="0 0 320 240" aria-hidden="true"><path className={`map-blue ${side==='blue'?'selected':''}`} d="M0 0V240H320Z"/><path className={`map-red ${side==='red'?'selected':''}`} d="M0 0H320V240Z"/><path className="map-river" d="M0 0L320 240"/><path className="map-lanes" d="M24 25V214H294M25 214L293 26M24 25H294V214"/><circle cx="28" cy="211" r="11" fill="#82c5ff"/><circle cx="292" cy="29" r="11" fill="#ff929a"/></svg>
+  <button type="button" className="side-region blue" aria-label="Blue side, first pick" aria-pressed={side==='blue'} disabled={disabled} onClick={e=>{e.stopPropagation();onChange('blue');}}><span>BLUE SIDE<small>First pick</small></span></button>
+  <button type="button" className="side-region red" aria-label="Red side, second pick" aria-pressed={side==='red'} disabled={disabled} onClick={e=>{e.stopPropagation();onChange('red');}}><span>RED SIDE<small>Second pick</small></span></button>
+ </div></section>;
+}

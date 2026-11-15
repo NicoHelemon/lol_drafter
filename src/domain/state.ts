@@ -1,14 +1,16 @@
 import {roleName} from './roles';
 import {ROLES,type State,type Team} from './types';
 import {validatePool} from './rolePools';
+import {validateGuidedState} from './progression';
 export function validateState(s:State,ids?:Set<string>){
  if(!['setup','live'].includes(s.phase)||!['blue','red'].includes(s.side))throw Error('Invalid state');
+ validateGuidedState(s);
  const seen=new Set<string>();
  for(const t of ['ally','enemy'] as Team[]){
   if(s.picks[t].length>5||s.bans[t].length!==5)throw Error('Each team can have at most five picks and five bans');
   const roles=new Set<string>();
   for(const p of s.picks[t]){if(!ROLES.includes(p.role)||roles.has(p.role))throw Error('Role already occupied');roles.add(p.role);}
-  for(const c of [...s.picks[t].map(p=>p.championId),...s.bans[t].filter(Boolean)] as string[]){if(seen.has(c))throw Error('Champion already picked or banned');if(ids&&!ids.has(c))throw Error('Unknown champion');seen.add(c);}
+  for(const c of [...s.picks[t].map(p=>p.championId),...s.bans[t].filter(Boolean)] as string[]){if(seen.has(c)&&!(s.draftMode==='ranked'&&t==='enemy'&&s.bans.ally.includes(c)&&s.bans.enemy.filter(x=>x===c).length===1&&![...s.picks.ally,...s.picks.enemy].some(p=>p.championId===c)))throw Error('Champion already picked or banned');if(ids&&!ids.has(c))throw Error('Unknown champion');seen.add(c);}
  }
  if(s.players.length>5||new Set(s.players.map(p=>p.id)).size!==s.players.length)throw Error('Room is full');
  const roles=s.players.map(p=>p.role).filter(Boolean);if(new Set(roles).size!==roles.length)throw Error('Role already taken');

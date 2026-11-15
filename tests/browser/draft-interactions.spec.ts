@@ -151,7 +151,7 @@ test('click/keyboard role targeting moves into a free role and carries anonymous
  await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 test('role and popularity filters work in lobby and draft while keeping selected off-role candidates visible',async({page})=>{
- await page.goto('/');await page.getByPlaceholder('Your name').fill('Filter check');await page.getByRole('button',{name:'Open local demo',exact:false}).click();
+ await page.goto('/');await page.getByPlaceholder('Your name').fill('Filter check');await page.getByRole('button',{name:'Open local demo',exact:false}).click();await page.evaluate(()=>{const r=JSON.parse(localStorage.getItem('draftroom-demo')!);delete r.state.draftMode;localStorage.setItem('draftroom-demo',JSON.stringify(r));});await page.reload();
  await page.getByRole('group',{name:'Top role',exact:true}).getByRole('button',{name:'Join',exact:true}).click();
  await page.getByRole('button',{name:'Add champion to Top pool'}).click();
  await expect(page.getByRole('button',{name:'Filter Top',exact:true})).toHaveAttribute('aria-pressed','true');

@@ -24,8 +24,8 @@ export function candidates(
   team: Team,
   state: State,
   names: Record<string, string> = {},
+  index = new Map(state.dataset.pairs.map((p) => [pairKey(p), p])),
 ) {
-  const index = new Map(state.dataset.pairs.map((p) => [pairKey(p), p]));
   const selected = state.picks[team].find((p) => p.role === role)?.championId,
     used = unavailable(state);
   const ids = [...new Set(selected ? [selected, ...pool] : pool)];

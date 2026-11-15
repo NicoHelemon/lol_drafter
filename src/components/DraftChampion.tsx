@@ -6,11 +6,11 @@ import { roleName } from '../domain/roles';
 import { names, Portrait } from './Champions';
 import ContributionTooltip from './ContributionTooltip';
 export default function DraftChampion({ id, role, team, state, result, selected, blocked, busy,
-  onPick, pickLabel, toggle = true, onDragStart, onDragEnd, dragging = false, active, onActivate, onDeactivate }: {
+  pickDisabled=false,automatic=false,onPick, pickLabel, toggle = true, onDragStart, onDragEnd, dragging = false, active, onActivate, onDeactivate }: {
   id: string; role: Role; team: Team; state: State; result: CandidateScore;
   selected: boolean; blocked: boolean; busy: boolean; onPick: () => void;
   active:boolean; onActivate:()=>void; onDeactivate:()=>void;
-  pickLabel?: string; toggle?: boolean; onDragStart: (e: DragEvent) => void; onDragEnd: () => void; dragging?: boolean;
+  pickDisabled?:boolean;automatic?:boolean;pickLabel?: string; toggle?: boolean; onDragStart: (e: DragEvent) => void; onDragEnd: () => void; dragging?: boolean;
 }) {
   const label = scoreLabel(result.value), tooltipId = useId(), anchor = useRef<HTMLDivElement>(null);
   const open = !dragging && active;
@@ -23,8 +23,9 @@ export default function DraftChampion({ id, role, team, state, result, selected,
     onKeyDown={e => { if (e.key === 'Escape') onDeactivate(); }}>
     <button className="champion-choice" aria-label={pickLabel ?? `Pick ${names[id]} ${roleName(role)} ${team}`}
       aria-pressed={toggle ? selected : undefined} aria-describedby={open ? tooltipId : undefined}
-      disabled={busy || blocked} onClick={onPick}>
+      disabled={busy || blocked||pickDisabled} onClick={onPick}>
       <Portrait id={id} />
+      {automatic&&<span className="automatic-mark" title="Automatic candidate" aria-label="Automatic candidate">✦</span>}
       {selected && <span className="picked-mark" aria-hidden="true">✓</span>}
     </button>
     <span className={`tile-score ${result.value === null ? 'muted' : result.value < 0 ? 'negative' : result.value > 0 ? 'positive' : 'neutral'}`}>

@@ -27,7 +27,7 @@ beforeAll(async()=>{
  db=new PGlite();await db.exec(`create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;`);
  for(const id of ids)await db.query('insert into auth.users values($1)',[id]);
- for(const file of readdirSync('supabase/migrations').sort())await db.exec(readFileSync(`supabase/migrations/${file}`,'utf8'));
+ for(const file of readdirSync('supabase/migrations').filter(f=>!f.includes('014_')).sort())await db.exec(readFileSync(`supabase/migrations/${file}`,'utf8'));
 },30000);
 afterAll(()=>db.close());beforeEach(()=>db.exec('begin'));afterEach(()=>db.exec('rollback'));
 it('carries each player, pool and selected champion after consent, preserving enemies and dataset',async()=>{

@@ -1,5 +1,9 @@
 import {rolePool,toggleRoleCandidate} from '../domain/rolePools';
-import { useState, useEffect, type DragEvent } from 'react';
+import {automaticPool} from '../domain/automaticCandidates';
+import {canPick,canBan} from '../domain/progression';
+import DraftProgress from '../components/DraftProgress';
+import { useState, useEffect, useMemo, type DragEvent } from 'react';
+import {pairKey} from '../domain/scoring';
 import { ROLES, type State, type Team, type Role } from '../domain/types';
 import { roleName } from '../domain/roles';
 import { RoleIcon } from '../components/RoleIcon';
@@ -11,7 +15,7 @@ import TeamSummary from '../components/TeamSummary';
 import StatisticsNote from '../components/StatisticsNote';
 import type { Picker } from '../App';
 interface Props {
-  state: State; uid: string; busy: boolean;
+  state: State; uid: string; host:boolean; busy: boolean;
   change: (fn: (s: State) => State) => Promise<void>;
   setPicker: (p: Picker) => void;
   onMove: (team: Team, from: Role, to: Role) => Promise<void>;
@@ -19,8 +23,9 @@ interface Props {
   pendingRoles?: Set<Role>;
 }
 type DragPick = { team: Team; role: Role; championId: string; tap?: boolean };
-export default function DraftPage({ state, uid, busy, change, setPicker, onMove,onRoleMove, pendingRoles = new Set() }: Props) {
+export default function DraftPage({ state, uid, host, busy, change, setPicker, onMove,onRoleMove, pendingRoles = new Set() }: Props) {
   const associatedPlayers = new Map(state.players.map(player => [player.role, player]));
+  const pairIndex=useMemo(()=>new Map(state.dataset.pairs.map(p=>[pairKey(p),p])),[state.dataset.pairs]);
   const [activeTooltip,setActiveTooltip] = useState<string|null>(null);
   const [dragged, setDragged] = useState<DragPick | null>(null), [over, setOver] = useState<string | null>(null);
   const [roleDrag,setRoleDrag]=useState<Role|null>(null),[roleOver,setRoleOver]=useState<Role|null>(null);
@@ -55,19 +60,20 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
   }
   const roleTarget=(role:Role)=>!!roleDrag&&roleDrag===myRole&&role!==roleDrag&&!busy&&!pendingRoles.has(role)&&!pendingRoles.has(roleDrag);
   function finishRole(role:Role){if(roleTarget(role)){setRoleDrag(null);setRoleOver(null);void onRoleMove(role);}}
-  return <section aria-label="Draft" className="draft-page" onKeyDown={e => {
+  return <section aria-label="Draft" className={`draft-page side-${state.side}`} onKeyDown={e => {
     if (e.key === 'Escape') { setDragged(null); setOver(null); }
   }}>
     <section className="card board integrated-board">
       <div className="section-heading"><h2>Draft board</h2><span className="badge">LIVE</span></div>
+      <DraftProgress state={state} host={host} busy={busy} change={change}/>
       <div className="draft-bans" role="region" aria-label="Bans">
-        {(['ally','enemy'] as Team[]).map(team => <section className={`team-bans ${team}`} aria-label={team === 'ally' ? 'Our bans' : 'Opponent bans'} key={team}>
+        {(['ally','enemy'] as Team[]).map(team => <section className={`team-bans ${team}${state.draftMode&&state.bans[team].some((_,i)=>canBan(state,team,i))?' current-bans':''}`}  aria-label={team === 'ally' ? 'Our bans' : 'Opponent bans'} key={team}>
           <b>{team === 'ally' ? 'OUR BANS' : 'OPPONENT BANS'}</b><div className="bans">
             {state.bans[team].map((id, slot) => <div key={slot}>
-              <button aria-label={`Ban ${slot + 1} ${team}`} disabled={busy} onClick={() => setPicker({kind:'ban',team,slot})}>
+              <button aria-label={`Ban ${slot + 1} ${team}`} disabled={busy||!canBan(state,team,slot)} onClick={() => setPicker({kind:'ban',team,slot})}>
                 {id ? <Portrait id={id} /> : <span>+</span>}
               </button>
-              {id && <button className="remove-ban" aria-label={`Remove ban ${names[id]}`} disabled={busy} onClick={() => void change(s => {
+              {id && <button className="remove-ban" aria-label={`Remove ban ${names[id]}`} disabled={busy||!canBan(state,team,slot)} onClick={() => void change(s => {
                 s.bans[team][slot] = null; return record(s,`Ban removed · ${names[id]}`);
               })}>×</button>}
             </div>)}
@@ -94,9 +100,12 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
         {(['ally','enemy'] as Team[]).map(team => {
           const player = team === 'ally' ? associatedPlayers.get(role) : undefined;
           const pick = state.picks[team].find(p => p.role === role);
-          const options = candidates(rolePool(state,team,role),role,team,state,names);
+          const explicit=rolePool(state,team,role),pool=automaticPool(state,team,role);
+          const options = candidates(pool,role,team,state,names,pairIndex);
+          if(state.draftMode)options.sort((a,b)=>Number(b.selected)-Number(a.selected)||Number(explicit.includes(b.id))-Number(explicit.includes(a.id))||(!explicit.includes(a.id)&&!explicit.includes(b.id)?pool.indexOf(a.id)-pool.indexOf(b.id):0));
+          const editable=canPick(state,team,pick?.championId);
           const pending = blockedRole(team,role), available = canDrop(team,role), roleAvailable=team==='ally'&&roleTarget(role), key = `${team}:${role}`;
-          return <section key={team} className={`draft-cell ${team}${player?.id === uid ? ' mine' : ''}${available ? ' drop-available' : ''}${over === key ? ' drop-over' : ''}${pending ? ' transfer-pending' : ''}${roleAvailable?' role-drop-target':''}${roleAvailable&&roleOver===role?' role-drop-over':''}`}
+          return <section key={team} className={`draft-cell ${team}${player?.id === uid ? ' mine' : ''}${available ? ' drop-available' : ''}${over === key ? ' drop-over' : ''}${pending ? ' transfer-pending' : ''}${state.draftMode&&editable?' current-pick':''}${roleAvailable?' role-drop-target':''}${roleAvailable&&roleOver===role?' role-drop-over':''}`}
             aria-label={`${roleName(role)} ${team} picks`} data-drop-team={team} data-drop-role={role}
             aria-describedby={available||roleAvailable ? 'pick-move-help' : undefined} tabIndex={available||roleAvailable ? 0 : undefined}
             onDragOver={e => { if(roleAvailable){e.preventDefault();e.dataTransfer.dropEffect='move';setRoleOver(role);}else if (available) { e.preventDefault(); e.dataTransfer.dropEffect='move'; setOver(key); } }}
@@ -110,7 +119,7 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
                 <button aria-label={`Move ${names[pick.championId]} ${team}`} title="Move champion: choose a role" disabled={busy || pending}
                   aria-pressed={dragged?.tap && dragged.team === team && dragged.role === role}
                   onClick={() => {setRoleDrag(null);setRoleOver(null);setDragged(old => old?.role === role && old.team === team ? null : {team,role,championId:pick.championId,tap:true});}}>↕</button>
-                <button aria-label={`Remove ${names[pick.championId]} ${team}`} disabled={busy || pending} onClick={() => void change(s => {
+                <button aria-label={`Remove ${names[pick.championId]} ${team}`} disabled={busy || pending||!editable} onClick={() => void change(s => {
                   s.picks[team] = s.picks[team].filter(p => p.championId !== pick.championId);
                   return record(s,`Pick removed · ${names[pick.championId]}`);
                 })}>×</button>
@@ -118,7 +127,7 @@ export default function DraftPage({ state, uid, busy, change, setPicker, onMove,
             </div>
             <div className="draft-options">
               {options.map(option => <DraftChampion key={option.id} id={option.id} role={role} team={team} state={state} result={option}
-                selected={option.selected} blocked={option.blocked} busy={busy || pending} toggle={true}
+                selected={option.selected} blocked={option.blocked} busy={busy || pending} pickDisabled={!editable} automatic={!!state.draftMode&&!option.selected&&!explicit.includes(option.id)} toggle={true}
                 active={activeTooltip===`${team}:${role}:${option.id}`}
                 onActivate={()=>setActiveTooltip(`${team}:${role}:${option.id}`)}
                 onDeactivate={()=>setActiveTooltip(old=>old===`${team}:${role}:${option.id}` ? null : old)}
