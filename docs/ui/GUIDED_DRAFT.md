@@ -33,4 +33,14 @@ Migration **014** : validation des bans ranked et trigger contrôlant mode, camp
 
 ![Deux picks actifs, camp allié rouge](evidence/guided-ranked-picks.png)
 
-Ces images utilisent la démonstration fictive. Validation GitHub Actions et preuves hébergées consignées après observation. Aucun nouveau collecteur ni intégration Riot/OP.GG ajouté.
+Ces premières images utilisent la démonstration fictive. Aucun nouveau collecteur ni intégration Riot/OP.GG ajouté. Le complément populaire n'est pas une recherche stratégique minimax.
+
+## Livraison vérifiée
+
+Version **`ccb334e`** observée sur Netlify le **15 novembre 2026 à 15:22 Europe/Zurich**, après [CI de branche](https://github.com/NicoHelemon/lol_drafter/actions/runs/43723650663) verte. [CI de main](https://github.com/NicoHelemon/lol_drafter/actions/runs/43723966343) également verte : 106 tests TypeScript/PostgreSQL, 50 Python et 25 parcours navigateur. La seule migration 014 a été appliquée après sauvegarde privée ; la suppression des salles temporaires autorisée a été exécutée dans la même transaction. Les tables de salles étaient déjà vides. Les identités Auth anonymes n'ont pas été supprimées.
+
+Recette réelle à deux navigateurs réussie pour **ranked côté allié rouge** et **tournament côté allié bleu** : mode/camp synchronisés, lobby ranked limité aux alliés, priorité d'Ahri Top explicitement préparée, cinq choix disponibles dans les dix cases, toutes les étapes de picks et bans confirmées dans l'ordre, doublon de ban interéquipes accepté en ranked, seconde phase de bans rouge d'abord en tournoi, fin de draft, échange de rôles consenti sur des picks verrouillés, retour à la dernière étape, re-confirmation et rechargement. Les deux salles de test et leurs dépendances ont été supprimées par Quit.
+
+Contrôle des scores réels réussi dans la séquence guidée rouge : Renekton **+0,97**, équipe **+0,40**, remplacement par Camille **+0,27**, variation **−0,13**. Aucun appel Lolalytics depuis les navigateurs. Le contrôle final retrouve **865 empreintes identiques**, le même snapshot courant, les mêmes modèles et catalogues, et aucune salle temporaire restante.
+
+Preuves : [rapport structuré](evidence/guided-production-verification.json), [lobby ranked réel](evidence/guided-ranked-lobby-production.png), [seconde phase de bans réelle](evidence/guided-tournament-bans-production.png), [tournoi terminé](evidence/guided-tournament-complete-production.png). La branche dédiée conserve ces preuves sans nouvelle publication frontend uniquement documentaire.
