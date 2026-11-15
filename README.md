@@ -104,6 +104,6 @@ Projet communautaire non affilié à Riot Games. Les assets League of Legends ap
 
 Pour les scores des picks adverses, le contexte est orienté depuis le candidat adverse (ses coéquipiers et ses adversaires). Aucune symétrie ou inversion artificielle d’un score allié n’est supposée. Le candidat lui-même est exclu des paires.
 
-Pendant la draft, tous les membres peuvent ajouter un candidat à un poste incarné via `add_draft_candidate`. Cette RPC ne modifie que le pool ciblé et vérifie la version de la salle ; les permissions générales de suppression/remplacement des pools ne sont pas élargies.
+Pendant la draft, tous les membres peuvent modifier les candidats des dix cases via `set_role_candidates`, sans changer leurs picks. Cette RPC ne modifie que la liste ciblée et vérifie la version de la salle. En préparation, les pools incarnés restent réservés au propriétaire ou à l’hôte. L’ancienne RPC `add_draft_candidate` reste compatible avec les anciens clients.
 
 Le lot de navigation et de consentement est décrit dans [docs/ui/DRAFT_INTERACTIONS.md](docs/ui/DRAFT_INTERACTIONS.md), avec captures et statut de livraison.
