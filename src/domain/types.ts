@@ -15,8 +15,9 @@ export interface Player {id:string; name:string; role:Role|null; pool:string[]}
 export interface Pick {championId:string; role:Role}
 export type DraftMode='ranked'|'tournament';
 export interface DraftCheckpoint {picks:Record<Team,string[]>;bans:Record<Team,(string|null)[]>}
-export interface State {draftMode?:DraftMode;draftStep?:number;draftHistory?:DraftCheckpoint[];phase:'setup'|'live'; side:'blue'|'red'; dataset:Dataset; players:Player[]; picks:Record<Team,Pick[]>; bans:Record<Team,(string|null)[]>; history:string[]; shrinkage?:ShrinkageModel;roleCatalogue?:RoleCatalogue;rolePools?:Partial<Record<Team,Partial<Record<Role,string[]>>>>}
-export interface Room {id:string;slug:string;name:string; host_id:string; version:number; state:State}
+export interface DraftPosition {picks:Record<Team,Pick[]>;bans:Record<Team,(string|null)[]>;draftStep:number;draftHistory:DraftCheckpoint[]}
+export interface State {openDraft?:boolean;draftMode?:DraftMode;draftStep?:number;draftHistory?:DraftCheckpoint[];phase:'setup'|'live'; side:'blue'|'red'; dataset:Dataset; players:Player[]; picks:Record<Team,Pick[]>; bans:Record<Team,(string|null)[]>; history:string[]; shrinkage?:ShrinkageModel;roleCatalogue?:RoleCatalogue;rolePools?:Partial<Record<Team,Partial<Record<Role,string[]>>>>}
+export interface Room {id:string;slug:string;name:string; host_id:string; version:number; undo_count?:number;redo_count?:number;draft_undo?:DraftPosition[];draft_redo?:DraftPosition[]; state:State}
 
 export interface RoleSwapRequest {id:string;room_id:string;requester_id:string;target_id:string;from_role:Role;to_role:Role;created_at:string;expires_at:string;phase?:'setup'|'live';from_champion_id?:string|null;to_champion_id?:string|null}
 

@@ -1,5 +1,6 @@
+import {trackDraft,controlLocalDraft,type DraftControl} from '../domain/draftHistory';
 import { RoomExpiredError } from "./errors";
-import {validateGuidedTransition,resetDraft} from '../domain/progression';
+import {validateGuidedTransition} from '../domain/progression';
 import {exchangeLiveRoles,makeRoleSwap,matchesRoleSwap} from '../domain/roleSwaps';
 import { makePickSwap, moveDraftPick, pickOwners, approvePickSwap, matchesPickSwap } from "../domain/pickSwaps";
 import { addDraftCandidate } from "../domain/draft";
@@ -142,7 +143,7 @@ export async function saveRoom(room: Room, next: State): Promise<Room> {
     const stored = await readRoom(room.id);
     if (stored.version !== room.version)
       throw Error("Conflict: room updated. Please try again.");
-    const updated = { ...room, state: next, version: room.version + 1 };
+    const updated = trackDraft(room,next);
     localStorage.setItem("draftroom-demo", JSON.stringify(updated));
     return updated;
   }
@@ -155,18 +156,16 @@ export async function saveRoom(room: Room, next: State): Promise<Room> {
   if (!data) throw new RoomExpiredError();
   return hydrated(data);
 }
-export async function clearDraft(room:Room):Promise<Room>{
- if(room.host_id!==await identity())throw Error('Only the host can clear the draft');
+export const clearDraft=(room:Room)=>controlDraft(room,'clear');
+export async function controlDraft(room:Room,action:DraftControl):Promise<Room>{
+ if(room.host_id!==await identity())throw Error('Only the host can control draft history');
  if(!supabase){
   const stored=await readRoom(room.id);
   if(stored.version!==room.version)throw Error('Conflict: room updated. Please try again.');
-  const updated={...room,version:room.version+1,state:resetDraft(room.state)};
-  updated.state.history=['Draft cleared',...updated.state.history].slice(0,25);
-  localStorage.setItem('draftroom-demo',JSON.stringify(updated));
-  localStorage.removeItem(`draftroom-swaps-${room.id}`);localStorage.removeItem(`draftroom-pick-swaps-${room.id}`);
-  return updated;
+  const updated=controlLocalDraft(room,action);localStorage.setItem('draftroom-demo',JSON.stringify(updated));
+  localStorage.removeItem(`draftroom-swaps-${room.id}`);localStorage.removeItem(`draftroom-pick-swaps-${room.id}`);return updated;
  }
- const {data,error}=await supabase.rpc('clear_draft',{room_id:room.id,expected_version:room.version});
+ const {data,error}=await supabase.rpc('control_draft',{room_id:room.id,expected_version:room.version,action});
  if(error)throw error;if(!data)throw new RoomExpiredError();return hydrated(data);
 }
 export async function setCandidates(room:Room,team:Team,role:Role,pool:string[]):Promise<Room>{
@@ -380,7 +379,7 @@ export async function respondPickSwap(room:Room, requestId:string, accept:boolea
     const rest=pending.filter(r=>r.id!==requestId);
     if(nextRequest && valid && !apply) rest.push(nextRequest);
     localStorage.setItem(`draftroom-pick-swaps-${room.id}`,JSON.stringify(rest));
-    const next={...current,version:current.version+1,state:apply ? moveDraftPick(current.state,'ally',request.from_role,request.to_role) : current.state};
+    const next=apply?trackDraft(current,moveDraftPick(current.state,'ally',request.from_role,request.to_role)):{...current,version:current.version+1};
     localStorage.setItem('draftroom-demo',JSON.stringify(next));
     return next;
   }

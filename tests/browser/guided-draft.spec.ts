@@ -48,7 +48,7 @@ test('ranked has a compact square map, batch bans, automatic grouped picks and C
  await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Blue team · 2nd and 3rd picks');
  await expect(page.getByRole('button',{name:/^Confirm/})).toHaveCount(0);
  await page.screenshot({path:folder+'/ranked-two-picks.png',fullPage:true,animations:'disabled'});
- await page.reload();await page.getByRole('button',{name:'Previous step'}).click();await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Red team · 1st and 2nd picks');
+ await page.reload();await page.getByRole('button',{name:'Undo'}).click();await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Red team · 1st and 2nd picks');
  await page.getByRole('button',{name:'Clear',exact:true}).click();const cleared=await state(page);
  expect(cleared.draftStep).toBe(0);expect(cleared.draftHistory).toEqual([]);expect(cleared.picks).toEqual({ally:[],enemy:[]});expect([...cleared.bans.ally,...cleared.bans.enemy].filter(Boolean)).toEqual([]);
  expect(cleared.players).toEqual(prepared.players);expect(cleared.rolePools).toEqual(prepared.rolePools);expect(cleared.side).toBe('red');
@@ -85,4 +85,22 @@ test('tournament auto-advances actual bans and grouped picks, with spaced side-c
  }
  await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Draft complete');await expect(page.locator('.tile-selected')).toHaveCount(10);await expect(page.locator('.champion-choice:enabled')).toHaveCount(0);
  await page.screenshot({path:folder+'/tournament-complete.png',fullPage:true,animations:'disabled'});
+});
+test('Undo/Redo follows individual choices and shortcuts, while Open draft stays open through history and Clear',async({page})=>{
+ await create(page,'ranked','red');await page.getByRole('button',{name:'Start draft'}).click();await page.getByRole('button',{name:'Skip remaining bans',exact:true}).click();
+ const progress=page.getByRole('region',{name:'Draft progression'}),undo=page.getByRole('button',{name:'Undo',exact:true}),redo=page.getByRole('button',{name:'Redo',exact:true});
+ await pick(page,'enemy');await expect(progress).toContainText('Red team · 1st and 2nd picks');
+ await page.keyboard.press('Control+z');await expect(progress).toContainText('Blue team · 1st pick');await expect(page.locator('.tile-selected')).toHaveCount(0);
+ await page.keyboard.press('Control+y');await expect(progress).toContainText('Red team · 1st and 2nd picks');await expect(page.locator('.tile-selected')).toHaveCount(1);
+ await pick(page,'ally');await expect(page.locator('.tile-selected')).toHaveCount(2);await undo.click();await expect(page.locator('.tile-selected')).toHaveCount(1);await redo.click();await expect(page.locator('.tile-selected')).toHaveCount(2);
+ await pick(page,'ally');await expect(progress).toContainText('Blue team · 2nd and 3rd picks');await undo.click();await expect(progress).toContainText('Red team · 1st and 2nd picks');await expect(page.locator('.tile-selected')).toHaveCount(2);
+ await page.reload();await expect(redo).toBeEnabled();await redo.click();await expect(progress).toContainText('Blue team · 2nd and 3rd picks');
+ await expect(page.locator('.pick-actions button')).toHaveCount(0);await expect(page.locator('.remove-ban')).toHaveCount(0);await expect(page.getByRole('button',{name:'Previous step',exact:true})).toHaveCount(0);
+ await page.getByRole('button',{name:'Add Mid candidates',exact:true}).click();const saved=await state(page);await page.getByRole('textbox',{name:'Search champions'}).pressSequentially('ahri');await page.keyboard.press('Control+z');expect((await state(page)).picks).toEqual(saved.picks);await page.getByRole('button',{name:'Close',exact:true}).click();
+ await page.getByRole('button',{name:'Open draft',exact:true}).click();await expect(progress).toContainText('Open draft');await expect(undo).toBeDisabled();await expect(redo).toBeDisabled();await expect(page.getByRole('button',{name:'Open draft',exact:true})).toHaveCount(0);await expect(page.locator('.pick-actions button')).toHaveCount(3);
+ const support=page.getByRole('region',{name:'Support enemy picks',exact:true});await support.locator('.champion-choice:enabled').first().click();await expect(page.locator('.tile-selected')).toHaveCount(4);
+ await undo.click();await expect(page.locator('.tile-selected')).toHaveCount(3);await redo.click();await expect(page.locator('.tile-selected')).toHaveCount(4);
+ await page.getByRole('button',{name:'Clear',exact:true}).click();await expect(page.locator('.tile-selected')).toHaveCount(0);await undo.click();await expect(page.locator('.tile-selected')).toHaveCount(4);expect((await state(page)).openDraft).toBe(true);
+ await page.reload();await expect(progress).toContainText('Open draft');await expect(redo).toBeEnabled();await support.locator('.pick-actions button').click();await expect(page.locator('.tile-selected')).toHaveCount(3);await expect(redo).toBeDisabled();
+ mkdirSync(folder,{recursive:true});await page.screenshot({path:folder+'/open-draft-history.png',fullPage:true,animations:'disabled'});
 });

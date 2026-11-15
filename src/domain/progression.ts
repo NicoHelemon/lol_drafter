@@ -9,17 +9,17 @@ export function draftStages(mode:DraftMode):DraftStage[]{
  else{for(let i=0;i<3;i++){ban('blue',i);ban('red',i);}pick('blue',1);pick('red',2);pick('blue',2);pick('red',1);for(let i=3;i<5;i++){ban('red',i);ban('blue',i);}pick('red',1);pick('blue',2);pick('red',1);}
  return result;
 }
-export function stage(s:State){return s.draftMode&&s.phase==='live'?draftStages(s.draftMode)[s.draftStep??0]:undefined;}
+export function stage(s:State){return s.draftMode&&!s.openDraft&&s.phase==='live'?draftStages(s.draftMode)[s.draftStep??0]:undefined;}
 export function teamFor(s:State,side:'blue'|'red'):Team{return s.side===side?'ally':'enemy';}
 export function checkpoint(s:State):DraftCheckpoint{return {picks:{ally:s.picks.ally.map(p=>p.championId).sort(),enemy:s.picks.enemy.map(p=>p.championId).sort()},bans:structuredClone(s.bans)};}
 export function locked(s:State,team:Team){return s.draftHistory?.at(-1)?.picks[team]??[];}
 export function canPick(s:State,team:Team,champion?:string){
- if(!s.draftMode)return true;const current=stage(s);
+ if(!s.draftMode||s.openDraft)return true;const current=stage(s);
  if(current?.kind!=='pick'||teamFor(s,current.side!)!==team)return false;
  if(champion&&locked(s,team).includes(champion))return false;
  return !!champion||s.picks[team].length<locked(s,team).length+current.count;
 }
-export function canBan(s:State,team:Team,slot:number){if(!s.draftMode)return true;const current=stage(s);return current?.kind==='bans'||current?.kind==='ban'&&teamFor(s,current.side!)===team&&current.slot===slot;}
+export function canBan(s:State,team:Team,slot:number){if(!s.draftMode||s.openDraft)return true;const current=stage(s);return current?.kind==='bans'||current?.kind==='ban'&&teamFor(s,current.side!)===team&&current.slot===slot;}
 export function canAdvance(s:State){const current=stage(s);if(!current)return false;if(current.kind!=='pick')return true;const team=teamFor(s,current.side!);return s.picks[team].length===locked(s,team).length+current.count;}
 export function advanceDraft(s:State):State{if(!canAdvance(s))throw Error('Complete the current draft step first');return {...structuredClone(s),draftStep:(s.draftStep??0)+1,draftHistory:[...s.draftHistory??[],checkpoint(s)]};}
 // A grouped turn finishes only after its last pick; ranked bans finish at ten slots.
@@ -39,7 +39,9 @@ export function startDraft(s:State):State{return {...structuredClone(s),phase:'l
 const stable=(v:unknown):unknown=>Array.isArray(v)?v.map(stable):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b)).map(([k,x])=>[k,stable(x)])):v;
 const same=(a:unknown,b:unknown)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 export function validateGuidedState(s:State){
+ if(s.openDraft!==undefined&&typeof s.openDraft!=='boolean')throw Error('Invalid open draft mode');
  if(s.draftMode===undefined)return;
+ if(s.openDraft&&(s.phase!=='live'||(s.draftStep??0)!==0||(s.draftHistory??[]).length))throw Error('Invalid open draft progression');
  if(!['ranked','tournament'].includes(s.draftMode))throw Error('Invalid draft mode');
  const index=s.draftStep??0,history=s.draftHistory??[];
  if(!Number.isInteger(index)||index<0||index>draftStages(s.draftMode).length||!Array.isArray(history)||history.length!==index)throw Error('Invalid draft progression');
@@ -63,6 +65,9 @@ export function validateGuidedTransition(before:State,next:State,host:boolean){
  validateGuidedState(next);if(!next.draftMode)return;
  if(before.phase==='setup'){if(next.phase==='live'&&((next.draftStep??0)!==0||(next.draftHistory??[]).length||!same(checkpoint(before),checkpoint(next))))throw Error('Start at the first draft step');return;}
  if(next.side!==before.side)throw Error('Side is locked during the draft');
+ if(before.openDraft&&!next.openDraft)throw Error('Open draft is permanent');
+ if(!before.openDraft&&next.openDraft){if(!host||!same(checkpoint(next),checkpoint(before)))throw Error('Only the host can open the draft without changing picks');return;}
+ if(next.openDraft)return;
  const old=before.draftStep??0,n=next.draftStep??0,history=before.draftHistory??[];
  if(n===old){if(!same(next.draftHistory??[],history))throw Error('Confirmed draft history is locked');}
  else if(n===old+1){

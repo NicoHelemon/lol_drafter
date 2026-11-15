@@ -38,8 +38,6 @@ export function candidates(
     }))
     .sort(
       (a, b) =>
-        Number(b.selected) - Number(a.selected) ||
-        Number(a.blocked) - Number(b.blocked) ||
         (a.value === null && b.value !== null
           ? 1
           : b.value === null && a.value !== null

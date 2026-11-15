@@ -24,6 +24,7 @@ import { record } from "./domain/state";
 import {
   createRoom,
   clearDraft,
+  controlDraft,
   joinRoom,
   readRoom,
   saveRoom,
@@ -100,7 +101,7 @@ export default function App() {
   }, [room?.id]);
   useEffect(() => {
     setPicker(null);
-  }, [room?.state.phase,room?.state.draftStep,room?.state.players.map(p=>`${p.id}:${p.role}`).join('|')]);
+  }, [room?.state.phase,room?.state.openDraft,room?.state.draftStep,room?.state.players.map(p=>`${p.id}:${p.role}`).join('|')]);
   useEffect(() => {
     if (!room) return;
     const path = `/rooms/${room.slug}/${room.state.phase === "setup" ? "setup" : "draft"}${invite ? "#" + invite : ""}`;
@@ -213,6 +214,19 @@ export default function App() {
       }
     });
   }
+  async function historyAction(action:'undo'|'redo'|'open'){
+    if(!room||busy)return;
+    await run(async()=>{try{setRoom(await controlDraft(room,action));setPicker(null);setSwaps([]);setPickSwaps([]);}catch(e){setRoom(await readRoom(room.id));throw e;}});
+  }
+  useEffect(()=>{
+    function shortcut(e:KeyboardEvent){
+      if(!room||room.state.phase!=='live'||room.host_id!==uid||busy||picker||e.defaultPrevented||e.isComposing||e.altKey||!e.ctrlKey)return;
+      const target=e.target;if(target instanceof HTMLElement&&(target.isContentEditable||target.closest('input,textarea,select,[contenteditable="true"],[role="textbox"],[role="dialog"]')))return;
+      const action=e.key.toLowerCase()==='z'&&!e.shiftKey?'undo':e.key.toLowerCase()==='y'&&!e.shiftKey?'redo':null;
+      if(action){e.preventDefault();if(action==='undo'?room.undo_count:room.redo_count)void historyAction(action);}
+    }
+    window.addEventListener('keydown',shortcut);return()=>window.removeEventListener('keydown',shortcut);
+  },[room,uid,busy,picker]);
   const state = room?.state,
     host = room?.host_id === uid,
     used = state ? unavailable(state) : new Set<string>();
@@ -371,6 +385,7 @@ export default function App() {
                   Start draft →
                 </button>
               )}
+              {host&&state!.phase==='live'&&!state!.openDraft&&<button disabled={busy} title="Pick and ban in any order. This cannot be reversed." onClick={()=>void historyAction('open')}>Open draft</button>}
               {host&&state!.phase==='live'&&<button disabled={busy} onClick={()=>void run(async()=>{
                 try{setRoom(await clearDraft(room));setPicker(null);setSwaps([]);setPickSwaps([]);}catch(e){setRoom(await readRoom(room.id));throw e;}
               })}>Clear</button>}
@@ -406,6 +421,7 @@ export default function App() {
               busy={busy}
               change={change}
               setPicker={setPicker}
+              undoCount={room.undo_count??0} redoCount={room.redo_count??0} onHistory={action=>void historyAction(action)}
               onMove={championMove}
               onRoleMove={roleMove}
               pendingRoles={new Set([...pickSwaps,...swaps.filter(q=>q.phase==='live')].flatMap(r=>[r.from_role,r.to_role]))}

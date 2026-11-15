@@ -42,7 +42,7 @@ test('compact candidates keep the selected size and hover shows nine adjusted, r
  expect((await selected.boundingBox())!.width).toBe(72);
  expect((await candidate.boundingBox())!.width).toBe(52);
  expect((await mid.getByRole('button',{name:'Add Mid candidates'}).boundingBox())!.width).toBe(52);
- expect(await mid.locator('.draft-champion-tile').first().getAttribute('data-champion')).toBe('103');
+ expect(await mid.locator('.draft-champion-tile').first().getAttribute('data-champion')).toBe('7');
  await selected.hover();const tooltip=page.getByRole('tooltip');
  await expect(tooltip).toContainText('9/9 pairs');await expect(tooltip).toContainText('+0.35');
  await expect(tooltip.locator('.contribution-row')).toHaveCount(5);
@@ -130,25 +130,14 @@ test('dragging the full role panel onto an allied card requests consent and carr
  const screenshots=process.env.DRAFT_REVIEW_SCREENSHOTS??'test-results';mkdirSync(screenshots,{recursive:true});
  await page.screenshot({path:`${screenshots}/live-role-swap.png`,fullPage:true});
 });
-test('click/keyboard role targeting moves into a free role and carries anonymous picks back',async({page})=>{
+test('role movement uses only drag and carries anonymous picks back, without swap/delete buttons',async({page})=>{
  await seed(page);await page.evaluate(()=>{const r=JSON.parse(localStorage.getItem('draftroom-demo')!);r.state.players=r.state.players.filter((p:{id:string})=>p.id!=='jungle-player');localStorage.setItem('draftroom-demo',JSON.stringify(r));});await page.reload();
- await page.getByRole('button',{name:'Move your Mid role',exact:true}).click({position:{x:4,y:4}});
- await expect(cell(page,'Jungle')).toHaveClass(/role-drop-target/);
- await page.keyboard.press('Escape');await expect(cell(page,'Jungle')).not.toHaveClass(/role-drop-target/);
- await cell(page,'Mid').getByRole('button',{name:'Move Ahri ally',exact:true}).click();
- await expect(cell(page,'Jungle')).toHaveClass(/drop-available/);
- await page.getByRole('button',{name:'Move your Mid role',exact:true}).click({position:{x:4,y:4}});
- await expect(cell(page,'Jungle')).not.toHaveClass(/drop-available/);
- await cell(page,'Mid').getByRole('button',{name:'Move Ahri ally',exact:true}).click();
- await expect(cell(page,'Jungle')).not.toHaveClass(/role-drop-target/);
- await expect(cell(page,'Jungle')).toHaveClass(/drop-available/);
- await page.getByRole('button',{name:'Move your Mid role',exact:true}).click({position:{x:4,y:4}});
- const screenshots=process.env.DRAFT_REVIEW_SCREENSHOTS??'test-results';mkdirSync(screenshots,{recursive:true});
- await page.screenshot({path:`${screenshots}/full-role-panels.png`,fullPage:true,animations:'disabled'});
- await cell(page,'Jungle').focus();await page.keyboard.press('Enter');
- await expect(cell(page,'Jungle').locator('.tile-selected')).toHaveAttribute('data-champion','103');
- await expect(cell(page,'Mid').locator('.tile-selected')).toHaveAttribute('data-champion','64');
- await expect(page.getByRole('dialog')).toHaveCount(0);
+ const handle=page.getByRole('button',{name:'Move your Mid role',exact:true});
+ await handle.click({position:{x:4,y:4}});await expect(cell(page,'Jungle')).not.toHaveClass(/role-drop-target/);
+ await expect(cell(page,'Mid').getByRole('button',{name:'Move Ahri ally',exact:true})).toHaveCount(0);await expect(cell(page,'Mid').getByRole('button',{name:'Remove Ahri ally',exact:true})).toHaveCount(0);
+ const box=(await handle.boundingBox())!,target=cell(page,'Jungle'),targetBox=(await target.boundingBox())!;
+ await handle.dragTo(target,{sourcePosition:{x:6,y:box.height-8},targetPosition:{x:targetBox.width-8,y:targetBox.height-8}});
+ await expect(cell(page,'Jungle').locator('.tile-selected')).toHaveAttribute('data-champion','103');await expect(cell(page,'Mid').locator('.tile-selected')).toHaveAttribute('data-champion','64');await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 test('role and popularity filters work in lobby and draft while keeping selected off-role candidates visible',async({page})=>{
  await page.goto('/');await page.getByPlaceholder('Your name').fill('Filter check');await page.getByRole('button',{name:'Open local demo',exact:false}).click();await page.evaluate(()=>{const r=JSON.parse(localStorage.getItem('draftroom-demo')!);delete r.state.draftMode;localStorage.setItem('draftroom-demo',JSON.stringify(r));});await page.reload();
@@ -218,16 +207,16 @@ test('an uncalibrated dataset shows no raw score disguised as an adjusted one',a
  await expect(page.getByRole('button',{name:'Sort by popularity',exact:true})).toBeDisabled();
  await expect(page.locator('.champion-grid button')).toHaveCount(173);
 });
-test('native drag exchanges enemy picks, rejects cross-team drops, and supports keyboard role targeting',async({page})=>{
- await page.setViewportSize({width:1440,height:1360});await seed(page);
+test('native drag exchanges enemy picks and rejects cross-team drops without move buttons',async({page})=>{
+ await page.setViewportSize({width:1440,height:2100});await seed(page);
  await cell(page,'Top','enemy').locator('[data-champion="122"]').dragTo(cell(page,'Jungle','enemy'));
  await expect(cell(page,'Top','enemy').locator('[data-champion="56"]')).toBeVisible();
  await expect(cell(page,'Jungle','enemy').locator('[data-champion="122"]')).toBeVisible();
  const before=(await state(page)).picks;
  await cell(page,'Jungle','enemy').locator('[data-champion="122"]').dragTo(cell(page,'Top','ally'));
  expect((await state(page)).picks).toEqual(before);
- await cell(page,'Jungle','enemy').getByRole('button',{name:'Move Darius enemy',exact:true}).click();
- await cell(page,'Support','enemy').focus();await page.keyboard.press('Enter');
+ await expect(cell(page,'Jungle','enemy').getByRole('button',{name:'Move Darius enemy',exact:true})).toHaveCount(0);
+ await cell(page,'Jungle','enemy').locator('[data-champion="122"]').dragTo(cell(page,'Support','enemy'));
  await expect(cell(page,'Support','enemy').locator('[data-champion="122"]')).toBeVisible();
  await expect(cell(page,'Jungle','enemy').locator('[data-champion="267"]')).toBeVisible();
  await expect(page.getByRole('combobox')).toHaveCount(0);

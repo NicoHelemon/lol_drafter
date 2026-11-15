@@ -116,6 +116,7 @@ test("full-width draft integrates pool candidates, score overlays and disabled p
     .click();
   await addPool(page, ["Renekton", "Darius", "Camille"]);
   await page.getByRole("button", { name: "Start draft" }).click();
+  await page.getByRole("button",{name:"Open draft",exact:true}).click();
   const top = page.getByRole("region", { name: "Top ally picks" });
   await expect(
     top.getByRole("button", { name: "Pick Renekton Top ally", exact: true }),
@@ -383,7 +384,7 @@ test('unoccupied ally and enemy seats keep multiple candidates independently of 
   await expect(cell.locator('.tile-selected')).toHaveCount(0);await expect(cell.locator('.draft-champion-tile')).toHaveCount(2);
  }
 });
-test("represented allies add candidates without picking, toggle selections, and keep the selected champion first", async ({
+test("represented allies add candidates without picking and keep their selected champion identifiable", async ({
   page,
 }) => {
   await openDemo(page);
@@ -410,7 +411,7 @@ test("represented allies add candidates without picking, toggle selections, and 
   await cell
     .getByRole("button", { name: "Pick Renekton Top ally", exact: true })
     .click();
-  await expect(cell.locator(".draft-champion-tile").first()).toHaveAttribute(
+  await expect(cell.locator(".tile-selected")).toHaveAttribute(
     "data-champion",
     "58",
   );
@@ -427,7 +428,7 @@ test("represented allies add candidates without picking, toggle selections, and 
   await cell
     .getByRole("button", { name: "Pick Camille Top ally", exact: true })
     .click();
-  await expect(cell.locator(".draft-champion-tile").first()).toHaveAttribute(
+  await expect(cell.locator(".tile-selected")).toHaveAttribute(
     "data-champion",
     "164",
   );

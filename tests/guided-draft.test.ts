@@ -116,3 +116,39 @@ it('restricts Clear to the host and removes pending consent without removing mem
  expect((await db.query('select * from public.role_swap_requests where room_id=$1',[r.id])).rows).toHaveLength(0);expect(r.state.players).toHaveLength(2);
  expect((await db.query('select * from public.room_members where room_id=$1',[r.id])).rows).toHaveLength(2);
 });
+const control=async(r:Room,action:string,uid=ids[0])=>(await as<{r:Room}>(uid,'select public.control_draft($1,$2,$3) r',[r.id,r.version,action])).r;
+it('undoes and redoes individual choices and grouped turn boundaries without undoing candidate edits',async()=>{
+ let r=await room('ranked');r=await save(r,startDraft(r.state));r=await save(r,advanceDraft(r.state));
+ let s=structuredClone(r.state);s.picks.ally=[{role:'Top',championId:'58'}];r=await save(r,finishChoice(s));expect(r.undo_count).toBe(2);
+ const picked=structuredClone(r.state);r=await save(r,setRolePool(r.state,'ally','Top',['58','164']));
+ r=await control(r,'undo');expect(r.state.draftStep).toBe(1);expect(r.state.picks.ally).toEqual([]);expect(r.redo_count).toBe(1);expect(r.state.rolePools?.ally?.Top).toEqual(['58','164']);
+ r=await control(r,'redo');expect(r.state.picks).toEqual(picked.picks);expect(r.state.draftHistory).toEqual(picked.draftHistory);
+ s=structuredClone(r.state);s.picks.enemy=[{role:'Top',championId:'122'}];r=await save(r,finishChoice(s));const partial=structuredClone(r.state);
+ s=structuredClone(r.state);s.picks.enemy.push({role:'Mid',championId:'103'});r=await save(r,finishChoice(s));expect(r.state.draftStep).toBe(3);
+ r=await control(r,'undo');expect(r.state.draftStep).toBe(2);expect(r.state.picks).toEqual(partial.picks);r=await control(r,'redo');expect(r.state.draftStep).toBe(3);
+ r=await control(r,'undo');s=structuredClone(r.state);s.picks.enemy.push({role:'Mid',championId:'84'});r=await save(r,finishChoice(s));expect(r.redo_count).toBe(0);await fails(()=>control(r,'redo'),'Nothing to redo');
+});
+it('Open draft is irreversible, discards guided history and retains choices through Clear/Undo/Redo',async()=>{
+ let r=await room('tournament');r=await save(r,startDraft(r.state));r=await save(r,chooseBan(r.state,'ally',0,'58'));
+ r=await control(r,'open');expect(r.state.openDraft).toBe(true);expect(r.state.bans.ally[0]).toBe('58');expect(r.undo_count).toBe(0);expect(r.redo_count).toBe(0);await fails(()=>control(r,'undo'),'Nothing to undo');
+ let s=structuredClone(r.state);s.picks.enemy=[{role:'Support',championId:'25'}];r=await save(r,s);s=structuredClone(r.state);s.bans.enemy[4]='122';r=await save(r,s);
+ r=await control(r,'undo');expect(r.state.bans.enemy[4]).toBeNull();expect(r.state.picks.enemy).toHaveLength(1);r=await control(r,'redo');const before=structuredClone(r.state);
+ r=await control(r,'clear');expect(r.state.openDraft).toBe(true);expect(r.state.picks.enemy).toHaveLength(0);r=await control(r,'undo');expect(r.state.picks).toEqual(before.picks);expect(r.state.bans).toEqual(before.bans);expect(r.state.openDraft).toBe(true);
+ s=structuredClone(r.state);s.openDraft=false;await fails(()=>save(r,s),'Open draft is permanent');await fails(()=>control(r,'open'),'already open');
+});
+it('keeps the restoration ticket private and controls host-only, member-only and versioned',async()=>{
+ let r=await room('tournament');r=(await as<{r:Room}>(ids[1],'select public.join_room($1,$2,$3) r',[r.slug,'a'.repeat(72),'Guest'])).r;r=await save(r,startDraft(r.state));
+ await fails(()=>control(r,'open',ids[1]),'Only the host');await fails(()=>control(r,'undo',ids[2]),'Access denied');await fails(()=>control(r,'bogus'),'Invalid draft control');
+ await fails(()=>as(ids[0],"update public.draft_timelines set restoring=true where room_id=$1",[r.id]),'permission denied');await fails(()=>as(ids[0],"select * from public.draft_timelines"),'permission denied');
+ const stale=r;r=await save(r,chooseBan(r.state,'ally',0,'58'));await fails(()=>control(stale,'undo'),'Conflict');expect(r.undo_count).toBe(1);
+ r=await control(r,'undo');expect(r.state.draftStep).toBe(0);r=await control(r,'redo');expect(r.state.draftStep).toBe(1);
+});
+it('consented champion/role assignment changes establish a new history baseline',async()=>{
+ let r=await room('ranked');r=await save(r,startDraft(r.state));r=await control(r,'open');let s=structuredClone(r.state);s.picks.enemy=[{role:'Top',championId:'122'}];r=await save(r,s);expect(r.undo_count).toBe(1);
+ s=structuredClone(r.state);s.picks.enemy[0].role='Mid';r=await save(r,s);expect(r.undo_count).toBe(0);expect(r.redo_count).toBe(0);await fails(()=>control(r,'undo'),'Nothing to undo');
+});
+it('bounds shared choice history at sixty positions',async()=>{
+ let r=await room('ranked');r=await save(r,startDraft(r.state));r=await control(r,'open');
+ for(let i=0;i<65;i++){const s=structuredClone(r.state);s.bans.ally[0]=i%2?'58':'164';r=await save(r,s);}
+ expect(r.undo_count).toBe(60);for(let i=0;i<60;i++)r=await control(r,'undo');expect(r.undo_count).toBe(0);expect(r.redo_count).toBe(60);await fails(()=>control(r,'undo'),'Nothing to undo');
+});
