@@ -1,0 +1,122 @@
+{
+  "checkedAt": "2026-11-15T17:21:18.269243+00:00",
+  "site": "https://draftroom-lol.netlify.app",
+  "deployment": {
+    "commit": "7026ce15d2e31955af15d6a1fb3008bd886a44de",
+    "builtAt": "2026-11-15T17:17:36.510Z"
+  },
+  "ci": {
+    "branch": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43740080752",
+    "main": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43740251575",
+    "result": "success",
+    "typescriptPostgres": 111,
+    "python": 50,
+    "browser": 26,
+    "build": "passed"
+  },
+  "database": {
+    "checkedAt": "2026-11-15T17:21:18.269243+00:00",
+    "migration": "015",
+    "statisticalShardsPreserved": 865,
+    "snapshotPointerPreserved": true,
+    "modelsAndCataloguesPreserved": true,
+    "temporaryTables": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0
+    },
+    "roomResetExplicitlyAuthorized": true
+  },
+  "temporaryRoomsDeletedAtUpdate": 1,
+  "hosted": {
+    "checkedAt": "2026-11-15T17:18:09.219Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "modes": [
+      {
+        "mode": "ranked",
+        "alliedSide": "red",
+        "steps": [
+          "Both teams \u00b7 enter all bans",
+          "Blue team \u00b7 1st pick",
+          "Red team \u00b7 1st and 2nd picks",
+          "Blue team \u00b7 2nd and 3rd picks",
+          "Red team \u00b7 3rd and 4th picks",
+          "Blue team \u00b7 4th and 5th picks",
+          "Red team \u00b7 5th pick"
+        ],
+        "automaticProgression": true,
+        "rankedMultiBan": true,
+        "automaticFiveCandidates": true,
+        "explicitFirst": true,
+        "twoClientsSynchronized": true,
+        "complementaryMaps": false,
+        "roleConsentAfterCompletion": true,
+        "backAndReloadPreserved": true,
+        "clearAtomicAndSynchronized": true,
+        "clearPreservesRolesPoolsSnapshot": true
+      },
+      {
+        "mode": "tournament",
+        "alliedSide": "blue",
+        "steps": [
+          "Blue team \u00b7 1st ban",
+          "Red team \u00b7 1st ban",
+          "Blue team \u00b7 2nd ban",
+          "Red team \u00b7 2nd ban",
+          "Blue team \u00b7 3rd ban",
+          "Red team \u00b7 3rd ban",
+          "Blue team \u00b7 1st pick",
+          "Red team \u00b7 1st and 2nd picks",
+          "Blue team \u00b7 2nd and 3rd picks",
+          "Red team \u00b7 3rd pick",
+          "Red team \u00b7 4th ban",
+          "Blue team \u00b7 4th ban",
+          "Red team \u00b7 5th ban",
+          "Blue team \u00b7 5th ban",
+          "Red team \u00b7 4th pick",
+          "Blue team \u00b7 4th and 5th picks",
+          "Red team \u00b7 5th pick"
+        ],
+        "automaticProgression": true,
+        "rankedMultiBan": false,
+        "automaticFiveCandidates": true,
+        "explicitFirst": true,
+        "twoClientsSynchronized": true,
+        "complementaryMaps": true,
+        "roleConsentAfterCompletion": true,
+        "backAndReloadPreserved": true,
+        "clearAtomicAndSynchronized": true,
+        "clearPreservesRolesPoolsSnapshot": true
+      }
+    ],
+    "deployment": {
+      "commit": "7026ce15d2e31955af15d6a1fb3008bd886a44de",
+      "builtAt": "2026-11-15T17:17:36.510Z"
+    },
+    "success": true,
+    "cleanup": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0
+    }
+  },
+  "scoring": {
+    "success": true,
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+    "expectedScore": "+0.97",
+    "displayedScore": "+0.97",
+    "expectedTeam": "+0.40",
+    "expectedCamilleTeam": "+0.27",
+    "k": 2510.0480193943954,
+    "sourceRequests": 0,
+    "shardRequests": 6,
+    "reloadPreservedScore": true,
+    "reloadPreservedTeamScore": true,
+    "testRoomRemoved": true
+  }
+}

@@ -36,4 +36,17 @@ La RPC `clear_draft` est réservée à l'hôte membre et vérifie la version. El
 
 111 tests TypeScript/PostgreSQL et 50 tests Python réussis. Le build passe. Les 14 tests de progression utilisent toutes les migrations jusqu'à 015 ; les fixtures historiques des autres suites restent isolées au schéma 013. Les nouveaux contrôles couvrent les transitions atomiques par invité, les deux picks d'un tour, les choix hors tour, Clear sur les deux modes, les conflits de version, les droits et le nettoyage des demandes sans suppression des membres.
 
-Les parcours navigateur vérifient les cartes liées et le gris, le ratio 20/80, les carrés, les bans multiples, les deux séquences complètes, la progression automatique, l'absence des boutons Confirm, Clear et la conservation de la préparation, les bordures de couleur, le dégagement vertical et l'absence de débordement à 390 px. Les résultats de livraison sont ajoutés après vérification du site hébergé.
+Les parcours navigateur vérifient les cartes liées et le gris, le ratio 20/80, les carrés, les bans multiples, les deux séquences complètes, la progression automatique, l'absence des boutons Confirm, Clear et la conservation de la préparation, les bordures de couleur, le dégagement vertical et l'absence de débordement à 390 px. Les **26 parcours** passent localement et sur GitHub Actions.
+
+
+## Livraison vérifiée
+
+Version **`7026ce1`** constatée sur [Netlify](https://draftroom-lol.netlify.app) le **15 novembre 2026 à 18:21 Europe/Zurich**. [CI de branche](https://github.com/NicoHelemon/lol_drafter/actions/runs/43740080752) et [CI de main](https://github.com/NicoHelemon/lol_drafter/actions/runs/43740251575) vertes : 111 tests TypeScript/PostgreSQL, 50 Python, 26 parcours navigateur et build.
+
+Après sauvegarde privée et vérification du projet Supabase, seule la migration 015 a été appliquée. Une salle temporaire, son membre et son invitation ont été supprimés dans la même transaction conformément à la consigne. Les identités Auth anonymes réutilisables ne sont pas supprimées. Comparaison après migration **et après recette** : les empreintes des **865 fragments**, le snapshot courant, le modèle et le catalogue sont inchangés.
+
+Deux navigateurs indépendants ont terminé les **7 étapes ranked** (alliés rouges) et **17 étapes tournament** (alliés bleus). Bans ranked multiples avec doublons interéquipes, choix et avancement par l'invité, cartes complémentaires synchronisées, priorités et compléments populaires, échange de rôles consenti après verrouillage, retour/correction et rechargement : réussis. **Clear** est atomique (une nouvelle version), synchronisé sur les deux clients, conserve rôles/pools/mode/camp/snapshot, puis survit au rechargement. Les salles de recette ont été supprimées par Quit.
+
+Recette statistique réelle également réussie : Renekton Top **+0,97**, équipe **+0,40**, remplacement par Camille **+0,27** (évolution **−0,13**), avec le k publié **2510,0480**. Aucun appel direct à Lolalytics depuis les navigateurs. Aucun secret, collecteur ou calcul de score modifié.
+
+[Preuve structurée](evidence/streamlined-production-verification.json). Les constats post-publication sont sauvegardés sur la branche de travail sans nouvelle publication de production pour ce seul ajout documentaire.
