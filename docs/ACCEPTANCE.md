@@ -1,6 +1,6 @@
 # Recette partagée
 
-À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611140012_role_catalogues.sql`.
+À exécuter sur le site Netlify relié à Supabase, après toutes les migrations jusqu’à `202611150013_all_role_candidates.sql`.
 
 1. Nico crée une salle : titre « Nico’s room », URL `/rooms/nicos-room/setup`, badge HOST à côté de son nom. Un second Nico reçoit une URL distincte, avec suffixe numérique.
 2. Quatre autres profils de navigateur rejoignent via l’invitation. Chacun choisit une case avec Join. Un sixième participant et une invitation incorrecte doivent être refusés.
@@ -19,19 +19,19 @@ Automatisation : `npm test` valide le domaine, les 173 portraits et les RPC/RLS 
 
 - Aucun panneau Recommendations ni option Unassigned role. Le tableau prend toute la largeur disponible, y compris sur mobile.
 - Les deux groupes de bans se trouvent immédiatement sous Draft board.
-- Pour un allié incarné, chaque case affiche les candidats de son pool. [+] ajoute des candidats sans sélectionner ni remplacer le pick actuel. Cliquer un candidat le sélectionne, cliquer un autre le remplace, et recliquer le candidat sélectionné efface uniquement le pick. Le candidat choisi reste le premier, même si son score est inférieur. Le pick se déplace par glisser-déposer dans sa propre équipe, ou via ↕ puis une cible au clic/toucher/clavier. Entre deux rôles alliés incarnés, les propriétaires concernés doivent consentir sous cinq secondes. Un rôle destinataire vide reçoit le champion et le donneur perd sa sélection. Les pools et les rôles des joueurs ne sont pas échangés.
+- Chaque case affiche ses candidats, qu’elle soit alliée, ennemie ou sans participant. [+] ajoute des candidats sans sélectionner ni remplacer le pick actuel. Cliquer un candidat le sélectionne, cliquer un autre le remplace, et recliquer le candidat sélectionné efface uniquement le pick. Le candidat choisi reste le premier, même si son score est inférieur. Le pick se déplace par glisser-déposer dans sa propre équipe, ou via ↕ puis une cible au clic/toucher/clavier. Entre deux rôles alliés incarnés, les propriétaires concernés doivent consentir sous cinq secondes. Un rôle destinataire vide reçoit le champion et le donneur perd sa sélection. Les pools et les rôles des joueurs ne sont pas échangés.
 - Les candidats bannis ou pris dans une autre case restent visibles en gris et ne sont pas sélectionnables. Retirer le ban/pick les réactive.
 - Les scores sont visibles en transparence sur les candidats et les picks sélectionnés des deux équipes. Les données manquantes restent N/A ; une indication signale la couverture partielle. Le survol ou focus du portrait affiche une miniature de cinq lignes en deux colonnes, avec rôles, portraits et valeurs ajustées colorées. Le propre rôle allié est exclu ; les paires inconnues affichent N/A, les emplacements vides un tiret. Aucun clic de score n’est nécessaire.
 - Le panneau des participants indique N/5, les noms et le badge d’hôte, sans postes. Le cadre doré de son rôle est épais de 3 px.
 
-## Postes anonymes et rôles incarnés
+## Candidats des dix rôles
 
-- Sur un poste ennemi ou allié sans participant, [+] disparaît après la sélection initiale. Cliquer le portrait ouvre le catalogue pour remplacer le pick ; il n’y a jamais plusieurs candidats affichés pour ce poste. Retirer le pick rétablit [+].
-- Sur un poste allié occupé par un participant, [+] reste présent et ouvre l’ajout de candidats. Ajouter un candidat ne sélectionne rien et ne change pas le pick actuel, y compris si celui-ci est déjà sélectionné.
-- La sélection et la désélection ne retirent aucun candidat du pool. Après rechargement, les candidats ajoutés et le pick effectif restent cohérents.
-- Le nom du participant apparaît sous le libellé de son rôle, par exemple Jungle puis Mathis.
-
-- Les candidats alliés non sélectionnés et [+] sont plus petits ; le pick garde sa taille initiale. Le score utilise la moyenne à poids égaux des seules contributions ajustées connues, sans convertir les absences en zéro.
+- Le lobby présente cinq rôles alliés et cinq rôles ennemis, tous avec une liste de candidats. Préparer un rôle libre ou adverse est possible avant toute prise de rôle.
+- Prendre un rôle remplace sa liste préparée par le pool personnel, sans fusion, même vide. Le pool du rôle adverse correspondant reste inchangé. Une modification simultanée obsolète est refusée.
+- Après Start draft, les dix listes sont conservées sans sélection automatique. [+] reste toujours présent ; ajouter un candidat ne sélectionne rien. Cliquer un candidat sélectionne/remplace le pick, recliquer le sélectionné efface uniquement le pick. Retirer un candidat depuis le sélecteur ne supprime pas un pick existant.
+- Les listes peuvent partager des candidats, mais les picks/bans restent uniques. Le pick choisi reste premier ; les candidats indisponibles restent visibles en gris. Recharger conserve les dix listes et les picks séparément.
+- En préparation, propriétaire ou hôte édite un pool incarné ; les listes libres et adverses sont partagées. Vérifier un second membre et la prise de rôle pendant une édition.
+- Le nom du participant reste sous son rôle. Les candidats non sélectionnés et [+] sont plus petits, dans les deux équipes. Le score et les contributions ajustées ne changent pas.
 
 ## Équipes et shrinkage
 
