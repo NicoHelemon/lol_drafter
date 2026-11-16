@@ -1,29 +1,39 @@
 import {test,expect,type Page} from '@playwright/test';
 import type {AccountProfile,Room,Role} from '../../src/domain/types';
 const guest='11111111-1111-4111-8111-111111111111',member='22222222-2222-4222-8222-222222222222';
-function session(registered:boolean){const now=Math.floor(Date.now()/1000),user={id:registered?member:guest,aud:'authenticated',role:'authenticated',email:registered?'player@example.test':undefined,is_anonymous:!registered,email_confirmed_at:registered?new Date().toISOString():undefined,created_at:new Date().toISOString(),app_metadata:{provider:registered?'email':'anonymous',providers:[registered?'email':'anonymous']},user_metadata:{}};const b=(v:unknown)=>Buffer.from(JSON.stringify(v)).toString('base64url');return {access_token:`${b({alg:'HS256',typ:'JWT'})}.${b({sub:user.id,role:'authenticated',exp:now+3600,iat:now,email:user.email,is_anonymous:user.is_anonymous})}.dGVzdA`,refresh_token:registered?'test-registered-refresh':'test-guest-refresh',expires_in:3600,token_type:'bearer',user};}
-async function mock(page:Page,ready=true){
- const state:{profile:AccountProfile|null;room:Room|null;saves:number;requestedEmail:string;createdUid:string|null}={profile:null,room:null,saves:0,requestedEmail:'',createdUid:null};const anonymous=session(false),account=session(true);
+const pools=()=>({Top:['58'],Jungle:[],Mid:['103'],ADC:[],Support:[]});
+function session(registered:boolean){const now=Math.floor(Date.now()/1000),user={id:registered?member:guest,aud:'authenticated',role:'authenticated',email:registered?'player@example.test':undefined,is_anonymous:!registered,email_confirmed_at:registered?new Date().toISOString():undefined,created_at:new Date().toISOString(),app_metadata:{provider:registered?'email':'anonymous',providers:[registered?'email':'anonymous']},user_metadata:{}};const b=(v:unknown)=>Buffer.from(JSON.stringify(v)).toString('base64url');return {access_token:`${b({alg:'HS256',typ:'JWT'})}.${b({sub:user.id,role:'authenticated',exp:now+3600,iat:now,email:user.email,is_anonymous:user.is_anonymous})}.dGVzdA`,refresh_token:registered?'test-registered-refresh':'test-guest-refresh',expires_in:3600,expires_at:now+3600,token_type:'bearer',user};}
+async function mock(page:Page,{ready=true,legacy=false,signedIn=false}={}){
+ const anonymous=session(false),account=session(true);
+ const state={profile:{user_id:member,display_name:'Nico',role_pools:pools(),version:1} as AccountProfile,room:null as Room|null,saves:0,requestedEmail:'',createdUid:null as string|null,loginName:legacy?null:'private_nico' as string|null,hasPassword:!legacy,passwordUpdates:0,recoveryRequests:0,signups:0,passwordLogins:[] as string[]};
+ if(signedIn)await page.addInitScript(value=>{if(!localStorage.getItem('sb-127-auth-token'))localStorage.setItem('sb-127-auth-token',JSON.stringify(value));},account);
  await page.route('http://127.0.0.1:54321/**',async route=>{
-  const req=route.request(),url=new URL(req.url()),path=url.pathname,body=req.method()==='POST'?req.postDataJSON():null;let result:unknown=null,status=200;
+  const req=route.request(),url=new URL(req.url()),path=url.pathname,body=['POST','PUT'].includes(req.method())?req.postDataJSON():null;let result:unknown=null,status=200;
   if(req.method()==='OPTIONS'){await route.fulfill({status:200,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'*'}});return;}
-  if(path==='/auth/v1/signup')result=anonymous;
-  else if(path==='/auth/v1/otp'){state.requestedEmail=body.email;result={};}
+  if(path==='/auth/v1/signup'){
+   if(body.password){state.signups++;state.loginName=body.data.login_name;state.hasPassword=true;state.profile={...state.profile,display_name:body.data.display_name,role_pools:{Top:[],Jungle:[],Mid:[],ADC:[],Support:[]}};result={user:account.user,session:null};}
+   else result=anonymous;
+  }else if(path==='/functions/v1/account-password-login'){
+   state.passwordLogins.push(body.identifier);if(body.password==='valid-password')result={access_token:account.access_token,refresh_token:account.refresh_token};else{status=401;result={message:'Invalid login name, email or password'};}
+  }else if(path==='/auth/v1/recover'){state.requestedEmail=body.email;state.recoveryRequests++;result={};}
   else if(path==='/auth/v1/verify'){if(body.token==='12345678')result=account;else{status=403;result={code:'otp_expired',msg:'The email code is invalid or expired'};}}
-  else if(path==='/auth/v1/user')result=req.headers().authorization===`Bearer ${account.access_token}`?account.user:anonymous.user;
+  else if(path==='/auth/v1/user'){if(req.method()==='PUT'){state.hasPassword=true;state.passwordUpdates++;}result=req.headers().authorization===`Bearer ${account.access_token}`?account.user:anonymous.user;}
   else if(path==='/auth/v1/logout')result={};
   else if(path.endsWith('/account_features'))result={email_login_ready:ready};
-  else if(path.endsWith('/user_profiles'))result=state.profile?[state.profile]:[];
+  else if(path.endsWith('/user_profiles'))result=[state.profile];
   else if(path.endsWith('/statistics_current'))result=[];
   else if(path.endsWith('/room_members'))result=[{user_id:member,last_seen:new Date().toISOString()}];
   else if(path.endsWith('/rooms'))result=state.room?[state.room]:[];
   else if(path.endsWith('/role_swap_requests')||path.endsWith('/pick_swap_requests'))result=[];
   else if(path.endsWith('/rpc/account_login_allowed'))result=state.room===null;
+  else if(path.endsWith('/rpc/my_account_login'))result={login_name:state.loginName,has_password:state.hasPassword};
+  else if(path.endsWith('/rpc/login_name_available'))result=body.proposed_name!=='taken_name';
+  else if(path.endsWith('/rpc/set_my_login_name')){state.loginName=body.proposed_name;result=null;}
   else if(path.endsWith('/rpc/save_my_profile')){
-   if(body.expected_version!==(state.profile?.version??0)){status=400;result={message:'Conflict: profile updated'};}
-   else{state.saves++;state.profile={user_id:member,display_name:body.new_name,role_pools:body.new_pools,version:state.saves};result=state.profile;}
-  }else if(path.endsWith('/rpc/create_room')){state.createdUid=body.initial_state.players[0].id;state.room={id:'33333333-3333-4333-8333-333333333333',slug:'account-room',name:"Nico's room",host_id:member,version:0,state:body.initial_state};result=state.room;}
-  else if(path.endsWith('/rpc/claim_role')){state.room!.state.players[0].role=body.new_role;state.room!.state.players[0].pool=[...state.profile!.role_pools[body.new_role as Role]];state.room!.version++;result=state.room;}
+   if(body.expected_version!==state.profile.version){status=400;result={message:'Conflict: profile updated'};}
+   else{state.saves++;state.profile={...state.profile,display_name:body.new_name,role_pools:body.new_pools,version:state.profile.version+1};result=state.profile;}
+  }else if(path.endsWith('/rpc/create_room')){state.createdUid=body.initial_state.players[0].id;state.room={id:'33333333-3333-4333-8333-333333333333',slug:'account-room',name:"Room alias's room",host_id:member,version:0,state:body.initial_state};result=state.room;}
+  else if(path.endsWith('/rpc/claim_role')){state.room!.state.players[0].role=body.new_role;state.room!.state.players[0].pool=[...state.profile.role_pools[body.new_role as Role]];state.room!.version++;result=state.room;}
   else if(path.endsWith('/rpc/set_role_candidates')){state.room!.state.players[0].pool=body.champion_ids;state.room!.version++;result=state.room;}
   else if(path.endsWith('/rpc/leave_room')){state.room=null;result=null;}
   else if(path.endsWith('/rpc/heartbeat'))result=null;
@@ -31,18 +41,29 @@ async function mock(page:Page,ready=true){
   await route.fulfill({status,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify(result)});
  });return state;
 }
-test('email code, private five-role profile, current identity and explicit room-to-profile save',async({page})=>{
- const server=await mock(page);await page.goto('/');await page.getByRole('button',{name:'Sign in / Create account',exact:true}).click();
- await page.getByLabel('Email address',{exact:true}).fill('player@example.test');await page.getByRole('button',{name:'Send sign-in code',exact:true}).click();await expect.poll(()=>server.requestedEmail).toBe('player@example.test');
- await page.getByLabel('Sign-in code',{exact:true}).fill('11111111');await page.getByRole('button',{name:'Verify code',exact:true}).click();await expect(page.getByRole('dialog').getByRole('alert')).toContainText('invalid or expired');
- await page.getByLabel('Sign-in code',{exact:true}).fill('12345678');await page.getByRole('button',{name:'Verify code',exact:true}).click();await expect(page.getByRole('dialog',{name:'My champion pools'})).toBeVisible();
- await page.getByRole('dialog').getByLabel('Display name',{exact:true}).fill('Nico');await page.getByRole('tab',{name:'Mid',exact:true}).click();await page.getByRole('textbox',{name:'Search champions'}).fill('Ahri');await page.getByRole('button',{name:'Ahri',exact:true}).click();await page.getByRole('button',{name:'Save profile and pools',exact:true}).click();
- await expect(page.getByRole('dialog')).toHaveCount(0);expect(server.profile?.role_pools.Mid).toEqual(['103']);await expect(page.getByLabel('Display name',{exact:true})).toHaveValue('Nico');await page.reload();await expect(page.getByText('Signed in as',{exact:false})).toContainText('Nico');await expect(page.getByLabel('Display name',{exact:true})).toHaveValue('Nico');
- await page.getByRole('button',{name:/Create private room/}).click();await expect(page.getByRole('region',{name:'Room preparation'})).toBeVisible();expect(server.createdUid).toBe(member);await expect(page.getByRole('button',{name:'Sign in / Create account',exact:true})).toHaveCount(0);
- await page.getByRole('group',{name:'Mid role',exact:true}).getByRole('button',{name:'Join',exact:true}).click();await expect(page.getByRole('group',{name:'Mid role',exact:true}).locator('.pool-tile')).toHaveCount(1);
- await page.getByRole('button',{name:'Add champion to Mid pool',exact:true}).click();await page.getByRole('textbox',{name:'Search champions'}).fill('Akali');await page.getByRole('button',{name:'Akali',exact:true}).click();await page.getByRole('button',{name:'Close',exact:true}).click();expect(server.saves).toBe(1);expect(server.profile!.role_pools.Mid).toEqual(['103']);
- page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Save my Mid pool',exact:true}).click();await expect.poll(()=>server.saves).toBe(2);expect(server.profile!.role_pools.Mid).toEqual(['103','84']);
+async function open(page:Page){await page.goto('/');await page.getByRole('button',{name:'Sign in / Create account',exact:true}).click();}
+async function password(page:Page,value='new-valid-password'){await page.getByLabel('New password',{exact:true}).fill(value);await page.getByLabel('Confirm password',{exact:true}).fill(value);}
+async function recovery(page:Page){await page.getByRole('button',{name:'Forgot password?',exact:true}).click();await page.getByLabel('Email address',{exact:true}).fill('player@example.test');await page.getByRole('button',{name:'Send recovery code',exact:true}).click();await page.getByLabel('Confirmation code',{exact:true}).fill('12345678');await page.getByRole('button',{name:'Verify code',exact:true}).click();}
+test('password sign-in, persistence and distinct room alias without changing private login or profile pools',async({page})=>{
+ const server=await mock(page);await open(page);await page.getByLabel('Login name or email',{exact:true}).fill('PRIVATE_NICO');await page.getByLabel('Password',{exact:true}).fill('wrong-password');await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page.getByRole('alert')).toContainText('Invalid login');
+ await page.getByLabel('Password',{exact:true}).fill('valid-password');await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page.getByRole('dialog',{name:'My account'})).toContainText('private_nico');await expect(page.getByLabel('Room display name',{exact:true})).toHaveValue('Nico');await page.getByRole('button',{name:'Save profile and pools',exact:true}).click();await page.reload();await expect(page.getByText('Signed in as',{exact:false})).toContainText('Nico');
+ await page.getByLabel('Display name',{exact:true}).fill('Room alias');await page.getByRole('button',{name:/Create private room/}).click();await expect(page.getByRole('region',{name:'Room preparation'})).toBeVisible();expect(server.createdUid).toBe(member);expect(server.room?.state.players[0].name).toBe('Room alias');expect(server.loginName).toBe('private_nico');expect(server.profile.display_name).toBe('Nico');await expect(page.getByRole('button',{name:'My account',exact:true})).toHaveCount(0);
+ await page.getByRole('group',{name:'Mid role',exact:true}).getByRole('button',{name:'Join',exact:true}).click();await expect(page.getByRole('group',{name:'Mid role',exact:true}).locator('.pool-tile')).toHaveCount(1);await page.getByRole('button',{name:'Add champion to Mid pool',exact:true}).click();await page.getByRole('textbox',{name:'Search champions'}).fill('Akali');await page.getByRole('button',{name:'Akali',exact:true}).click();await page.getByRole('button',{name:'Close',exact:true}).click();expect(server.profile.role_pools.Mid).toEqual(['103']);
+ page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Save my Mid pool',exact:true}).click();await expect.poll(()=>server.saves).toBe(2);expect(server.profile.role_pools.Mid).toEqual(['103','84']);expect(server.recoveryRequests).toBe(0);
 });
-test('email setup gate keeps guest entry available and never requests a code while unavailable',async({page})=>{
- const server=await mock(page,false);await page.goto('/');await page.getByRole('button',{name:'Sign in / Create account',exact:true}).click();await expect(page.getByRole('dialog')).toContainText('Email sign-in is being configured');await expect(page.getByRole('button',{name:'Send sign-in code',exact:true})).toBeDisabled();expect(server.requestedEmail).toBe('');await page.getByRole('button',{name:'Close account',exact:true}).click();await page.getByLabel('Display name',{exact:true}).fill('Guest');await expect(page.getByRole('button',{name:/Create private room/})).toBeEnabled();
+test('new registration separates names, rejects a taken name and confirms email only once',async({page})=>{
+ const server=await mock(page);await open(page);await page.getByRole('tab',{name:'Create account',exact:true}).click();await page.getByLabel('Email address',{exact:true}).fill('player@example.test');await page.getByLabel('Login name',{exact:true}).fill('taken_name');await page.getByLabel('Password',{exact:true}).fill('new-valid-password');await page.getByLabel('Confirm password',{exact:true}).fill('new-valid-password');await page.getByLabel('Room display name',{exact:true}).fill('Visible room name');await page.getByRole('button',{name:'Create account',exact:true}).click();await expect(page.getByRole('alert')).toContainText('already taken');expect(server.signups).toBe(0);
+ await page.getByLabel('Login name',{exact:true}).fill('Private_New');await page.getByRole('button',{name:'Create account',exact:true}).click();await page.getByLabel('Confirmation code',{exact:true}).fill('11111111');await page.getByRole('button',{name:'Verify code',exact:true}).click();await expect(page.getByRole('alert')).toContainText('invalid or expired');await page.getByLabel('Confirmation code',{exact:true}).fill('12345678');await page.getByRole('button',{name:'Verify code',exact:true}).click();await expect(page.getByRole('dialog',{name:'My account'})).toContainText('private_new');await expect(page.getByLabel('Room display name',{exact:true})).toHaveValue('Visible room name');expect(server.hasPassword).toBe(true);expect(server.passwordUpdates).toBe(0);
+});
+test('signed-in legacy account sets its first private login and password without recreating its profile',async({page})=>{
+ const server=await mock(page,{legacy:true,signedIn:true});const before=structuredClone(server.profile);await page.goto('/');await page.getByRole('button',{name:'My account',exact:true}).click();await expect(page.getByRole('dialog')).toContainText('Finish setting up your account');await page.getByLabel('Login name',{exact:true}).fill('My_Private_Login');await password(page);await page.getByRole('button',{name:'Save login and password',exact:true}).click();await expect(page.getByLabel('Room display name',{exact:true})).toHaveValue('Nico');expect(server.loginName).toBe('my_private_login');expect(server.profile).toEqual(before);expect(server.passwordUpdates).toBe(1);expect(server.recoveryRequests).toBe(0);expect(server.signups).toBe(0);
+});
+test('signed-out legacy account recovers access and adds its first password without losing pools',async({page})=>{
+ const server=await mock(page,{legacy:true});const before=structuredClone(server.profile);await open(page);await recovery(page);await page.getByLabel('Login name',{exact:true}).fill('Legacy_Login');await password(page);await page.getByRole('button',{name:'Save login and password',exact:true}).click();await expect(page.getByLabel('Room display name',{exact:true})).toHaveValue('Nico');expect(server.profile).toEqual(before);expect(server.loginName).toBe('legacy_login');expect(server.recoveryRequests).toBe(1);expect(server.signups).toBe(0);
+});
+test('forgotten password keeps the existing login name and profile',async({page})=>{
+ const server=await mock(page);const before=structuredClone(server.profile);await open(page);await recovery(page);await expect(page.getByLabel('Login name',{exact:true})).toHaveValue('private_nico');await expect(page.getByLabel('Login name',{exact:true})).toBeDisabled();await password(page);await page.getByRole('button',{name:'Save login and password',exact:true}).click();await expect(page.getByLabel('Room display name',{exact:true})).toBeVisible();expect(server.passwordUpdates).toBe(1);expect(server.profile).toEqual(before);
+});
+test('email setup gate preserves guest entry and password sign-in while blocking new confirmation emails',async({page})=>{
+ const server=await mock(page,{ready:false});await open(page);await expect(page.getByRole('dialog')).toContainText('Account email is being configured');await expect(page.getByRole('button',{name:'Sign in',exact:true})).toBeEnabled();await page.getByRole('tab',{name:'Create account',exact:true}).click();await expect(page.getByRole('button',{name:'Create account',exact:true})).toBeDisabled();expect(server.recoveryRequests).toBe(0);await page.getByRole('button',{name:'Close account',exact:true}).click();await page.getByLabel('Display name',{exact:true}).fill('Guest');await expect(page.getByRole('button',{name:/Create private room/})).toBeEnabled();
 });
