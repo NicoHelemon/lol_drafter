@@ -1,5 +1,7 @@
 # Comptes personnels et dix participants
 
+> La connexion habituelle par code de ce document est remplacée par les [comptes classiques](PASSWORD_ACCOUNTS.md), livrés le 17 novembre 2026. Profils, pools et dix places restent conservés.
+
 Demande du 16 novembre 2026, branche `feat/accounts-ten-members`. Migration 018 après 017. Interface en anglais.
 
 ## Compte facultatif

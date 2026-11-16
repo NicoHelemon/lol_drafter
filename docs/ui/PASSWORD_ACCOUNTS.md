@@ -29,3 +29,24 @@ Appliquer seulement 019 après sauvegarde des identités/profils existants et em
 Les tests SQL couvrent la migration des comptes existants, les champs séparés, l’unicité insensible à la casse, la réservation transactionnelle à l’inscription, la confidentialité, le refus des comptes non vérifiés, les changements hors salle et l’expiration des limites. Les tests du handler vérifient erreurs génériques, réponses sans secret, validation et débit. Les tests navigateur couvrent connexion normale persistante, nom ponctuel de salle, inscription et confirmation, premier mot de passe depuis une session existante ou une récupération, réinitialisation et mode invité.
 
 La recette hébergée doit créer seulement des comptes réservés de test sans envoi d’email, vérifier les mots de passe réels et la conservation des deux comptes utilisateurs. Cela ne prouve pas la réception d’un vrai message Brevo. Statut de livraison et preuves à ajouter après constat.
+
+
+## Livraison constatée
+
+Version **`4209425`** observée sur Netlify le **17 novembre 2026 à 00:39 Europe/Zurich**. CI de [branche](https://github.com/NicoHelemon/lol_drafter/actions/runs/43980742971) et de [main](https://github.com/NicoHelemon/lol_drafter/actions/runs/43981130114) vertes : **140 tests TypeScript/PostgreSQL, 50 Python, 36 parcours navigateur et build**. Une seule publication de production du lot ; ces preuves sont ensuite sauvegardées sur la branche de travail.
+
+Seule la migration 019 a été appliquée après sauvegarde privée et vérification du projet Supabase. La fonction `account-password-login` est active (version 1, empreinte du handler dans les preuves). Le minimum de dix caractères et les modèles de confirmation/récupération ont été vérifiés via l’administration Auth ; aucun identifiant SMTP, secret GitHub ou clé Netlify modifié. Aucune suppression des salles existantes requise.
+
+Après migration **et après recette**, les deux comptes préexistants conservent leurs identifiants, adresses, état de confirmation et empreintes de mots de passe ; leurs deux profils, noms, versions et cinq listes sont strictement inchangés. Les **865 fragments statistiques**, le pointeur courant, le modèle et le catalogue sont identiques à la sauvegarde.
+
+La recette réelle utilise deux comptes temporaires réservés, sans envoi d’email. Un compte simulant l’ancien fonctionnement reçoit un profil avec Renekton Top et Ahri Mid, puis utilise un code de récupération généré par l’administration Auth. Il définit son pseudo privé et son premier mot de passe dans l’interface, garde son identifiant et son profil à la même version, puis se connecte réellement par pseudo en majuscules ou par email. La réinitialisation garde son pseudo et ses listes ; l’ancien mot de passe est refusé et le nouveau fonctionne. La session survit au rechargement.
+
+Pour la nouvelle inscription, seule la demande d’envoi vers l’adresse réservée est interceptée ; l’administration Auth génère une inscription réelle avec mot de passe et métadonnées, sans envoyer de message. Le trigger réserve le pseudo et initialise le profil. Le code de confirmation est vérifié réellement ; la connexion suivante par pseudo/mot de passe utilise la fonction hébergée et Auth réels. Un pseudo déjà pris est refusé avant l’inscription. La table privée et son RPC de résolution refusent l’accès du second compte. Cette recette ne prouve pas le transport d’un message par Brevo.
+
+Sur ordinateur et à 375 px, le profil est utilisable et la fenêtre défile. Un nom ponctuel de salle différent conserve le compte et son nom par défaut ; prendre Top charge Renekton depuis le profil, puis quitter la salle ne change ni le nom ni la version personnelle. Les deux seuls comptes de recette créés pour ces vérifications sont supprimés, avec leurs profils. Aucun appel Lolalytics depuis les navigateurs.
+
+Le contrôle des statistiques réelles réussit : Renekton **+0,97**, équipe **+0,40**, aperçu Camille **+0,27**, conservés après rechargement.
+
+![Compte avec identifiant privé et nom de salle séparés](evidence/password-accounts-production.png)
+
+[Preuves structurées](evidence/password-accounts-production-verification.json) · [Vue mobile](evidence/password-accounts-mobile.png).
