@@ -20,7 +20,7 @@ Un observateur ordinaire ne peut pas modifier les candidats, picks ou bans ; le 
 
 ## Email et exploitation
 
-L’utilisateur a configuré Brevo SMTP dans Supabase ; les identifiants ne figurent ni dans le code ni dans les preuves. L’URL Auth pointe vers `https://draftroom-lol.netlify.app`. Les modèles inscription et connexion affichent uniquement un code (`{{ .Token }}`), valable dix minutes ; l’expiration serveur est alignée. Le débit d’envoi configuré est dix emails par heure pour le projet. Le frontend accepte les codes numériques de six à dix caractères (configuration actuelle : huit).
+L’utilisateur a configuré Brevo SMTP dans Supabase ; les identifiants ne figurent ni dans le code ni dans les preuves. L’URL Auth pointe vers `https://draftroom-lol.netlify.app`. Les modèles inscription et connexion affichent uniquement un code (`{{ .Token }}`), valable dix minutes ; l’expiration serveur est alignée. Le débit d’envoi configuré est dix emails par heure pour le projet. Le frontend accepte les codes numériques de six à dix caractères (configuration actuelle : huit). La clé SMTP créée par l’utilisateur est annoncée expirant le 16 novembre 2027 dans sa capture Brevo ; la renouveler avant cette date pour maintenir l’envoi.
 
 `account_features.email_login_ready` permet d’ouvrir l’interface email uniquement après configuration du fournisseur. Cela ne remplace pas la validation effective de la livraison d’un message. L’adresse Gmail vérifiée par Brevo ne constitue pas une authentification d’un domaine propre ; aucune configuration DNS d’un domaine Netlify n’a été tentée.
 
@@ -31,3 +31,20 @@ L’utilisateur a configuré Brevo SMTP dans Supabase ; les identifiants ne figu
 129 tests TypeScript/PostgreSQL, 50 Python, 32 parcours Playwright et build réussis. Les nouveaux tests vérifient isolation des profils et refus des invités, versions concurrentes, listes vides prioritaires, chargement au changement de rôle avec consentement, indépendance salle/profil, dix places et débordement, observation/prise de rôle en direct, transfert à un observateur et conservation des profils après suppression de la salle.
 
 Les parcours navigateur email utilisent un serveur Auth simulé : code invalide puis valide, profil après rechargement, identité enregistrée lors de la création de salle, chargement du pool, modification locale puis sauvegarde personnelle explicite, et accès invité si l’envoi n’est pas ouvert. Ils ne prouvent pas la réception d’un email réel. La validation hébergée et la livraison sont documentées après constat.
+
+
+## Livraison constatée
+
+Version **`e06f330`** observée sur Netlify le **16 novembre 2026**, après la CI de [branche](https://github.com/NicoHelemon/lol_drafter/actions/runs/43907432414) et de [main](https://github.com/NicoHelemon/lol_drafter/actions/runs/43907953221), toutes deux vertes. Une seule publication du lot ; les preuves ajoutées ensuite restent sur la branche de travail.
+
+Seule la migration 018 a été appliquée après sauvegarde privée et contrôle du projet. Les deux salles temporaires, leurs membres, invitations et historiques ont été nettoyés conformément à l’autorisation permanente. Les 865 empreintes de fragments, le pointeur courant, le modèle et le catalogue sont inchangés après migration et après recette.
+
+Deux comptes de test sur des adresses réservées `example.test` ont suivi la vérification OTP réelle de Supabase, créé leurs profils et conservé leurs préférences après rechargement. Les codes ont été générés via l’administration Auth **sans envoi d’email** ; seules les demandes d’envoi de ces adresses de test ont été interceptées dans le navigateur. Cela vérifie Auth, l’interface et les autorisations hébergées, mais **pas la réception d’un vrai email Brevo**, laissée au test utilisateur sur son adresse. Aucun code ni jeton n’est conservé dans les preuves.
+
+Trois navigateurs indépendants ont validé les profils privés entre comptes, le chargement des listes personnelles, la séparation entre édition de salle et sauvegarde explicite du profil, l’échange de rôles accepté avec conservation des champions, la prise/libération d’un rôle en draft, le refus serveur d’une édition d’observateur, l’hôte observateur et le transfert d’hébergement sans changement de draft/historique. Sept identités invitées supplémentaires ont rempli les dix places ; une onzième a été refusée par le serveur. La suppression de la salle de recette a laissé les profils intacts, avant suppression ciblée des seuls comptes de test créés pour la recette. Les comptes réels ne sont pas concernés.
+
+La recette des scores réels réussit aussi : Renekton Top **+0,97**, équipe **+0,40**, remplacement Camille **+0,27**, conservés au rechargement. Aucun appel Lolalytics depuis les navigateurs ; aucun changement du collecteur ou des secrets GitHub.
+
+![Dix participants et hôte observateur sur le service hébergé](evidence/accounts-members-production.png)
+
+[Preuves structurées](evidence/accounts-members-production-verification.json).

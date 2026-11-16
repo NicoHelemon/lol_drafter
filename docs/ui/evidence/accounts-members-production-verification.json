@@ -1,0 +1,116 @@
+{
+  "revision": "e06f3308529f74421053b8e9154ccc910874c2fc",
+  "validation": {
+    "typescriptPostgreSQL": 129,
+    "python": 50,
+    "browser": 32,
+    "build": true
+  },
+  "ci": {
+    "branch": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43907432414",
+    "main": "https://github.com/NicoHelemon/lol_drafter/actions/runs/43907953221"
+  },
+  "authConfiguration": {
+    "siteUrlCorrect": true,
+    "signupAndSigninUseCode": true,
+    "codeExpiresSeconds": 600,
+    "emailLimitPerHour": 10,
+    "smtpCredentialsPreserved": true,
+    "anonymousAccessPreserved": true,
+    "senderConfigured": true
+  },
+  "migration": {
+    "checkedAt": "2026-11-16T16:28:39.934748+00:00",
+    "migration": "018",
+    "statisticalShardsPreserved": 865,
+    "snapshotPointerPreserved": true,
+    "modelsAndCataloguesPreserved": true,
+    "temporaryTables": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0,
+      "draft_timelines": 0
+    },
+    "roomResetExplicitlyAuthorized": true,
+    "accountLoginReady": true,
+    "persistentProfiles": 0
+  },
+  "hostedAccounts": {
+    "checkedAt": "2026-11-16T16:33:13.491Z",
+    "sourceRequests": 0,
+    "adminGeneratedCodesWithoutSending": true,
+    "deployment": {
+      "commit": "e06f3308529f74421053b8e9154ccc910874c2fc",
+      "builtAt": "2026-11-16T16:29:09.333Z"
+    },
+    "privateProfileRls": true,
+    "roomEditsSeparateAndExplicitSave": true,
+    "liveRoleConsentLoadsPersonalPoolsAndKeepsChampion": true,
+    "observerWritesDenied": true,
+    "liveObserverCanClaimAndRelease": true,
+    "hostCanObserveAndTransferToObserver": true,
+    "tenParticipantsAndEleventhRejected": true,
+    "success": true,
+    "cleanup": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0,
+      "draft_timelines": 0
+    },
+    "profileSurvivesRoomDeletion": true,
+    "accountCleanup": {
+      "ownedTestUsersRemoved": 2
+    },
+    "interceptedEmailSendRequests": 2,
+    "realEmailDeliveryVerified": false
+  },
+  "hostedScoring": {
+    "checkedAt": "2026-11-16T16:29:36.691Z",
+    "site": "https://draftroom-lol.netlify.app",
+    "sourceRequests": 0,
+    "shardRequests": 6,
+    "expectedScore": "+0.97",
+    "k": 2510.0480193943954,
+    "expectedTeam": "+0.40",
+    "expectedCamilleTeam": "+0.27",
+    "deployment": {
+      "commit": "e06f3308529f74421053b8e9154ccc910874c2fc",
+      "builtAt": "2026-11-16T16:29:09.333Z"
+    },
+    "roomSlug": "deployment-checks-room",
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+    "fictional": false,
+    "inlinePairs": 0,
+    "displayedScore": "+0.97",
+    "details": "Renekton · Top\nIndividual score\n+0.97\nALLY TEAM\nENEMY TEAM\n·\n—\n+1.63\n+0.30\n—\n—\n—\n—\n—\n—\n—\n—\n—\n—\n—\n—\n—\n—\n2/2 pairs\nAdjusted values · equal average\nAdd Renekton · Top\nCurrent team\n-0.19\n→\nWith Renekton\n+0.40\nTeam score change\n+0.59 ↑\nProvisional · 2/2 picks scored · 4/4 pairs",
+    "displayedTeam": "ALLY TEAM · RED\n+0.40\nProvisional · 2/5 picks · 2 scored · 4/4 pairs",
+    "candidatePreview": "Renekton → Camille\nCurrent team\n+0.40\n→\nWith Camille\n+0.27\nTeam score change\n-0.13 ↓\nProvisional · 2/2 picks scored · 4/4 pairs",
+    "explanation": "Data: Lolalytics · last 14 days · Emerald+. Matchups with fewer games are pulled closer to zero. Learned k = 2,510 (half the observed advantage at this many games). Calibration: 14/11/2026; reviewed every 30 days. Scores average these adjusted values equally; team scores average selected champions. They are not win probabilities.",
+    "reloadPreservedScore": true,
+    "reloadPreservedTeamScore": true,
+    "success": true,
+    "testRoomRemoved": true
+  },
+  "databaseAfterHostedChecks": {
+    "checkedAt": "2026-11-16T16:34:49.455594+00:00",
+    "migration": "018",
+    "statisticalShardsPreserved": 865,
+    "snapshotPointerPreserved": true,
+    "modelsAndCataloguesPreserved": true,
+    "temporaryTables": {
+      "rooms": 0,
+      "room_members": 0,
+      "room_invites": 0,
+      "role_swap_requests": 0,
+      "pick_swap_requests": 0,
+      "draft_timelines": 0
+    },
+    "roomResetExplicitlyAuthorized": true,
+    "accountLoginReady": true,
+    "persistentProfiles": 0
+  }
+}
