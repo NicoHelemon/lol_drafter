@@ -5,14 +5,12 @@ import {exchangeLiveRoles,makeRoleSwap,matchesRoleSwap} from '../domain/roleSwap
 import { makePickSwap, moveDraftPick, pickOwners, approvePickSwap, matchesPickSwap } from "../domain/pickSwaps";
 import { addDraftCandidate } from "../domain/draft";
 import {reconcileRolePools,setRolePool,validatePool} from '../domain/rolePools';
-import { createClient } from "@supabase/supabase-js";
+import {supabase} from './client';
+export {supabase} from './client';
 import type { Room, State, RoleSwapRequest, PickSwapRequest, Role, Team, DraftMode } from "../domain/types";
 import { initialState, DemoProvider } from "../data/provider";
 import { validateState } from "../domain/state";
 import { StatisticsCache, persistedState, snapshotMetadata } from "../data/shared";
-const url = import.meta.env.VITE_SUPABASE_URL,
-  key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-export const supabase = url && key ? createClient(url, key) : null;
 const statistics = new StatisticsCache(async (snapshot, keys) => {
   if (!supabase) throw Error('Shared statistics require Supabase');
   const { data, error } = await supabase.from('statistics_shards')
@@ -32,6 +30,7 @@ const statistics = new StatisticsCache(async (snapshot, keys) => {
 const hydrated = (room: Room) => statistics.hydrate(room);
 export const clearStatisticsCache = () => statistics.clear();
 let identityPromise: Promise<string> | null = null;
+supabase?.auth.onAuthStateChange(()=>{identityPromise=null;});
 export function identity() {
   return (identityPromise ??= resolveIdentity().catch((e) => {
     identityPromise = null;
@@ -87,7 +86,7 @@ export async function createRoom(
 export async function joinRoom(
   slug: string,
   token: string,
-  name: string, asObserver=false,
+  name: string,
 ): Promise<Room> {
   await identity();
   if (!supabase) throw Error("Shared rooms are unavailable in local demo mode");
@@ -95,7 +94,6 @@ export async function joinRoom(
     room_slug: slug,
     invite_token: token,
     nickname: name,
-    as_observer: asObserver,
   });
   if (error?.message === "Room not found") throw new RoomExpiredError();
   if (error) throw error;
@@ -387,4 +385,14 @@ export async function respondPickSwap(room:Room, requestId:string, accept:boolea
   const {data,error}=await supabase.rpc('respond_pick_swap',{room_id:room.id,request_id:requestId,accept});
   if(error) throw error;
   return hydrated(data);
+}
+
+export async function claimRole(room:Room,role:Role|null):Promise<Room>{
+ if(!supabase){const next=structuredClone(room.state),me=next.players.find(p=>p.id==='local-player')!;if(role&&next.players.some(p=>p.role===role&&p.id!==me.id))throw Error('Role already taken');me.role=role;return saveRoom(room,next);}
+ const {data,error}=await supabase.rpc('claim_role',{room_id:room.id,new_role:role,expected_version:room.version});if(error)throw error;return hydrated(data);
+}
+export async function transferHost(room:Room,target:string):Promise<Room>{
+ if(room.host_id!==await identity())throw Error('Only the host can transfer hosting');
+ if(!supabase){const current=await readRoom(room.id);if(current.version!==room.version)throw Error('Conflict: room updated');if(!current.state.players.some(p=>p.id===target))throw Error('Choose a room member');const next={...current,host_id:target,version:current.version+1};localStorage.setItem('draftroom-demo',JSON.stringify(next));return next;}
+ const {data,error}=await supabase.rpc('transfer_host',{room_id:room.id,target_id:target,expected_version:room.version});if(error)throw error;return hydrated(data);
 }

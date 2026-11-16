@@ -1,3 +1,5 @@
+import AccountPanel from './components/AccountPanel';
+import {readAccount,signOutAccount,saveRoomPool,type Account} from './lib/accounts';
 import {startDraft,chooseBan} from './domain/progression';
 import type {DraftMode} from './domain/types';
 import Participants from "./components/Participants";
@@ -25,6 +27,7 @@ import {
   createRoom,
   clearDraft,
   controlDraft,
+  claimRole,transferHost,
   joinRoom,
   readRoom,
   saveRoom,
@@ -49,7 +52,7 @@ export type Picker =
   | {kind:'ban';team:Team;slot:number}
   | {kind:'bans';team:Team};
 export default function App() {
-  const [joinAsObserver,setJoinAsObserver]=useState(false);
+  const [account,setAccount]=useState<Account|null>(null),[accountOpen,setAccountOpen]=useState(false);
   const [draftMode,setDraftMode]=useState<DraftMode>('ranked');
   const [room, setRoom] = useState<Room | null>(null),
     [uid, setUid] = useState(""),
@@ -68,6 +71,7 @@ export default function App() {
   useEffect(() => {
     void run(async () => {
       setUid(await identity());
+      const signed=await readAccount();setAccount(signed);if(signed?.profile?.display_name)setNickname(signed.profile.display_name);
       const saved = localStorage.getItem("draftroom-current");
       const id = inviteRoom ?? saved;
       if (id) {
@@ -215,6 +219,10 @@ export default function App() {
       }
     });
   }
+  async function refreshAccount(next:Account){setAccount(next);setUid(next.id);if(next.profile?.display_name)setNickname(next.profile.display_name);}
+  async function takeRole(role:Role|null){if(!room||busy)return;await run(async()=>{try{setRoom(await claimRole(room,role));}catch(e){setRoom(await readRoom(room.id));throw e;}});}
+  async function handOver(target:string){if(!room||busy)return;const name=room.state.players.find(p=>p.id===target)?.name;if(!name||!confirm(`Make ${name} the host? You will lose host controls.`))return;await run(async()=>{try{setRoom(await transferHost(room,target));}catch(e){setRoom(await readRoom(room.id));throw e;}});}
+  async function savePersonal(role:Role){if(!room||!account||busy)return;const me=room.state.players.find(p=>p.id===uid&&p.role===role);if(!me||!confirm(`Save these ${roleName(role)} candidates as your personal ${roleName(role)} pool?`))return;await run(async()=>{const profile=await saveRoomPool(role,me.pool,me.name);setAccount({...account,profile});setSync('Personal pool saved');});}
   async function historyAction(action:'undo'|'redo'|'open'|'guided'|'lobby'){
     if(action==='guided'&&!confirm('Restart guided draft from the beginning? Picks, bans and undo history will be cleared. Roles and candidates will stay.'))return;
     if(action==='lobby'&&!confirm('Return everyone to the lobby? Picks, bans and undo history will be cleared. Roles and allied candidates will stay.'))return;
@@ -232,7 +240,7 @@ export default function App() {
   },[room,uid,busy,picker]);
   const state = room?.state,
     host = room?.host_id === uid,
-    readOnly=!!room?.state.players.find(p=>p.id===uid)?.observer&&!host,
+    readOnly=!!room&&!room.state.players.find(p=>p.id===uid)?.role&&!host,
     used = state ? unavailable(state) : new Set<string>();
   function expireRoom() {
     clearRoom();
@@ -304,6 +312,7 @@ export default function App() {
       {!room ? (
         <main className="welcome">
           <h1>Draftroom</h1>
+          <div className="account-home">{account?<><span>Signed in as <b>{account.profile?.display_name||account.email}</b></span><button title="Edit your display name and personal champion lists for all five roles" disabled={busy} onClick={()=>setAccountOpen(true)}>My champion pools</button><button title="Sign out before joining a room" disabled={busy} onClick={()=>void run(async()=>{await signOutAccount();setAccount(null);setUid(await identity());setNickname('');})}>Sign out</button></>:<button title="Optional email account to keep your name and champion pools across visits" disabled={busy} onClick={()=>setAccountOpen(true)}>Sign in / Create account</button>}</div>
           <section className="card entry">
             <h2>{inviteRoom ? "Join room" : "Create room"}</h2>
             <label>
@@ -315,7 +324,7 @@ export default function App() {
                 placeholder="Your name"
               />
             </label>
-            {inviteRoom&&<div className="draft-mode-choice" role="group" aria-label="Join as"><button type="button" aria-pressed={!joinAsObserver} onClick={()=>setJoinAsObserver(false)}>Player</button><button type="button" aria-pressed={joinAsObserver} onClick={()=>setJoinAsObserver(true)}>Observer</button></div>}
+
             {!inviteRoom&&<div className="draft-mode-choice" role="group" aria-label="Draft mode">{(['ranked','tournament'] as DraftMode[]).map(mode=><button type="button" key={mode} aria-pressed={draftMode===mode} onClick={()=>setDraftMode(mode)}>{mode==='ranked'?'Ranked draft':'Tournament draft'}</button>)}</div>}
             <button
               className="primary"
@@ -324,7 +333,7 @@ export default function App() {
                 void run(async () => {
                   if (inviteRoom) {
                     setRoom(
-                      await joinRoom(inviteRoom, invite, nickname.trim(),joinAsObserver),
+                      await joinRoom(inviteRoom, invite, nickname.trim()),
                     );
                   } else {
                     const result = await createRoom(nickname.trim(),draftMode);
@@ -361,7 +370,7 @@ export default function App() {
             </div>
             <div className="actions">
               {link && (
-                <button
+                <button title="Copy a private link so others can join this room"
                   onClick={() =>
                     void run(async () => {
                       await navigator.clipboard.writeText(link);
@@ -374,7 +383,7 @@ export default function App() {
               )}
               {host && state!.phase === "setup" && (
                 <button
-                  className="primary"
+                  className="primary" title="Start the draft for everyone, following the selected pick and ban order"
                   disabled={busy}
                   onClick={() =>
                     void change((s) => {
@@ -386,22 +395,23 @@ export default function App() {
                 </button>
               )}
               {host&&state!.phase==='live'&&!state!.openDraft&&<button disabled={busy} title="Pick and ban in any order." onClick={()=>void historyAction('open')}>Open draft</button>}
-              {host&&state!.phase==='live'&&state!.openDraft&&<button disabled={busy} onClick={()=>void historyAction('guided')}>Guided draft</button>}
-              {host&&state!.phase==='live'&&<button disabled={busy} onClick={()=>void run(async()=>{
+              {host&&state!.phase==='live'&&state!.openDraft&&<button title="Restart the guided draft from zero after confirmation; keep roles and candidate lists" disabled={busy} onClick={()=>void historyAction('guided')}>Guided draft</button>}
+              {host&&state!.phase==='live'&&<button title="Clear all picks and bans, keeping roles, candidate lists and the current mode" disabled={busy} onClick={()=>void run(async()=>{
                 try{setRoom(await clearDraft(room));setPicker(null);setSwaps([]);setPickSwaps([]);}catch(e){setRoom(await readRoom(room.id));throw e;}
               })}>Clear</button>}
-              {host&&state!.phase==='live'&&<button disabled={busy} onClick={()=>void historyAction('lobby')}>Return to lobby</button>}
-              <button disabled={busy} onClick={() => void exitRoom()}>
+              {host&&state!.phase==='live'&&<button title="Return everyone to preparation after confirmation and clear the current draft" disabled={busy} onClick={()=>void historyAction('lobby')}>Return to lobby</button>}
+              {state!.players.find(p=>p.id===uid)?.role&&<button title="Leave your role and observe; your selected champion stays in its slot" disabled={busy} onClick={()=>void takeRole(null)}>Observe</button>}
+              <button title="Leave this room personally; the others can continue" disabled={busy} onClick={() => void exitRoom()}>
                 Quit room
               </button>
             </div>
           </div>
           <Participants
             players={state!.players}
-            hostId={room.host_id}
+            hostId={room.host_id} uid={uid} busy={busy} onTransfer={id=>void handOver(id)}
             online={online}
           />
-          {readOnly&&<p className="observer-notice" role="status">Observing · you can follow the room without changing the draft.</p>}
+          {readOnly&&<p className="observer-notice" role="status">You are observing. Take an available role to participate.</p>}
           {state!.phase === "setup" ? (
             <SetupPage
               state={state!}
@@ -412,7 +422,7 @@ export default function App() {
               online={online}
               swaps={swaps}
               requestSwap={(id) => void swapAction(id)}
-              change={change}
+              change={change} claimRole={role=>void takeRole(role)} onSavePool={account?role=>void savePersonal(role):undefined}
               editPool={(team,role) => setPicker({kind:"candidates",team,role})}
               updatePool={(team,role,pool)=>void updateCandidates(team,role,pool)}
             />
@@ -425,6 +435,7 @@ export default function App() {
               change={change}
               setPicker={setPicker}
               undoCount={room.undo_count??0} redoCount={room.redo_count??0} onHistory={action=>void historyAction(action)}
+              claimRole={role=>void takeRole(role)} onSavePool={account?role=>void savePersonal(role):undefined}
               onMove={championMove}
               onRoleMove={roleMove}
               pendingRoles={new Set([...pickSwaps,...swaps.filter(q=>q.phase==='live')].flatMap(r=>[r.from_role,r.to_role]))}
@@ -457,6 +468,7 @@ export default function App() {
       {state?.phase === 'live' && pickSwaps.filter(r=>[r.requester_id,r.from_player_id,r.to_player_id].includes(uid)).slice(0,1).map(request=>(
         <PickSwapPrompt key={request.id} request={request} state={state} uid={uid} busy={busy} onRespond={accept=>void championSwapReply(request.id,accept)}/>
       ))}
+      {!room&&accountOpen&&<AccountPanel account={account} onChange={next=>void refreshAccount(next)} onClose={()=>setAccountOpen(false)}/> }
       {error && (
         <div className="error" role="alert">
           {error}

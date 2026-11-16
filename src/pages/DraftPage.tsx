@@ -20,10 +20,10 @@ interface Props {
   setPicker: (p: Picker) => void;
   onMove: (team: Team, from: Role, to: Role) => Promise<void>;
   onRoleMove:(to:Role)=>Promise<void>;
-  pendingRoles?: Set<Role>;undoCount:number;redoCount:number;onHistory:(action:'undo'|'redo')=>void;
+  onSavePool?:(role:Role)=>void;claimRole:(role:Role)=>void;pendingRoles?: Set<Role>;undoCount:number;redoCount:number;onHistory:(action:'undo'|'redo')=>void;
 }
 type DragPick = { team: Team; role: Role; championId: string };
-export default function DraftPage({ state, uid, host, busy,readOnly=false, change, setPicker, onMove,onRoleMove,undoCount,redoCount,onHistory, pendingRoles = new Set() }: Props) {
+export default function DraftPage({ state, uid, host, busy,readOnly=false,claimRole,onSavePool, change, setPicker, onMove,onRoleMove,undoCount,redoCount,onHistory, pendingRoles = new Set() }: Props) {
   const associatedPlayers = new Map(state.players.map(player => [player.role, player]));
   const pairIndex=useMemo(()=>new Map(state.dataset.pairs.map(p=>[pairKey(p),p])),[state.dataset.pairs]);
   const [activeTooltip,setActiveTooltip] = useState<string|null>(null);
@@ -86,9 +86,10 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false, chang
       <div className="board-head"><span>ROLE</span><TeamSummary team="ally" state={state}/><TeamSummary team="enemy" state={state}/></div>
       {ROLES.map(role => <div className="board-row" key={role}>
           <button className={`role-label draft-role-handle${roleTarget(role)?' role-drop-target':''}${roleOver===role?' role-drop-over':''}`} aria-label={myRole===role?`Move your ${roleName(role)} role`:`Move to ${roleName(role)} role`}
-            title={myRole===role?'Drag to change role with your champion':'Drop your role here'}
-            disabled={busy||pendingRoles.has(role)||(myRole!==role&&!roleTarget(role))}
+            title={!myRole&&!associatedPlayers.has(role)?'Take this role and load your candidates':myRole===role?'Drag to change role with your champion':'Drop your role here'}
+            disabled={busy||pendingRoles.has(role)||!!myRole&&myRole!==role&&!roleTarget(role)||!myRole&&associatedPlayers.has(role)}
             draggable={myRole===role&&!busy&&!pendingRoles.has(role)} aria-pressed={roleDrag===role}
+            onClick={()=>{if(!myRole&&!associatedPlayers.has(role))claimRole(role);}}
             onDragStart={e=>{if(myRole!==role){e.preventDefault();return;}e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('application/x-draftroom-role',role);setRoleDrag(role);setRoleOver(null);setDragged(null);setOver(null);setActiveTooltip(null);}}
             onDragEnd={()=>{setRoleDrag(null);setRoleOver(null);}}
             onDragOver={e=>{if(roleTarget(role)){e.preventDefault();e.dataTransfer.dropEffect='move';setRoleOver(role);}}}
@@ -111,6 +112,7 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false, chang
             onDrop={e => { e.preventDefault(); if(roleAvailable&&e.dataTransfer.types.includes('application/x-draftroom-role'))finishRole(role);else if (e.dataTransfer.types.includes('application/x-draftroom-pick')) finish(team,role); }}
 >
             <div className="draft-cell-heading"><span>{pick ? names[pick.championId] : ''}</span>
+              {player?.id===uid&&onSavePool&&<button className="save-personal" disabled={busy} title={`Save these candidates to your personal ${roleName(role)} pool`} onClick={()=>onSavePool(role)}>Save pool</button>}
               {pending && <span className="pick-pending-label">Swap pending</span>}
               {pick&&state.openDraft && <div className="pick-actions">
                 <button aria-label={`Remove ${names[pick.championId]} ${team}`} disabled={busy || pending||!editable} onClick={() => void change(s => {

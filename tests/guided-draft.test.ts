@@ -12,7 +12,7 @@ async function as<T>(uid:string,sql:string,args:unknown[]=[]){await db.exec('sav
 const save=async(r:Room,s:State,uid=ids[0])=>(await as<{r:Room}>(uid,'select public.save_room($1,$2,$3::jsonb) r',[r.id,r.version,JSON.stringify(s)])).r;
 async function room(mode:DraftMode,side:'blue'|'red'='blue'){const s=initialState(ids[0],'Host',mode);s.dataset.pairs=[];s.side=side;return (await as<{r:Room}>(ids[0],'select public.create_room($1::jsonb,$2) r',[JSON.stringify(s),'a'.repeat(72)])).r;}
 async function fails(fn:()=>Promise<unknown>,message:string){await db.exec('savepoint expected');await expect(Promise.resolve().then(fn)).rejects.toThrow(message);await db.exec('rollback to expected');}
-beforeAll(async()=>{db=new PGlite();await db.exec("create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;");for(const id of ids)await db.query('insert into auth.users values($1)',[id]);for(const f of readdirSync('supabase/migrations').sort())await db.exec(readFileSync('supabase/migrations/'+f,'utf8'));},30000);
+beforeAll(async()=>{db=new PGlite();await db.exec("create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;");for(const id of ids)await db.query('insert into auth.users values($1)',[id]);for(const f of readdirSync('supabase/migrations').filter(f=>f<'202611160018').sort())await db.exec(readFileSync('supabase/migrations/'+f,'utf8'));},30000);
 afterAll(()=>db.close());beforeEach(()=>db.exec('begin'));afterEach(()=>db.exec('rollback'));
 for(const mode of ['ranked','tournament'] as DraftMode[])for(const side of ['blue','red'] as const)it(`completes ${mode} on allied ${side}, with automatic choices, locks, role moves and backtracking`,async()=>{
  let r=await room(mode,side);r=await save(r,startDraft(r.state));let serial=100;
@@ -167,7 +167,7 @@ const join=async(r:Room,uid:string,observer=false)=>(await as<{r:Room}>(uid,'sel
 it('admits five players plus three observers, preserves undo when observers join, and rejects overflow',async()=>{
  let r=await room('tournament');for(const uid of ids.slice(1,5))r=await join(r,uid);
  await fails(()=>join(r,ids[5]),'Room is full');r=await save(r,startDraft(r.state));r=await save(r,chooseBan(r.state,'ally',0,'58'));const undo=r.undo_count;
- for(const uid of ids.slice(5,8))r=await join(r,uid,true);expect(r.state.players).toHaveLength(8);expect(r.state.players.filter(p=>p.observer)).toHaveLength(3);expect(r.undo_count).toBe(undo);
+ for(const uid of ids.slice(5,8))r=await join(r,uid,true);expect(r.state.players).toHaveLength(8);expect(r.state.players.filter(p=>(p as {observer?:boolean}).observer)).toHaveLength(3);expect(r.undo_count).toBe(undo);
  await fails(()=>join(r,ids[8],true),'Room is full');await fails(()=>join(r,ids[8]),'Draft already started');
  r=await control(r,'undo');expect(r.state.draftStep).toBe(0);expect(r.state.players).toHaveLength(8);
 });
@@ -180,6 +180,6 @@ it('observers can read, heartbeat and quit, but every editing RPC and the privat
  r=await save(r,startDraft(r.state));await fails(()=>control(r,'lobby',spectator),'Only the host');await as(spectator,'select public.leave_room($1)',[r.id]);const remaining=(await db.query<{state:State}>('select state from public.rooms where id=$1',[r.id])).rows[0].state;expect(remaining.players).toHaveLength(1);expect(remaining.players[0].id).toBe(ids[0]);
 });
 it('participant types cannot be forged and host departure prefers a player over an observer',async()=>{
- let r=await room('tournament');r=await join(r,ids[1],true);r=await join(r,ids[2]);let s=structuredClone(r.state);s.players[1].observer=false;await fails(()=>save(r,s),'Participant type is fixed');
+ let r=await room('tournament');r=await join(r,ids[1],true);r=await join(r,ids[2]);let s=structuredClone(r.state);(s.players[1] as {observer?:boolean}).observer=false;await fails(()=>save(r,s),'Participant type is fixed');
  s=structuredClone(r.state);s.players[1].role='Top';await fails(()=>save(r,s),'Observers cannot occupy');await as(ids[0],'select public.leave_room($1)',[r.id]);const next=(await db.query<Room>('select * from public.rooms where id=$1',[r.id])).rows[0];expect(next.host_id).toBe(ids[2]);expect(next.state.players).toHaveLength(2);
 });

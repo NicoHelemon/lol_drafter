@@ -3,7 +3,7 @@ import {resetDraft} from './progression';
 export type DraftControl='undo'|'redo'|'open'|'clear'|'guided'|'lobby';
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 export const draftPosition=(s:State):DraftPosition=>structuredClone({picks:s.picks,bans:s.bans,draftStep:s.draftStep??0,draftHistory:s.draftHistory??[]});
-const owners=(s:State)=>s.players.filter(p=>!p.observer).map(p=>[p.id,p.role]).sort(([a],[b])=>a!.localeCompare(b!));
+const owners=(s:State)=>s.players.filter(p=>!!p.role).map(p=>[p.id,p.role]).sort(([a],[b])=>a!.localeCompare(b!));
 export function changesAssignments(a:State,b:State){return !same(owners(a),owners(b))||(['ally','enemy'] as const).some(team=>a.picks[team].some(p=>b.picks[team].some(q=>p.championId===q.championId&&p.role!==q.role)));}
 export function trackDraft(room:Room,next:State):Room{
  let undo=room.draft_undo??[],redo=room.draft_redo??[];

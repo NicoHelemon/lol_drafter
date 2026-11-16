@@ -15,7 +15,7 @@ interface Props {
   change: (fn: (s: State) => State) => Promise<void>;
   editPool: (team:Team,role:Role) => void;
   updatePool:(team:Team,role:Role,pool:string[])=>void;
-  requestSwap: (target: string) => void;
+  requestSwap: (target: string) => void;claimRole:(role:Role)=>void;onSavePool?:(role:Role)=>void;
 }
 export default function SetupPage({
   state,
@@ -24,10 +24,9 @@ export default function SetupPage({
   hostId,
   busy,readOnly=false,
   online,
-  swaps,
-  change,
+  swaps,change,
   editPool,updatePool,
-  requestSwap,
+  requestSwap,claimRole,onSavePool,
 }: Props) {
   const me = state.players.find((p) => p.id === uid);
   return (
@@ -88,6 +87,7 @@ export default function SetupPage({
                       </button>
                     )}
                   </div>
+                  {p?.id===uid&&onSavePool&&<button disabled={busy} title={`Save these candidates to your personal ${roleName(role)} pool`} onClick={()=>onSavePool(role)}>Save my {roleName(role)} pool</button>}
                   {canSwap && p && (
                     <button
                       className="swap-overlay"
@@ -107,16 +107,10 @@ export default function SetupPage({
                       <span>Swap role</span>
                     </button>
                   )}
-              {team==='ally'&&!p&&!me?.observer&&(
+              {team==='ally'&&!p&&(
                 <button
                   disabled={busy}
-                  onClick={() =>
-                    void change((s) => {
-                      const player = s.players.find((p) => p.id === uid)!;
-                      player.role = role;
-                      return s;
-                    })
-                  }
+                  onClick={()=>claimRole(role)}
                 >
                   Join
                 </button>
