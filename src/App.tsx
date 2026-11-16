@@ -323,7 +323,7 @@ export default function App() {
       {!room ? (
         <main className="welcome">
           <h1>Draftroom</h1>
-          <div className="account-home">{account?<><span>Signed in as <b>{account.profile?.display_name||account.email}</b></span><button title="Manage your private login, password, room display name and champion pools" disabled={busy} onClick={()=>setAccountOpen(true)}>My account</button><button title="Sign out before joining a room" disabled={busy} onClick={()=>void run(async()=>{await signOutAccount();setAccount(null);setUid(await identity());setNickname('');})}>Sign out</button></>:<button title="Optional account to keep your name and champion pools across visits" disabled={busy} onClick={()=>setAccountOpen(true)}>Sign in / Create account</button>}</div>
+          <div className="account-home">{account?<><span>Signed in as <b>{account.profile?.display_name||account.email}</b></span><button title="Manage your private login, password, room display name and champion pools" disabled={busy} onClick={()=>setAccountOpen(true)}>My account</button>{(!account.loginName||!account.hasPassword)&&<span className="account-setup-hint">Open My account to set your login name and password. Your champion lists stay.</span>}<button title="Sign out before joining a room" disabled={busy} onClick={()=>void run(async()=>{await signOutAccount();setAccount(null);setUid(await identity());setNickname('');})}>Sign out</button></>:<button title="Optional account to keep your name and champion pools across visits" disabled={busy} onClick={()=>setAccountOpen(true)}>Sign in / Create account</button>}</div>
           <section className="card entry">
             <h2>{inviteRoom ? "Join room" : "Create room"}</h2>
             <label>

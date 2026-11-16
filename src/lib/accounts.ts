@@ -11,7 +11,7 @@ export async function readAccount():Promise<Account|null>{
 }
 export async function readProfile():Promise<AccountProfile|null>{if(!supabase)return null;const {data,error}=await supabase.from('user_profiles').select('*').maybeSingle();if(error)throw error;return data;}
 export async function emailLoginReady(){if(!supabase)return false;const {data,error}=await supabase.from('account_features').select('email_login_ready').single();if(error)throw error;return data.email_login_ready===true;}
-async function outsideRoom(){if(!supabase)throw Error('Email sign-in is available on the hosted site');const {data,error}=await supabase.rpc('account_login_allowed');if(error)throw error;if(data!==true)throw Error('Quit your current room before signing in or out');}
+async function outsideRoom(){if(!supabase)throw Error('Accounts are available on the hosted site');const {data,error}=await supabase.rpc('account_login_allowed');if(error)throw error;if(data!==true)throw Error('Quit your current room before signing in or out');}
 export function validateLoginName(name:string){if(!/^[a-z0-9_]{3,24}$/i.test(name.trim()))throw Error('Use 3–24 letters, numbers or underscores for your login name');return name.trim().toLowerCase();}
 export function validatePassword(password:string){if(password.length<10||password.length>128)throw Error('Use a password between 10 and 128 characters');}
 export async function loginNameAvailable(name:string){const normal=validateLoginName(name);if(!supabase)throw Error('Accounts require the hosted site');const {data,error}=await supabase.rpc('login_name_available',{proposed_name:normal});if(error)throw error;return data===true;}
