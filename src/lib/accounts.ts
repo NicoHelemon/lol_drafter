@@ -13,7 +13,7 @@ export async function emailLoginReady(){if(!supabase)return false;const {data,er
 async function outsideRoom(){if(!supabase)throw Error('Email sign-in is available on the hosted site');const {data,error}=await supabase.rpc('account_login_allowed');if(error)throw error;if(data!==true)throw Error('Quit your current room before signing in or out');}
 export async function sendCode(email:string){await outsideRoom();if(!await emailLoginReady())throw Error('Email sign-in is being configured. You can continue as a guest.');const {error}=await supabase!.auth.signInWithOtp({email:email.trim(),options:{shouldCreateUser:true}});if(error)throw error;}
 export async function verifyCode(email:string,token:string){await outsideRoom();const {error}=await supabase!.auth.verifyOtp({email:email.trim(),token:token.trim(),type:'email'});if(error)throw error;return readAccount();}
-export async function signOutAccount(){await outsideRoom();const {error}=await supabase!.auth.signOut({scope:'local'});if(error)throw error;}
+export async function signOutAccount(){if(!supabase)throw Error('Email accounts require the hosted site');const {error}=await supabase.auth.signOut({scope:'local'});if(error)throw error;}
 export async function saveProfile(name:string,pools:Record<Role,string[]>,version:number){
  if(!supabase)throw Error('Profiles require an email account on the hosted site');for(const role of ROLES)validatePool(pools[role]);
  const {data,error}=await supabase.rpc('save_my_profile',{new_name:name.trim(),new_pools:pools,expected_version:version});if(error)throw error;return data as AccountProfile;

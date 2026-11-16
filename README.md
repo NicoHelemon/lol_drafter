@@ -4,7 +4,7 @@ Application de draft League of Legends pour une équipe de cinq joueurs. React +
 
 ## Base de données
 
-Le schéma courant comprend les migrations `202611110001` à `202611150017` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
+Le schéma courant comprend les migrations `202611110001` à `202611160018` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
 
 La migration **005** interdit les picks sans rôle. La migration **006** ajoute une opération transactionnelle pour enrichir les candidats pendant la draft sans modifier le pick. Ces deux migrations ne suppriment aucune donnée. Sur une installation existante, appliquer uniquement les nouvelles migrations. **Ne pas rejouer 004** : elle réinitialise les salles temporaires.
 
@@ -22,21 +22,23 @@ La migration **016** ajoute l'historique partagé Undo/Redo (Ctrl Z / Ctrl Y, r�
 
 La migration **017** permet le retour confirmé d'Open draft vers la draft guidée (repart de zéro), le retour partagé au lobby et cinq places de joueurs plus trois d'observateurs. Quit room quitte personnellement la salle. Les observateurs peuvent rejoindre en cours de draft et suivent sans éditer, avec contrôle serveur. Cette évolution remplace l'irréversibilité de la livraison 016. Voir [les retours et observateurs](docs/ui/LOBBY_OBSERVERS.md).
 
-**Politique permanente de livraison : aucune rétrocompatibilité des salles n’est requise. Les salles et leurs participants/invitations/demandes temporaires peuvent être supprimés à chaque mise à jour, avec vérification préalable. Cette autorisation ne concerne pas les statistiques, snapshots, modèles ou catalogues.** Ne pas rejouer une ancienne migration pour ce nettoyage.
+La migration **018** ajoute les comptes optionnels par code email, les profils privés et cinq pools personnels, ainsi que dix participants sans catégorie fixe. Un rôle libre peut être pris ou libéré ; seuls les cinq rôles peuvent être incarnés. L’hôte peut observer et transmettre sa fonction. Les profils sont persistants, protégés par RLS, et ne sont jamais nettoyés avec les salles. Voir [les comptes et participants](docs/ui/ACCOUNTS_MEMBERS.md).
+
+**Politique permanente de livraison : aucune rétrocompatibilité des salles n’est requise. Les salles et leurs participants/invitations/demandes temporaires peuvent être supprimés à chaque mise à jour, avec vérification préalable. Cette autorisation ne concerne pas les statistiques, snapshots, modèles, catalogues, comptes ou profils personnels.** Ne pas rejouer une ancienne migration pour ce nettoyage.
 
 ## Fonctionnement
 
-- La création choisit Ranked draft ou Tournament draft. Le lobby choisit le camp allié sur une carte bleu/rouge ; ranked masque les listes ennemies. Le déroulement est manuel, sans timer : chaque étape de bans/picks est confirmée par l’hôte, avec retour possible. Les listes courtes sont complétées par popularité jusqu’à cinq choix disponibles.
+- La création choisit Ranked draft ou Tournament draft. Le lobby choisit le camp allié sur une carte bleu/rouge ; ranked masque les listes ennemies. Le déroulement est manuel, sans timer : chaque choix termine automatiquement son étape, avec Undo/Redo pour l’hôte. Les listes courtes sont complétées par popularité jusqu’à cinq choix disponibles.
 - L’interface est en anglais. Une salle porte le nom de son créateur, par exemple **Nico’s room**, avec une URL `/rooms/nicos-room/setup`. Les doublons de noms reçoivent un suffixe numérique ; le UUID reste une clé interne.
-- Le panneau des participants indique le nombre de joueurs (`2/5`) et leurs noms, sans leurs rôles. Un badge **HOST** identifie l’hôte, y compris avant qu’il ait choisi un rôle. L’hôte peut démarrer immédiatement, sans Ready ni obligation de remplir les rôles ou pools.
+- Le panneau des participants indique le nombre de participants (`2/10`) et leurs noms, sans leurs rôles. Un badge **HOST** identifie l’hôte, y compris avant qu’il ait choisi un rôle. L’hôte peut démarrer immédiatement, sans Ready ni obligation de remplir les rôles ou pools.
 - **Join** réserve un rôle libre. Les pools commencent vides. Ajouter un portrait avec [+] ou le retirer avec × enregistre directement la modification.
 - Survoler le panneau d’un autre joueur fait apparaître les flèches d’échange ; le bouton reste accessible au clavier et visible sur écran tactile.
 - Les deux joueurs voient un popup pendant la demande, avec une barre de temps qui se vide. Le destinataire dispose de Accept / Decline, le demandeur de Cancel. La demande expire après **cinq secondes**. Sans réponse, elle est refusée ; le serveur rejette aussi les acceptations tardives.
-- Les pools restent liés à leur joueur lors d’un échange. L’hôte peut démarrer pendant une demande : le passage en draft la supprime.
-- Pendant la draft, glisser son panneau de rôle complet (icône, rôle et pseudo) vers un autre panneau ou une case alliée déplace le joueur, son pool et son champion sélectionné. Si le poste est occupé, l’autre joueur doit accepter sous cinq secondes. Clic/toucher puis cible et clavier sont aussi disponibles. Glisser un portrait continue de déplacer uniquement les champions.
+- Les invités conservent leur pool lors d’un échange. Les comptes chargent leur liste personnelle du nouveau rôle. L’hôte peut démarrer pendant une demande : le passage en draft la supprime.
+- Pendant la draft, glisser son panneau de rôle complet (icône, rôle et pseudo) vers un autre panneau ou une case alliée déplace le joueur et son champion sélectionné ; un compte charge son pool personnel du rôle cible. Si le poste est occupé, l’autre joueur doit accepter sous cinq secondes. Clic/toucher puis cible et clavier sont aussi disponibles. Glisser un portrait continue de déplacer uniquement les champions.
 - Les sélecteurs de champions du lobby et de la draft proposent cinq icônes de rôle et deux icônes de tri (A–Z et popularité), sur une seule ligne. À chaque ouverture, le rôle associé est préfiltré et le tri par popularité est actif ; les bans restent tous rôles par défaut. Recliquez le rôle actif pour afficher tous les rôles. Le seuil est de 5 % des parties du champion dans le rôle ; les sélections existantes restent visibles. Sans statistiques de rôles, le repli reste tous rôles et alphabétique. Voir [les règles et la provenance](docs/ui/LIVE_ROLES_FILTERS.md).
-- **Quit** libère le siège. Si l’hôte part, le premier participant restant devient hôte. La dernière sortie supprime la salle, ses membres, son invitation et ses demandes d’échange. Fermer un onglet conserve le siège pour permettre la reconnexion ; il faut utiliser Quit pour partir.
-- Le lobby et la draft permettent de préparer des candidats pour les cinq rôles alliés et les cinq adverses. Prendre un rôle remplace la liste préparée par le pool personnel du joueur, même vide. [+] ajoute uniquement des candidats ; dans la draft, cliquer un candidat le sélectionne, un autre le remplace et recliquer le pick le désélectionne. Les candidats restent visibles après sélection et les picks restent présents si leur candidat est retiré. Les champions pris ailleurs ou bannis sont grisés. Les pools suivent leurs propriétaires lors des échanges consentis. Les dix listes survivent au passage en draft et au rechargement ; les salles existantes restent compatibles. Voir [les règles et validations](docs/ui/ALL_ROLE_CANDIDATES.md).
+- **Quit room** libère la participation. Si l’hôte part, le premier participant restant devient hôte. La dernière sortie supprime la salle, ses membres, son invitation et ses demandes d’échange. Fermer un onglet conserve le siège pour permettre la reconnexion ; il faut utiliser Quit pour partir.
+- Le lobby et la draft permettent de préparer des candidats pour les cinq rôles alliés et les cinq adverses. Prendre un rôle remplace la liste préparée par le pool personnel du joueur, même vide. [+] ajoute uniquement des candidats ; dans la draft, cliquer un candidat le sélectionne, un autre le remplace et recliquer le pick le désélectionne. Les candidats restent visibles après sélection et les picks restent présents si leur candidat est retiré. Les champions pris ailleurs ou bannis sont grisés. Les invités gardent leur pool lors des échanges consentis ; les comptes chargent celui du nouveau rôle. Les dix listes survivent au passage en draft et au rechargement ; les salles temporaires peuvent être supprimées aux mises à jour. Voir [les règles et validations](docs/ui/ALL_ROLE_CANDIDATES.md).
 
 ## Développer
 
@@ -57,7 +59,7 @@ Sans variables Supabase, le site fonctionne en démo locale sur un seul navigate
 
 ## Créer Supabase et déployer sur Netlify
 
-1. Créer un projet Supabase neuf. Appliquer les dix-sept fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611150017`.
+1. Créer un projet Supabase neuf. Appliquer les dix-huit fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611160018`.
 2. Activer **Authentication → Sign In / Providers → Anonymous Sign-Ins**.
 3. Vérifier que `rooms` appartient à la publication `supabase_realtime` dans **Database → Replication**.
 4. Copier `.env.example` vers `.env.local` pour le développement. Renseigner `VITE_SUPABASE_URL` et la clé publique `VITE_SUPABASE_ANON_KEY` (anon ou publishable). Ne jamais utiliser de clé `service_role` ou secrète dans une variable `VITE_*`.

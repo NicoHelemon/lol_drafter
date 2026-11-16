@@ -11,7 +11,7 @@ import { errorMessage, RoomExpiredError } from "./lib/errors";
 import SetupPage from "./pages/SetupPage";
 import DraftPage from "./pages/DraftPage";
 import { Search, names, Portrait } from "./components/Champions";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   type Room,
   type Role,
@@ -64,6 +64,17 @@ export default function App() {
     [swaps, setSwaps] = useState<RoleSwapRequest[]>([]),
     [pickSwaps, setPickSwaps] = useState<PickSwapRequest[]>([]),
     [online, setOnline] = useState<string[]>([]);
+  const authView=useRef({room,uid,accountOpen});authView.current={room,uid,accountOpen};
+  const clearLatest=useRef(()=>{});clearLatest.current=clearRoom;
+  useEffect(()=>{
+    if(!supabase)return;
+    const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
+      if(event==='INITIAL_SESSION'||event==='TOKEN_REFRESHED')return;
+      const current=authView.current,next=session?.user.id??'';
+      if(current.room&&next!==current.uid){clearLatest.current();setAccount(null);setUid(next);setError('Your sign-in changed. Reopen the room from its invitation.');return;}
+      if(!current.room){setUid(next);if(!session||session.user.is_anonymous)setAccount(null);else if(!current.accountOpen)setTimeout(()=>{void readAccount().then(value=>{setAccount(value);if(value?.profile?.display_name)setNickname(value.profile.display_name);}).catch(e=>setError(errorMessage(e)));},0);}
+    });return()=>subscription.unsubscribe();
+  },[]);
   const [invite, setInvite] = useState(() => location.hash.slice(1));
   const [inviteRoom, setInviteRoom] = useState(
     () => location.pathname.match(/^\/rooms\/([^/]+)/)?.[1] ?? null,

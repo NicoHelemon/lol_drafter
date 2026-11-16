@@ -53,7 +53,7 @@ test("named rooms, host badge, direct joining and the current 173-champion catal
   await expect(top.locator(".pool-tile")).toHaveCount(0);
   await expect(top).toHaveCSS("border-top-width", "3px");
   const participants = page.getByRole("region", { name: "Room participants" });
-  await expect(participants).toContainText("1/5");
+  await expect(participants).toContainText("1/10");
   await expect(participants).not.toContainText("Top");
   await addPool(page, ["Zaahen", "Renekton", "Camille"]);
   await expect(top.locator(".pool-tile")).toHaveCount(3);
@@ -350,7 +350,7 @@ test("requester also sees a popup with a draining timer and the other player’s
     dialog.getByRole("button", { name: "Accept", exact: true }),
   ).toHaveCount(0);
   const participants = page.getByRole("region", { name: "Room participants" });
-  await expect(participants).toContainText("2/5");
+  await expect(participants).toContainText("2/10");
   await expect(participants).toContainText("Nico");
   await expect(participants).toContainText("Mathis");
   await expect(participants).not.toContainText("Mid");

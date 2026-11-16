@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => {
   channel.on.mockReturnValue(channel); channel.subscribe.mockReturnValue(channel);
   return {
     channel,
-    client: { channel: vi.fn(() => channel), removeChannel: vi.fn(), from: vi.fn(), rpc: vi.fn() },
+    client: { auth:{onAuthStateChange:vi.fn()}, channel: vi.fn(() => channel), removeChannel: vi.fn(), from: vi.fn(), rpc: vi.fn() },
   };
 });
 vi.mock('@supabase/supabase-js', () => ({ createClient: () => mocks.client }));
