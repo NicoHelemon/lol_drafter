@@ -6,17 +6,17 @@ import { roleName } from '../domain/roles';
 import { names, Portrait } from './Champions';
 import ContributionTooltip from './ContributionTooltip';
 export default function DraftChampion({ id, role, team, state, result, selected, blocked, busy,
-  pickDisabled=false,automatic=false,onPick, pickLabel, toggle = true, onDragStart, onDragEnd, dragging = false, active, onActivate, onDeactivate }: {
+  pickDisabled=false,dragDisabled=false,automatic=false,onPick, pickLabel, toggle = true, onDragStart, onDragEnd, dragging = false, active, onActivate, onDeactivate }: {
   id: string; role: Role; team: Team; state: State; result: CandidateScore;
   selected: boolean; blocked: boolean; busy: boolean; onPick: () => void;
   active:boolean; onActivate:()=>void; onDeactivate:()=>void;
-  pickDisabled?:boolean;automatic?:boolean;pickLabel?: string; toggle?: boolean; onDragStart: (e: DragEvent) => void; onDragEnd: () => void; dragging?: boolean;
+  pickDisabled?:boolean;dragDisabled?:boolean;automatic?:boolean;pickLabel?: string; toggle?: boolean; onDragStart: (e: DragEvent) => void; onDragEnd: () => void; dragging?: boolean;
 }) {
   const label = scoreLabel(result.value), tooltipId = useId(), anchor = useRef<HTMLDivElement>(null);
   const open = !dragging && active;
   return <div ref={anchor}
     className={`draft-champion-tile${selected ? ' tile-selected' : ''}${blocked ? ' tile-unavailable' : ''}`}
-    data-champion={id} draggable={selected && !busy}
+    data-champion={id} draggable={selected && !busy&&!dragDisabled}
     onDragStart={e => { onDeactivate(); onDragStart(e); }} onDragEnd={onDragEnd}
     onMouseEnter={onActivate} onMouseLeave={onDeactivate}
     onFocusCapture={onActivate} onBlurCapture={e => { if (!e.currentTarget.contains(e.relatedTarget)) onDeactivate(); }}

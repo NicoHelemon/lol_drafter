@@ -66,3 +66,22 @@ it('clears explicit candidates after live movement and observing while selected 
 it('clears a departing member pool from the role when they quit the room, preserving their profile',async()=>{
  await profile(ids[0],{...emptyPools(),Mid:['103']});let r=await room();r=await join(r,ids[2]);r=await claim(r,'Mid');await as(ids[0],'select public.leave_room($1)',[r.id]);const remaining=(await db.query<Room>('select * from public.rooms where id=$1',[r.id])).rows[0];expect(remaining.state.rolePools?.ally?.Mid).toEqual([]);expect((await as<{version:number}>(ids[0],'select version from public.user_profiles')).version).toBe(1);
 });
+
+async function ownedDraft(){let r=await room();r=await join(r,ids[1]);r=await join(r,ids[2]);r=await claim(r,'Top',ids[1]);r=await claim(r,'Mid',ids[2]);r=await save(r,startDraft(r.state));return control(r,'open');}
+it('restricts direct selection, replacement and removal to the role owner or host',async()=>{
+ let r=await ownedDraft(),s=structuredClone(r.state);s.picks.ally=[{role:'Top',championId:'58'}];await fails(()=>save(r,s,ids[2]),'Only the role owner or host');r=await save(r,s,ids[1]);
+ s=structuredClone(r.state);s.picks.ally=[];await fails(()=>save(r,s,ids[2]),'Only the role owner or host');s.picks.ally=[{role:'Top',championId:'164'}];await fails(()=>save(r,s,ids[2]),'Only the role owner or host');
+ s=structuredClone(r.state);s.picks.ally.push({role:'Mid',championId:'103'});r=await save(r,s,ids[2]);s=structuredClone(r.state);s.picks.ally=s.picks.ally.filter(p=>p.role!=='Mid');await fails(()=>save(r,s,ids[1]),'Only the role owner or host');r=await save(r,s);expect(r.state.picks.ally).toHaveLength(1);
+ s=structuredClone(r.state);s.picks.ally=[{role:'Top',championId:'164'}];r=await save(r,s);expect(r.state.picks.ally[0].championId).toBe('164');
+});
+it('keeps other-player candidate editing collaborative in both setup and live without changing their selected champion',async()=>{
+ let r=await room();r=await join(r,ids[1]);r=await join(r,ids[2]);r=await claim(r,'Top',ids[1]);r=await claim(r,'Mid',ids[2]);r=(await as<{r:Room}>(ids[2],'select public.set_role_candidates($1,$2,$3,$4,$5) r',[r.id,'ally','Top',['58','164'],r.version])).r;expect(r.state.players.find(p=>p.role==='Top')?.pool).toEqual(['58','164']);r=await save(r,startDraft(r.state));r=await control(r,'open');const s=structuredClone(r.state);s.picks.ally=[{role:'Top',championId:'58'}];r=await save(r,s,ids[1]);r=(await as<{r:Room}>(ids[2],'select public.set_role_candidates($1,$2,$3,$4,$5) r',[r.id,'ally','Top',['58','164','266'],r.version])).r;expect(r.state.picks.ally).toEqual([{role:'Top',championId:'58'}]);
+});
+it('rejects unconsented pick moves into or out of another occupied role and retains approved trades',async()=>{
+ let r=await ownedDraft();const s=structuredClone(r.state);s.picks.ally=[{role:'Top',championId:'58'},{role:'Mid',championId:'103'},{role:'Jungle',championId:'64'}];r=await save(r,s);
+ await fails(()=>as(ids[2],'select public.move_draft_pick($1,$2,$3,$4,$5)',[r.id,'ally','Top','Jungle',r.version]),'Only the role owner or host');await fails(()=>as(ids[2],'select public.move_draft_pick($1,$2,$3,$4,$5)',[r.id,'ally','Jungle','Top',r.version]),'Only the role owner or host');
+ r=(await as<{r:Room}>(ids[2],'select public.move_draft_pick($1,$2,$3,$4,$5) r',[r.id,'ally','Mid','Top',r.version])).r;const q=(await db.query<{id:string}>('select id from public.pick_swap_requests where room_id=$1',[r.id])).rows[0];expect(r.state.picks.ally).toContainEqual({role:'Top',championId:'58'});r=(await as<{r:Room}>(ids[1],'select public.respond_pick_swap($1,$2,true) r',[r.id,q.id])).r;expect(r.state.picks.ally).toContainEqual({role:'Top',championId:'103'});expect(r.state.picks.ally).toContainEqual({role:'Mid',championId:'58'});
+});
+it('lets active players select free ally roles and opponents while preserving occupied selections',async()=>{
+ let r=await ownedDraft();const s=structuredClone(r.state);s.picks.ally=[{role:'Jungle',championId:'64'}];s.picks.enemy=[{role:'Top',championId:'122'}];r=await save(r,s,ids[2]);expect(r.state.picks.enemy).toEqual(s.picks.enemy);expect(r.state.picks.ally).toEqual(s.picks.ally);
+});

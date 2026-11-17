@@ -1,6 +1,7 @@
 import {rolePool,toggleRoleCandidate} from '../domain/rolePools';
 import {automaticPool} from '../domain/automaticCandidates';
 import {canPick,canBan} from '../domain/progression';
+import {canSelectPick,canRequestPickMove} from '../domain/pickPermissions';
 import DraftProgress from '../components/DraftProgress';
 import { useState, useEffect, useMemo, type DragEvent } from 'react';
 import {pairKey} from '../domain/scoring';
@@ -46,13 +47,14 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false,claimR
   const blockedRole = (team: Team, role: Role) => readOnly||team === 'ally' && pendingRoles.has(role);
   const canDrop = (team: Team, role: Role) => !!dragged && !busy && dragged.team === team && dragged.role !== role
     && !blockedRole(team, role) && !blockedRole(team, dragged.role)
+    && canRequestPickMove(state,uid,host,team,dragged.role,role)
     && state.picks[team].some(p => p.role === dragged.role && p.championId === dragged.championId);
   function finish(team: Team, role: Role) {
     if (!canDrop(team, role) || !dragged) return;
     const from = dragged.role; setDragged(null); setOver(null); void onMove(team, from, role);
   }
   function start(e: DragEvent, team: Team, role: Role, championId: string) {
-    if (busy || blockedRole(team, role)) { e.preventDefault(); return; }
+    if (busy || blockedRole(team, role)||!canSelectPick(state,uid,host,team,role)) { e.preventDefault(); return; }
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('application/x-draftroom-pick', JSON.stringify({team, role, championId}));
     setDragged({team, role, championId});
@@ -102,7 +104,7 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false,claimR
           const pick = state.picks[team].find(p => p.role === role);
           const explicit=rolePool(state,team,role),pool=automaticPool(state,team,role);
           const options = candidates(pool,role,team,state,names,pairIndex);
-          const editable=!readOnly&&canPick(state,team,pick?.championId);
+          const editable=!readOnly&&canSelectPick(state,uid,host,team,role)&&canPick(state,team,pick?.championId);
           const pending = blockedRole(team,role), available = canDrop(team,role), roleAvailable=team==='ally'&&roleTarget(role), key = `${team}:${role}`;
           return <section key={team} className={`draft-cell ${team}${player?.id === uid ? ' mine' : ''}${available ? ' drop-available' : ''}${over === key ? ' drop-over' : ''}${pending ? ' transfer-pending' : ''}${state.draftMode&&!state.openDraft&&editable?' current-pick':''}${roleAvailable?' role-drop-target':''}${roleAvailable&&roleOver===role?' role-drop-over':''}`}
             aria-label={`${roleName(role)} ${team} picks`} data-drop-team={team} data-drop-role={role}
@@ -124,6 +126,7 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false,claimR
             <div className="draft-options">
               {options.map(option => <DraftChampion key={option.id} id={option.id} role={role} team={team} state={state} result={option}
                 selected={option.selected} blocked={option.blocked} busy={busy || pending} pickDisabled={!editable||!!state.draftMode&&!state.openDraft&&option.selected} automatic={!!state.draftMode&&!option.selected&&!explicit.includes(option.id)} toggle={true}
+                dragDisabled={!canSelectPick(state,uid,host,team,role)}
                 active={activeTooltip===`${team}:${role}:${option.id}`}
                 onActivate={()=>setActiveTooltip(`${team}:${role}:${option.id}`)}
                 onDeactivate={()=>setActiveTooltip(old=>old===`${team}:${role}:${option.id}` ? null : old)}

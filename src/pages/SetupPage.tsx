@@ -39,7 +39,7 @@ export default function SetupPage({
       <section className="roster">
         {ROLES.map((role) => {
           const p = team==='ally'?state.players.find((p) => p.role === role):undefined,
-            pool=rolePool(state,team,role),editable = !readOnly&&(!p || p.id === uid || host),
+            pool=rolePool(state,team,role),editable = !readOnly,
             canSwap = !readOnly&&!!me?.role && !!p && p.id !== uid;
           return (
             <div
