@@ -1,6 +1,12 @@
 import {test,expect,type Page} from '@playwright/test';
 import {reconcileRolePools} from '../../src/domain/rolePools';
 import type {AccountProfile,Room,Role} from '../../src/domain/types';
+test('public guide leaves the saved account and room untouched and never initializes authentication',async({page})=>{
+ const requests:string[]=[];page.on('request',r=>{if(r.url().startsWith('http://127.0.0.1:54321'))requests.push(r.url());});
+ await page.addInitScript(()=>{localStorage.setItem('draftroom-current','existing-room');localStorage.setItem('sb-127-auth-token','existing-session-placeholder');});
+ await page.goto('/guide');await expect(page.getByRole('navigation',{name:'Guide chapters'})).toBeVisible();
+ expect(await page.evaluate(()=>({room:localStorage.getItem('draftroom-current'),session:localStorage.getItem('sb-127-auth-token')}))).toEqual({room:'existing-room',session:'existing-session-placeholder'});expect(requests).toEqual([]);
+});
 const guest='11111111-1111-4111-8111-111111111111',member='22222222-2222-4222-8222-222222222222';
 const pools=()=>({Top:['58'],Jungle:[],Mid:['103'],ADC:[],Support:[]});
 function session(registered:boolean){const now=Math.floor(Date.now()/1000),user={id:registered?member:guest,aud:'authenticated',role:'authenticated',email:registered?'player@example.test':undefined,is_anonymous:!registered,email_confirmed_at:registered?new Date().toISOString():undefined,created_at:new Date().toISOString(),app_metadata:{provider:registered?'email':'anonymous',providers:[registered?'email':'anonymous']},user_metadata:{}};const b=(v:unknown)=>Buffer.from(JSON.stringify(v)).toString('base64url');return {access_token:`${b({alg:'HS256',typ:'JWT'})}.${b({sub:user.id,role:'authenticated',exp:now+3600,iat:now,email:user.email,is_anonymous:user.is_anonymous})}.dGVzdA`,refresh_token:registered?'test-registered-refresh':'test-guest-refresh',expires_in:3600,expires_at:now+3600,token_type:'bearer',user};}

@@ -5,6 +5,7 @@ import {RoleIcon} from './RoleIcon';
 import {Search,Portrait,names} from './Champions';
 import {type Account,emptyPools,emailLoginReady,signInPassword,registerAccount,sendRecoveryCode,resendConfirmationCode,verifyCode,setAccountPassword,saveProfile,accountRoleCatalogue,readProfile} from '../lib/accounts';
 import {errorMessage} from '../lib/errors';
+import GuideLink from './GuideLink';
 type Mode='signin'|'signup'|'recovery';
 export default function AccountPanel({account,onChange,onClose}:{account:Account|null;onChange:(account:Account)=>void;onClose:()=>void}){
  const [mode,setMode]=useState<Mode>('signin'),[email,setEmail]=useState(''),[identifier,setIdentifier]=useState(''),[loginName,setLoginName]=useState(account?.loginName??''),[password,setPassword]=useState(''),[repeat,setRepeat]=useState(''),[code,setCode]=useState(''),[pending,setPending]=useState<{email:string;type:'email'|'recovery'}|null>(null),[reset,setReset]=useState(false),[ready,setReady]=useState(false),[loadingProfile,setLoadingProfile]=useState(!!account),[busy,setBusy]=useState(false),[error,setError]=useState('');
@@ -28,6 +29,7 @@ export default function AccountPanel({account,onChange,onClose}:{account:Account
  </>;
  return <div className="modal-backdrop" onClick={()=>{if(!busy&&!loadingProfile)onClose();}}><section className="modal account-panel" role="dialog" aria-modal="true" aria-label={account?'My profile':'Account access'} onClick={e=>e.stopPropagation()}>
   <div className="section-heading"><h2>{account?onboarding?'Set up your champion pools':'My profile':mode==='signup'?'Create account':mode==='recovery'?'Recover your account':'Sign in'}</h2><button aria-label="Close account" disabled={busy||loadingProfile} onClick={onClose}>×</button></div>
+  <div className="account-guide"><GuideLink/></div>
   {loadingProfile&&<p role="status" className="muted">Loading your personal pools…</p>}
   {settingPassword?<>
    <h3>{account!.hasPassword&&account!.loginName?'Change password':'Finish setting up your account'}</h3>

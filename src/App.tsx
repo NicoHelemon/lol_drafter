@@ -1,4 +1,5 @@
 import AccountPanel from './components/AccountPanel';
+import GuideLink from './components/GuideLink';
 import {readAccount,signOutAccount,saveRoomPool,type Account} from './lib/accounts';
 import {startDraft,chooseBan} from './domain/progression';
 import type {DraftMode} from './domain/types';
@@ -328,10 +329,10 @@ export default function App() {
           </span>
         </a>
         <span className="subtitle">LEAGUE OF LEGENDS · TEAM DRAFT</span>
-        <span className="connection">
+        <div className="header-tools"><GuideLink/><span className="connection">
           <i className={supabase ? "dot" : "dot amber"} />
           {sync}
-        </span>
+        </span></div>
       </header>
       {!room ? (
         <main className="welcome">
