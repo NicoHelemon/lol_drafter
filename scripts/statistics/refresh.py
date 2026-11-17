@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+from contextlib import ExitStack
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 from urllib.request import Request, build_opener
@@ -63,7 +64,8 @@ def refresh():
     try:
         if mode == 'lolalytics':
             from collect_lolalytics import collect
-            with tempfile.TemporaryDirectory() as folder:
+            with ExitStack() as stack:
+                folder = os.environ.get('STATISTICS_WORK_DIR') or stack.enter_context(tempfile.TemporaryDirectory())
                 result = collect(folder, all_candidates=True, interval=1.)
                 return publish_refresh(Path(folder) / 'snapshots' / result['snapshotId'], previous)
         source = os.environ['STATISTICS_IMPORT_URL']

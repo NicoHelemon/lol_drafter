@@ -42,6 +42,42 @@ class FixtureFetcher:
 
 
 class CollectionTests(unittest.TestCase):
+    @staticmethod
+    def missing_page(candidate=902, lane='jungle'):
+        state = dict(path='/lol/milio/build/',cid=candidate,champion='milio',mode='ranked',tier='emerald_plus',region='all',patch='14',lane=lane)
+        objects = [{k:str(i+1) for i,k in enumerate(state)}, *state.values()]
+        return ('<title>404 Resource Not Found</title><script type="qwik/json">'+json.dumps({'objs':objects})+'</script>').encode()
+
+    @staticmethod
+    def tiny_team(games=7):
+        return json.dumps({'response':{'valid':True},'team_h':collector.COLUMNS,
+                          'team':{r:[[54,50,0,0,100,games]] for r in collector.ROLES if r!='jungle'}}).encode()
+
+    def test_verified_tiny_role_404_keeps_real_synergies_without_fabricating_against_values(self):
+        page = self.missing_page(); team = self.tiny_team()
+        class MissingFetcher(FixtureFetcher):
+            def get(self, url):
+                if '/milio/build/' in url:
+                    raise HTTPError(url,404,'missing',{},io.BytesIO(page))
+                if 'a1.lolalytics' in url:
+                    return team, {'url':url,'status':200}
+                return super().get(url)
+        with tempfile.TemporaryDirectory() as folder, patch.object(collector,'catalogue_map',return_value={'milio':902}):
+            result=collector.collect(folder,candidates=['milio:jungle'],fetcher=MissingFetcher(),workers=1)
+            self.assertEqual(result['unavailableBuilds']['902:Jungle']['unavailableBuildGames'],7)
+            _,groups=verify(Path(folder)/'snapshots'/result['snapshotId'])
+            self.assertTrue(all(p['relation']=='with' and p['games']==7 for p in groups['902:Jungle']))
+            self.assertEqual(len(groups['902:Jungle']),4)
+
+    def test_common_role_404_or_wrong_context_error_page_is_never_silently_ignored(self):
+        url=collector.urls('milio','jungle')[0]
+        synergy=collector.parse_team(self.tiny_team(),902,'jungle')
+        self.assertEqual(collector.verify_missing_build(self.missing_page(),url,902,'jungle',synergy),7)
+        for page in [b'proxy error 404', self.missing_page(candidate=58), self.missing_page(lane='middle')]:
+            with self.assertRaises(ValueError):collector.verify_missing_build(page,url,902,'jungle',synergy)
+        with self.assertRaisesRegex(ValueError,'tiny-role'):
+            collector.verify_missing_build(self.missing_page(),url,902,'jungle',collector.parse_team(self.tiny_team(101),902,'jungle'))
+
     def test_real_synergy_samples_match_independent_browser_cells(self):
         proof = json.loads((ROOT / 'docs/statistics/live-synergy-verified.json').read_text())
         for page, candidate in zip(proof['pages'], [58, 103, 202]):

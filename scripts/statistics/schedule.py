@@ -64,6 +64,7 @@ def main():
     if os.environ.get('GITHUB_OUTPUT'):
         with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
             output.write(f"allowed={str(result['allowed']).lower()}\n")
+            output.write(f"cache_date={result['dailyTarget'][:10]}\n")
 
 
 if __name__ == '__main__':

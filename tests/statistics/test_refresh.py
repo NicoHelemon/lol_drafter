@@ -123,6 +123,20 @@ class RefreshTests(unittest.TestCase):
                 self.assertRaisesRegex(ValueError,'source failed'):
             refresh.refresh()
 
+    def test_configured_collection_workspace_survives_failure_for_a_safe_resume(self):
+        import collect_lolalytics
+        with tempfile.TemporaryDirectory() as folder:
+            marker=Path(folder)/'responses'/'verified-response'
+            def fail_once(directory, **kwargs):
+                self.assertEqual(str(directory),folder)
+                marker.parent.mkdir(exist_ok=True);marker.write_text('verified')
+                raise ValueError('source interruption')
+            with patch.dict('os.environ', {'STATISTICS_SOURCE':'lolalytics','SUPABASE_ACCESS_TOKEN':'test','SUPABASE_PROJECT_REF':'test','STATISTICS_WORK_DIR':folder}), \
+                    patch.object(refresh,'health',return_value=None), patch.object(refresh,'maintain',return_value={}), \
+                    patch.object(collect_lolalytics,'collect',side_effect=fail_once), self.assertRaisesRegex(ValueError,'source interruption'):
+                refresh.refresh()
+            self.assertEqual(marker.read_text(),'verified')
+
 
 if __name__ == '__main__':
     unittest.main()

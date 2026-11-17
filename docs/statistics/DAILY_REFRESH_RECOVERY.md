@@ -30,6 +30,11 @@ timezone alone would not fix this failure.
   publication errors fail the run instead of silently skipping stale data.
 - Existing concurrency serialization, complete-shard validation, coverage-drop
   checks, calibration checks and atomic pointer promotion remain in place.
+- Verified response files are cached per daily target and collector/catalogue
+  revision. A failed attempt saves its response cache; the next attempt rebuilds
+  from those checksummed responses instead of re-fetching the same completed
+  requests. Expired or corrupt cache data still fails validation. Cache failure
+  does not prevent an uncached refresh.
 
 The extra schedule events normally perform only a freshness read, not three
 full daily collections. Failed collection/publication can be retried by the
@@ -40,12 +45,28 @@ require a manual refresh or an independent scheduler.
 
 ## Validation
 
-57 Python tests pass, including historical delayed-run regression cases, Swiss
+60 Python tests pass, including historical delayed-run regression cases, Swiss
 DST dates, daily deduplication, midnight/06:00 boundaries, missing/invalid/future
 health timestamps, stale-export rejection before publication, failure reporting
 and preservation of final SQL integrity checks. `actionlint` validates the
 workflow. No source thresholds, score definitions, account settings or image
 recognition features were changed.
+
+## Source absence discovered during recovery
+
+The first November 17 recovery attempt stopped at 416/865 targets on the public
+Milio Jungle Build page returning HTTP 404. The response is a genuine Qwik error
+page naming the exact champion, role and 14-day/Emerald+/Global/ranked context.
+The independent build-team response is valid and has seven games in each of its
+four ally-role totals. No partial snapshot was published.
+
+For this narrowly verified tiny-role case (consistent totals of 1–100 games), the
+collector keeps the real synergy observations and records the Build absence.
+Unavailable Against observations and role popularity are left missing, never
+fabricated as zero or copied from an old snapshot. An ordinary/proxy 404, context
+mismatch, malformed synergy response, inconsistent totals, or a missing page for
+a role with more than 100 synergy games still fails the refresh. This is not a
+minimum-games filter: existing low-game observations remain included.
 
 The full November 17 recovery collection is being checked separately; publication
 evidence will be recorded once it completes. Existing rooms keep their pinned

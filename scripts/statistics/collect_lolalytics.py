@@ -70,6 +70,30 @@ def catalogue_map(raw):
     return result
 
 
+def verify_missing_build(raw, url, candidate, lane, synergy):
+    """A source 404 for a tiny role is missing Against data, never a zero delta.
+
+    Require the genuine public error page to name the exact requested context
+    and a valid independent synergy response with the same tiny game total in
+    all four ally roles. Common-role outages and malformed pages still fail.
+    """
+    parser = QwikHTML(); parser.feed(raw.decode('utf-8'))
+    if len(parser.blocks) != 1 or b'404 Resource Not Found' not in raw:
+        raise ValueError('Unverified Build 404; current snapshot preserved')
+    objects = json.loads(parser.blocks[0])['objs']; refs = References(objects)
+    routes = [o for o in objects if isinstance(o, dict) and {'path','cid','champion','mode','tier','region','patch','lane'} <= o.keys()]
+    if len(routes) != 1 or any(isinstance(o, dict) and {'header','enemy_h','enemy','nav'} <= o.keys() for o in objects):
+        raise ValueError('Ambiguous Build 404; current snapshot preserved')
+    expected = dict(path=urlparse(url).path, cid=candidate, champion=urlparse(url).path.split('/')[2],
+                    mode='ranked', tier='emerald_plus', region='all', patch='14', lane=lane)
+    if {k:refs.read(routes[0][k]) for k in expected} != expected:
+        raise ValueError('Build 404 context mismatch')
+    totals = {role:sum(p['games'] for p in synergy if p['otherRole']==role) for role in ROLES.values() if role!=ROLES[lane]}
+    if len(set(totals.values())) != 1 or not 1 <= max(totals.values()) <= 100:
+        raise ValueError('Build 404 is not a verified tiny-role absence; current snapshot preserved')
+    return max(totals.values())
+
+
 class Fetcher:
     def __init__(self, directory, interval=1.0):
         if interval < .5:
@@ -186,12 +210,27 @@ def collect(directory, all_candidates=False, candidates=None, interval=1., fetch
     def collect_target_data(target):
         slug, lane = target
         build_url, team_url = urls(slug, lane)
-        raw, html_record = fetcher.get(build_url)
-        audit = inspect(raw, build_url)
-        if audit['candidateChampionId'] != str(registry[slug]):
-            raise ValueError('Candidate identity differs from registry')
+        missing = None
+        try:
+            raw, html_record = fetcher.get(build_url)
+        except HTTPError as error:
+            if error.code != 404:
+                raise
+            raw = error.read(10_000_001)
+            if len(raw) > 10_000_000:
+                raise ValueError('Source response exceeds 10 MB') from error
+            missing = raw
+            html_record = dict(url=build_url,status=404,bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest(),
+                               fetchedAt=datetime.now(timezone.utc).isoformat())
         team_raw, team_record = fetcher.get(team_url)
         synergy = parse_team(team_raw, registry[slug], lane)
+        if missing is not None:
+            html_record['unavailableBuildGames'] = verify_missing_build(missing,build_url,registry[slug],lane,synergy)
+            audit = {'observations':[], 'roleStatistics':None}
+        else:
+            audit = inspect(raw, build_url)
+            if audit['candidateChampionId'] != str(registry[slug]):
+                raise ValueError('Candidate identity differs from registry')
         pairs = audit['observations'] + synergy
         return slug, lane, pairs, html_record, team_record,audit.get('roleStatistics')
     def collect_target(target):
@@ -224,7 +263,9 @@ def collect(directory, all_candidates=False, candidates=None, interval=1., fetch
     document = dict(id='lolalytics-' + report['startedAt'], patch='14d', tier='Emerald+',
                     source=report['source'], importedAt=finished, fictional=False,
                     context=CONTEXT, pairs=all_pairs)
-    if all_candidates and len(catalogue_rows)!=len(targets):
+    missing_builds = {key:value['sources'][0] for key,value in report['completed'].items() if 'unavailableBuildGames' in value['sources'][0]}
+    report['unavailableBuilds'] = missing_builds
+    if all_candidates and len(catalogue_rows)+len(missing_builds)!=len(targets):
         raise ValueError('Incomplete role catalogue; current snapshot preserved')
     if catalogue_rows:
         from role_catalogue import document as role_document
