@@ -90,10 +90,11 @@ jobs:
         continue-on-error: true
         with:
           path: statistics-cache/daily/responses
-          key: statistics-v2-${{ runner.os }}-${{ needs.schedule.outputs.cache_date }}-${{ hashFiles('src/data/champions.json', 'scripts/statistics/collect_lolalytics.py', 'scripts/statistics/inspect_lolalytics.py') }}-${{ github.run_id }}
+          key: statistics-v2-${{ runner.os }}-${{ needs.schedule.outputs.cache_date }}-${{ hashFiles('src/data/champions.json', 'scripts/statistics/collect_lolalytics.py', 'scripts/statistics/inspect_lolalytics.py') }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             statistics-v2-${{ runner.os }}-${{ needs.schedule.outputs.cache_date }}-${{ hashFiles('src/data/champions.json', 'scripts/statistics/collect_lolalytics.py', 'scripts/statistics/inspect_lolalytics.py') }}-
       - run: python3 scripts/statistics/refresh.py
+        timeout-minutes: 50
         env:
           STATISTICS_WORK_DIR: statistics-cache/daily
           STATISTICS_SOURCE: ${{ vars.STATISTICS_SOURCE || 'lolalytics' }}
