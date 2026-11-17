@@ -10,17 +10,17 @@ const reading:ScreenshotReading={width:960,height:540,box:[0,0,960,540],slots:[
  {team:'enemy',slot:1,championId:'54',role:'Top',status:'locked',similarity:.99,margin:.2},
  {team:'ally',slot:3,championId:'157',status:'picking',similarity:.99,margin:.2}],bans:[
  {team:'ally',slot:1,championId:'157',similarity:1,margin:1},{team:'ally',slot:2,championId:'238',similarity:1,margin:1},{team:'enemy',slot:1,championId:'3',similarity:1,margin:1}]};
-async function fakeRecognizer(page:Page){await page.addInitScript(({reading})=>{
+async function fakeRecognizer(page:Page,delay=20,empty=false){await page.addInitScript(({reading,delay})=>{
  const Native=window.Worker;
  window.Worker=class {
   onmessage:((e:MessageEvent)=>void)|null=null;onerror:unknown=null;cancelled=false;
   constructor(url:string|URL,opts?:WorkerOptions){if(!String(url).includes('recognizer.worker'))return new Native(url,opts) as never;}
-  postMessage(data:{bitmap:ImageBitmap}){data.bitmap.close();setTimeout(()=>{if(!this.cancelled)this.onmessage?.({data:{kind:'result',reading}} as MessageEvent);},20);}
+  postMessage(data:{bitmap:ImageBitmap}){data.bitmap.close();const deliver=()=>{if(!this.cancelled)this.onmessage?.({data:{kind:'result',reading}} as MessageEvent);};if(delay<0)(window as unknown as {finishScreenshot:()=>void}).finishScreenshot=deliver;else setTimeout(deliver,delay);}
   terminate(){this.cancelled=true;}
  } as unknown as typeof Worker;
- },{reading});}
-async function seed(page:Page,host=true){
- await page.goto('/');const state=initialState('local-player','Image check','ranked');state.phase='live';state.players[0].role='Mid';state.players[0].pool=['58','112'];state.picks.ally=[{championId:'58',role:'Mid'}];state.bans.ally[0]='3';
+ },{reading:empty?{...reading,slots:[],bans:[]}:reading,delay});}
+async function seed(page:Page,host=true,conflictingBan=false){
+ await page.goto('/');const state=initialState('local-player','Image check','ranked');state.phase='live';state.players[0].role='Mid';state.players[0].pool=['58','112'];state.picks.ally=[{championId:'58',role:'Mid'}];state.bans.ally[0]=conflictingBan?'3':'157';
  const room={id:'image-check',slug:'image-check',name:'Image check room',host_id:host?'local-player':'other-host',version:0,state};
  await page.evaluate(room=>{localStorage.setItem('draftroom-demo',JSON.stringify(room));localStorage.setItem('draftroom-current',room.slug);},room);await page.goto('/rooms/image-check/draft');
  await expect(page.getByRole('heading',{name:'Draft board',exact:true})).toBeVisible();
@@ -29,22 +29,35 @@ async function paste(page:Page,target='window'){
  await page.evaluate(async target=>{const canvas=document.createElement('canvas');canvas.width=960;canvas.height=540;const blob=await new Promise<Blob>(r=>canvas.toBlob(b=>r(b!)));const transfer=new DataTransfer();transfer.items.add(new File([blob],'clipboard.png',{type:'image/png'}));const event=new ClipboardEvent('paste',{clipboardData:transfer,bubbles:true,cancelable:true});(target==='window'?window:document.querySelector(target)!).dispatchEvent(event);},target);
 }
 const stored=(page:Page)=>page.evaluate(()=>JSON.parse(localStorage.getItem('draftroom-demo')!));
-test('Ctrl+V previews append-only changes, preserves Renekton Mid, switches mode after confirmation and groups Undo/Redo',async({page})=>{
+test('Ctrl+V imports directly, preserves a compatible Renekton Mid and matching bans, and groups Undo/Redo',async({page})=>{
  await fakeRecognizer(page);await seed(page);const before=await stored(page);await paste(page);
- const dialog=page.getByRole('dialog',{name:'Review screenshot import'});await expect(dialog).toBeVisible();await expect(dialog).toContainText('This will switch to Open draft');await expect(dialog).toContainText('1 hover or in-progress picks left out');
- expect((await stored(page)).state).toEqual(before.state);await expect(dialog.getByRole('combobox',{name:'Ahri ally role'})).toHaveValue('Top');await expect(dialog.getByRole('combobox',{name:'Renekton ally role'})).toHaveCount(0);
- await dialog.getByRole('button',{name:'Switch to Open draft & import',exact:true}).click();await expect(dialog).toHaveCount(0);
- const after=await stored(page);expect(after.state.openDraft).toBe(true);expect(after.state.picks.ally).toContainEqual({championId:'58',role:'Mid'});expect(after.state.picks.ally).toContainEqual({championId:'103',role:'Top'});expect(after.state.bans.ally[0]).toBe('3');expect(after.state.players).toEqual(before.state.players);expect(after.undo_count).toBe(1);
+ await expect(page.getByRole('region',{name:'Screenshot import'})).toContainText('Imported 4 selections');
+ await expect(page.getByRole('dialog',{name:'Review screenshot import'})).toHaveCount(0);
+ const after=await stored(page);expect(after.state.openDraft).toBe(true);expect(after.state.picks.ally).toContainEqual({championId:'58',role:'Mid'});expect(after.state.picks.ally).toContainEqual({championId:'103',role:'Top'});expect(after.state.bans.ally[0]).toBe('157');expect(after.state.players).toEqual(before.state.players);expect(after.undo_count).toBe(1);
  await page.getByRole('button',{name:'Undo',exact:true}).click();expect((await stored(page)).state.picks).toEqual(before.state.picks);expect((await stored(page)).state.bans).toEqual(before.state.bans);expect((await stored(page)).state.openDraft).toBe(true);
  await page.keyboard.press('Control+y');expect((await stored(page)).state.picks).toEqual(after.state.picks);
+ const unchanged=await stored(page);await paste(page);await expect(page.getByRole('region',{name:'Screenshot import'})).toContainText('No new selections detected');expect(await stored(page)).toEqual(unchanged);
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
-test('file drops work on the pane, cancellation changes nothing, text-field paste and non-host imports stay protected',async({page})=>{
- await fakeRecognizer(page);await seed(page);const before=await stored(page);
- await page.getByRole('button',{name:'Add Mid candidates',exact:true}).click();await paste(page,'input[aria-label="Search champions"]');await expect(page.getByRole('dialog',{name:'Review screenshot import'})).toHaveCount(0);await page.getByRole('button',{name:'Close',exact:true}).click();
+test('file drop recognition can be cancelled, while text-field paste and non-host imports stay protected',async({page})=>{
+ await fakeRecognizer(page,3000);await seed(page);const before=await stored(page);
+ await page.getByRole('button',{name:'Add Mid candidates',exact:true}).click();await paste(page,'input[aria-label="Search champions"]');await expect(page.getByRole('progressbar',{name:'Screenshot recognition'})).toHaveCount(0);await page.getByRole('button',{name:'Close',exact:true}).click();
  const transfer=await page.evaluateHandle(async()=>{const c=document.createElement('canvas');c.width=960;c.height=540;const blob=await new Promise<Blob>(r=>c.toBlob(b=>r(b!)));const dt=new DataTransfer();dt.items.add(new File([blob],'drop.png',{type:'image/png'}));return dt;});
- await page.getByRole('region',{name:'Screenshot import'}).dispatchEvent('drop',{dataTransfer:transfer});const dialog=page.getByRole('dialog',{name:'Review screenshot import'});await expect(dialog).toBeVisible();await dialog.getByRole('button',{name:'Close screenshot review'}).click();expect((await stored(page)).state).toEqual(before.state);
- await seed(page,false);await expect(page.getByRole('region',{name:'Screenshot import'})).toHaveCount(0);await paste(page);await expect(dialog).toHaveCount(0);
+ await page.getByRole('region',{name:'Screenshot import'}).dispatchEvent('drop',{dataTransfer:transfer});await expect(page.getByRole('progressbar',{name:'Screenshot recognition'})).toBeVisible();await page.getByRole('button',{name:'Cancel',exact:true}).click();await expect(page.getByRole('region',{name:'Screenshot import'})).toContainText('Recognition cancelled');expect((await stored(page)).state).toEqual(before.state);
+ await seed(page,false);await expect(page.getByRole('region',{name:'Screenshot import'})).toHaveCount(0);await paste(page);expect((await stored(page)).state).toEqual(before.state);
+});
+test('contradictory screenshots report an error without partially importing or opening guided draft',async({page})=>{
+ await fakeRecognizer(page);await seed(page,true,true);const before=await stored(page);await paste(page);await expect(page.getByRole('alert')).toContainText('different ban');expect((await stored(page))).toEqual(before);await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+test('images with no confirmed detections report an error without changing the draft',async({page})=>{
+ await fakeRecognizer(page,20,true);await seed(page);const before=await stored(page);await paste(page);await expect(page.getByRole('alert')).toContainText('No confirmed picks or bans');expect((await stored(page))).toEqual(before);
+});
+test('a pick made during recognition is checked against the result before any changes are imported',async({page})=>{
+ await fakeRecognizer(page,-1);await seed(page);await page.getByRole('button',{name:'Open draft',exact:true}).click();await paste(page);
+ await page.waitForFunction(()=>typeof (window as unknown as {finishScreenshot:unknown}).finishScreenshot==='function');
+ await page.getByRole('region',{name:'Top enemy picks',exact:true}).getByRole('button',{name:'Pick Ahri Top enemy',exact:true}).click();
+ await page.evaluate(()=>(window as unknown as {finishScreenshot:()=>void}).finishScreenshot());
+ await expect(page.getByRole('alert')).toContainText('conflicts');expect((await stored(page)).state.picks.enemy).toContainEqual({championId:'103',role:'Top'});expect((await stored(page)).state.picks.ally).toEqual([{championId:'58',role:'Mid'}]);
 });
 
 // Exercise actual production bundles, local WASM/OCR assets and the intended
@@ -73,8 +86,7 @@ test('real screenshot pixels are recognized under production CSP without externa
   return [...new Uint8Array(await(await new Promise<Blob>(r=>canvas.toBlob(b=>r(b!)))).arrayBuffer())];
  },Object.fromEntries(champions.map(c=>[c.id,c.portrait])));
  await page.getByLabel('Choose draft screenshot',{exact:true}).setInputFiles({name:'synthetic-client.png',mimeType:'image/png',buffer:Buffer.from(data)});
- const dialog=page.getByRole('dialog',{name:'Review screenshot import'});await expect(dialog).toBeVisible({timeout:150000});
- await expect(dialog.getByLabel('Import Renekton ally pick',{exact:true})).toBeChecked();await expect(dialog.getByLabel('Import Ahri ally pick',{exact:true})).toBeChecked();await expect(dialog.getByLabel('Import Malphite enemy pick',{exact:true})).toBeChecked();await expect(dialog.getByLabel('Import Annie ally ban 1',{exact:true})).toBeChecked();
- expect(violations).toEqual([]);expect(external).toEqual([]);
- await dialog.getByRole('button',{name:'Switch to Open draft & import'}).click();await expect(dialog).toHaveCount(0);expect((await stored(page)).state.openDraft).toBe(true);
+ await expect(page.getByRole('region',{name:'Screenshot import'})).toContainText('Imported',{timeout:150000});
+ const after=await stored(page);expect(after.state.picks.ally).toContainEqual({championId:'58',role:'Top'});expect(after.state.picks.ally).toContainEqual({championId:'103',role:'Mid'});expect(after.state.picks.enemy).toContainEqual({championId:'54',role:'Top'});expect(after.state.bans.ally[0]).toBe('1');
+ expect(violations).toEqual([]);expect(external).toEqual([]);expect(after.state.openDraft).toBe(true);await expect(page.getByRole('dialog')).toHaveCount(0);
 });

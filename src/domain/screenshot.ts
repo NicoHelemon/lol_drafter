@@ -11,6 +11,9 @@ export interface ProposedPick extends Pick {team:Team;estimated:boolean;included
 export interface ProposedBan {team:Team;slot:number;championId:string;included:boolean;key:string}
 export interface ImportProposal {picks:ProposedPick[];bans:ProposedBan[];notes:string[];pending:number}
 const teams:Team[]=['ally','enemy'];
+export function assertScreenshotTarget(state:State){
+ if(state.phase!=='live')throw Error('Start the draft before importing a screenshot');
+}
 
 // Existing picks are fixed constraints. Search at most 5! assignments per team;
 // client role labels are preferred only when compatible with those constraints.
@@ -25,11 +28,11 @@ export function proposeScreenshot(state:State,reading:ScreenshotReading):ImportP
    if(seen.has(id)){proposal.notes.push('A repeated pick was left for manual review.');continue;}seen.add(id);
    const own=state.picks[team].find(p=>p.championId===id);
    if(own)continue;
-   if(used.has(id)||banned.has(id)){proposal.notes.push('A detected pick conflicts with an existing pick or ban and was skipped.');continue;}
+   if(used.has(id)||banned.has(id))throw Error('This screenshot conflicts with an existing pick or ban. The draft was not changed.');
    detected.push(slot);
   }
   const free=ROLES.filter(r=>!state.picks[team].some(p=>p.role===r));
-  if(detected.length>free.length){proposal.notes.push('More picks were detected than there are free roles. Review this team manually.');continue;}
+  if(detected.length>free.length)throw Error('This screenshot conflicts with the current team: more than five different picks. The draft was not changed.');
   let best=-Infinity,assignment:Role[]=[];
   function visit(roles:Role[]){
    if(roles.length===detected.length){
@@ -48,9 +51,11 @@ export function proposeScreenshot(state:State,reading:ScreenshotReading):ImportP
   const seen=new Set(state.bans[team].filter(Boolean));
   for(const ban of reading.bans.filter(b=>b.team===team&&b.championId&&championIds.has(b.championId))){
    const id=ban.championId!,slot=ban.slot-1;
-   if(slot<0||slot>4||seen.has(id))continue;
-   if(state.bans[team][slot]){if(state.bans[team][slot]!==id)proposal.notes.push('An existing ban was kept instead of a conflicting screenshot ban.');continue;}
-   if(used.has(id)||(state.draftMode!=='ranked'&&(state.bans[team==='ally'?'enemy':'ally'].includes(id)||proposal.bans.some(b=>b.team!==team&&b.championId===id)))){proposal.notes.push('A detected ban conflicts with an existing selection and was skipped.');continue;}
+   if(slot<0||slot>4)continue;
+   if(state.bans[team][slot]===id)continue;
+   if(state.bans[team][slot]||state.bans[team].includes(id))throw Error('This screenshot has a different ban at an existing ban position. The draft was not changed.');
+   if(seen.has(id))continue;
+   if(used.has(id)||(state.draftMode!=='ranked'&&(state.bans[team==='ally'?'enemy':'ally'].includes(id)||proposal.bans.some(b=>b.team!==team&&b.championId===id))))throw Error('This screenshot conflicts with an existing pick or ban. The draft was not changed.');
    seen.add(id);proposal.bans.push({team,slot,championId:id,included:true,key:`ban:${team}:${slot}`});
   }
  }
@@ -61,7 +66,7 @@ export function proposalAdditions(proposal:ImportProposal):ScreenshotAdditions{
   bans:Object.fromEntries(teams.map(t=>[t,proposal.bans.filter(b=>b.team===t&&b.included).map(({slot,championId})=>({slot,championId}))])) as ScreenshotAdditions['bans']};
 }
 export function mergeScreenshot(state:State,additions:ScreenshotAdditions):State{
- if(state.phase!=='live')throw Error('Start the draft before importing a screenshot');
+ assertScreenshotTarget(state);
  const next=structuredClone(state);next.openDraft=true;next.draftStep=0;next.draftHistory=[];
  let added=0;
  for(const team of teams){

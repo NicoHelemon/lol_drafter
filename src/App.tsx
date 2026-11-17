@@ -236,7 +236,7 @@ export default function App() {
   }
   async function screenshotImport(additions:ScreenshotAdditions,version:number){
     if(!room||busy)return;
-    if(room.version!==version)throw Error('The room changed. Review the updated suggestions before importing.');
+    if(room.version!==version)throw Error('The room changed. Try importing again.');
     setBusy(true);
     try{setRoom(await importRoomScreenshot(room,additions));setPicker(null);setSwaps([]);setPickSwaps([]);}
     catch(e){setRoom(await readRoom(room.id));throw Error(errorMessage(e));}

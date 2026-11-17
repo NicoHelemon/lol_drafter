@@ -21,10 +21,16 @@ it('preserves manual Renekton Mid, excludes hover/picking states and jointly ass
  const before=structuredClone(s),p=proposeScreenshot(s,reading),next=mergeScreenshot(s,proposalAdditions(p));
  expect(next.picks.ally).toContainEqual({championId:'58',role:'Mid'});expect(next.picks.ally).toContainEqual({championId:'103',role:'Top'});expect(next.picks.ally).toContainEqual({championId:'64',role:'Jungle'});expect(next.picks.enemy).toEqual([]);expect(p.pending).toBe(2);expect(s).toEqual(before);
 });
-it('only fills empty ban positions, keeps existing choices, and allows the same ranked ban on opposite teams',()=>{
- const s=state(),r:ScreenshotReading={slots:[],box:[],width:960,height:540,bans:[{team:'ally',slot:5,championId:'157',similarity:1,margin:1},{team:'enemy',slot:1,championId:'3',similarity:1,margin:1},{team:'enemy',slot:2,championId:'58',similarity:1,margin:1}]};
- const p=proposeScreenshot(s,r);expect(p.bans).toHaveLength(1);expect(p.bans[0].championId).toBe('3');expect(p.notes.length).toBeGreaterThan(0);
- expect(mergeScreenshot(s,proposalAdditions(p)).bans.enemy[0]).toBe('3');
+it('keeps matching bans and allows the same ranked ban on opposite teams',()=>{
+ const s=state(),r:ScreenshotReading={slots:[],box:[],width:960,height:540,bans:[{team:'ally',slot:5,championId:'3',similarity:1,margin:1},{team:'enemy',slot:1,championId:'3',similarity:1,margin:1}]};
+ const p=proposeScreenshot(s,r);expect(p.bans).toHaveLength(1);expect(mergeScreenshot(s,proposalAdditions(p)).bans.enemy[0]).toBe('3');
+});
+it('rejects conflicting bans, picked-versus-banned champions, opposite teams and overfilled teams without changing the draft',()=>{
+ const s=state(),before=structuredClone(s),reading:ScreenshotReading={slots:[],bans:[],box:[],width:960,height:540};
+ for(const bans of [[{team:'ally' as const,slot:5,championId:'157',similarity:1,margin:1}],[{team:'enemy' as const,slot:1,championId:'58',similarity:1,margin:1}],[{team:'ally' as const,slot:1,championId:'3',similarity:1,margin:1}]])expect(()=>proposeScreenshot(s,{...reading,bans})).toThrow(/conflict|different ban/);
+ expect(()=>proposeScreenshot(s,{...reading,slots:[{team:'enemy',slot:1,championId:'58',status:'locked',similarity:1,margin:1}]})).toThrow('conflicts');
+ expect(()=>proposeScreenshot(s,{...reading,slots:['103','64','222','412','122'].map((championId,i)=>({team:'ally' as const,slot:i+1,championId,status:'locked' as const,similarity:1,margin:1}))})).toThrow('more than five');
+ expect(s).toEqual(before);
 });
 it('keeps candidate lists and roles intact, groups import history and keeps Open draft through Undo and Redo',()=>{
  const s=state();s.players[0].role='Mid';s.players[0].pool=['58','112'];const room:Room={id:'room',slug:'room',name:'Room',host_id:'host',version:8,state:s};
