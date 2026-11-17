@@ -9,8 +9,8 @@ import { names, Portrait } from './Champions';
 import {candidateImpact} from '../domain/teamScore';
 import type {ExceptionalFit} from '../domain/exceptionalPicks';
 
-export default function ContributionTooltip({ id, champion, role, team, state, result, fit, anchor }: {
-  fit?:ExceptionalFit;
+export default function ContributionTooltip({ id, champion, role, team, state, result, fit, bestFit=false, anchor }: {
+  fit?:ExceptionalFit;bestFit?:boolean;
   id: string; champion: string; role: Role; team: Team; state: State; result: CandidateScore; anchor: HTMLElement;
 }) {
   const panel = useRef<HTMLDivElement>(null);
@@ -45,6 +45,7 @@ export default function ContributionTooltip({ id, champion, role, team, state, r
   }
   return createPortal(<div id={id} ref={panel} className="contribution-tooltip" role="tooltip" style={position}>
     <div className="contribution-heading"><strong>{names[champion]} <span>· {roleName(role)}</span></strong><div className="individual-score"><small>Individual score</small><b>{scoreLabel(result.value)}</b></div></div>
+    {bestFit&&<p className="best-fit-explanation">★ Best fit{result.total<9?' · Provisional':''} — one of the three highest adjusted scores for {team==='ally'?'your':'the enemy'} team at this role in the current draft. At least 5,000 role games and all current interactions covered.</p>}
     {fit&&<div className={`fit-explanation fit-${fit.kind}`}>
       <strong>{fit.kind==='positive'?'Excellent fit':'Poor fit'}{fit.provisional?' · Provisional':''}</strong>
       <span>{fit.kind==='positive'?'An exceptionally favorable':'A particularly unfavorable'} pick for {team==='ally'?'your':'the enemy'} team. {Math.abs(fit.gap).toFixed(2)} {fit.kind==='positive'?'above':'below'} the typical available {roleName(role)} option.</span>

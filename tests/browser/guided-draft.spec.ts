@@ -30,7 +30,7 @@ test('ranked has a compact square map, batch bans, automatic grouped picks and C
  const prepared=await state(page);
  mkdirSync(folder,{recursive:true});await page.screenshot({path:folder+'/ranked-lobby-side.png',fullPage:true,animations:'disabled'});
  await page.getByRole('button',{name:'Start draft'}).click();await expect(page.getByRole('region',{name:'Draft progression'})).toContainText('Both teams');
- for(const region of await page.locator('.draft-cell').all())await expect(region.locator('.draft-champion-tile')).toHaveCount(5);
+ for(const region of await page.locator('.draft-cell').all())await expect(region.locator('.draft-champion-tile')).toHaveCount(await region.getAttribute('aria-label')==='Top ally picks'?1:5);
  await expect(page.locator('.champion-choice:enabled')).toHaveCount(0);
  for(const team of ['ally','enemy']){
   await page.getByRole('button',{name:`Ban 1 ${team}`,exact:true}).click();

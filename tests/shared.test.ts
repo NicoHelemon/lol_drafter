@@ -3,6 +3,8 @@ import { StatisticsCache, persistedState } from '../src/data/shared';
 import { initialState } from '../src/data/provider';
 import { score } from '../src/domain/scoring';
 import type { Pair, Room } from '../src/domain/types';
+import {bestFitCandidates} from '../src/domain/bestFits';
+import {fitState} from './fixtures/best-fit-state';
 import {DEMO_MODEL} from '../src/domain/shrinkage';
 
 const sid = 'a'.repeat(64);
@@ -168,4 +170,17 @@ it('keeps normal scores working when optional reference loading fails or returns
  const cache=new StatisticsCache(read,{readReference});let a=await cache.hydrate(r);expect(a.state.referenceKey).toBeUndefined();expect(score('58','Top',a.state).value).toBe(0);
  readReference.mockImplementation(async()=>[{...pair,otherChampionId:'51'}] as never);a=await cache.hydrate(r);expect(a.state.referenceKey).toBeUndefined();
  readReference.mockImplementation(async()=>[pair] as never);a=await cache.hydrate(r);expect(a.state.referenceKey).toBeDefined();expect(readReference).toHaveBeenCalledTimes(3);
+});
+
+it('ranks all-role best fits from compact reference pairs without fetching their full shards',async()=>{
+ const state=fitState();state.dataset={...state.dataset,snapshotId:sid,pairs:[]};
+ state.players[0].role='Mid';state.players[0].pool=['103'];
+ const reference=fitState().dataset.pairs;
+ const read=vi.fn(async(_s:string,_keys:string[])=>[]),readReference=vi.fn(async()=>reference);
+ const cache=new StatisticsCache(read,{readReference});
+ const hydrated=await cache.hydrate({id:'best-fit-room',slug:'best-fits',name:'Best fits',host_id:'p',version:0,state});
+ expect(bestFitCandidates(hydrated.state,'ally','Mid')).toEqual(['112','3','517']);
+ expect(read.mock.calls.flatMap(c=>c[1])).not.toContain('112:Mid');
+ expect(persistedState(hydrated.state).players[0].pool).toEqual(['103']);
+ expect(persistedState(hydrated.state).dataset.pairs).toEqual([]);
 });

@@ -12,6 +12,12 @@ export function teamScore(team:Team,state:State,index=new Map(state.dataset.pair
   provisional:state.picks.ally.length<5 || state.picks.enemy.length<5 || pairs<possible || known.length<picks.length};
 }
 
+export function teamAdvantage(state:State,index?:Map<string,Pair>){
+ const ally=teamScore('ally',state,index),enemy=teamScore('enemy',state,index);
+ return {ally,enemy,value:ally.value===null||enemy.value===null?null:ally.value-enemy.value,
+  provisional:ally.provisional||enemy.provisional};
+}
+
 export function candidateImpact(id:string,role:Role,team:Team,state:State,index?:Map<string,Pair>) {
  const selected=state.picks[team].find(p=>p.role===role);
  if(unavailable(state).has(id)&&selected?.championId!==id) return null;

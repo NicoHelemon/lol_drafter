@@ -2,7 +2,7 @@ import {it,expect} from 'vitest';
 import {initialState} from '../src/data/provider';
 import {adjustedDelta,DEMO_MODEL,validateModel} from '../src/domain/shrinkage';
 import {scoreForTeam} from '../src/domain/candidates';
-import {candidateImpact,teamScore} from '../src/domain/teamScore';
+import {candidateImpact,teamScore,teamAdvantage} from '../src/domain/teamScore';
 import type {Pair,State,Role} from '../src/domain/types';
 
 const p=(candidate:string,role:Role,other:string,otherRole:Role,delta:number,relation:Pair['relation']='vs',games=625):Pair=>({candidateChampionId:candidate,candidateRole:role,otherChampionId:other,otherRole,delta2:delta,relation,games});
@@ -58,4 +58,11 @@ it('full teams expose 45 possible directed contributions; missing values stay pr
  expect(teamScore('ally',s)).toMatchObject({value:1,picks:5,scored:5,known:45,total:45,provisional:false});
  s.dataset.pairs[0].delta2=null;expect(teamScore('ally',s)).toMatchObject({value:1,known:44,total:45,provisional:true});
  delete s.shrinkage;expect(teamScore('ally',s)).toMatchObject({value:null,known:0,total:45,provisional:true});
+});
+
+it('compares independent team scores while preserving unknown and provisional states',()=>{
+ const s=state();expect(teamAdvantage(s)).toMatchObject({value:2,provisional:true,ally:{value:.5},enemy:{value:-1.5}});
+ s.dataset.pairs=s.dataset.pairs.filter(p=>p.candidateChampionId!=='122');
+ expect(teamAdvantage(s)).toMatchObject({value:null,enemy:{value:null}});
+ s.picks={ally:[],enemy:[]};expect(teamAdvantage(s).value).toBeNull();
 });

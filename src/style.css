@@ -58,3 +58,24 @@
 .fit-explanation.fit-positive{color:#8cebc7}.fit-explanation.fit-negative{color:#ffaaa3}.fit-explanation strong{font-size:11px}.fit-explanation small{color:var(--muted);font-size:9px}
 @keyframes fit-glow{50%{box-shadow:0 0 13px 3px color-mix(in srgb,var(--fit) 52%,transparent)}}
 @media(prefers-reduced-motion:reduce){.draft-champion-tile.fit-positive,.draft-champion-tile.fit-negative{animation:none}}
+
+/* The two signed team scores remain distinct from their difference. */
+.draft-evaluation{padding:0 22px 13px 108px}
+.team-advantage{--advantage-color:#9bacc1;color:var(--text)}
+.team-advantage.blue{--advantage-color:#66b9ff}.team-advantage.red{--advantage-color:#ff8e94}
+.advantage-label{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:9px;font-size:12px;font-variant-numeric:tabular-nums}
+.advantage-label strong{font-weight:600}.advantage-label small{color:var(--muted);font-size:10px}
+.advantage-track{height:8px;position:relative;background:#233448;border-radius:3px;margin:0 3px}
+.advantage-fill{position:absolute;top:0;height:100%;border-radius:3px;background:var(--advantage-color);transition:left .2s ease,width .2s ease}
+.advantage-zero{position:absolute;top:-3px;left:50%;width:1px;height:14px;background:#8091a9}
+.advantage-marker{position:absolute;top:-3px;width:3px;height:14px;border-radius:2px;background:var(--advantage-color);transform:translateX(-50%);transition:left .2s ease}
+.advantage-scale{display:flex;justify-content:space-between;margin-top:6px;color:var(--muted);font-size:10px;letter-spacing:0}
+.advantage-note{display:block;text-align:center;color:var(--muted);font-size:10px;margin-top:5px}
+.candidate-settings{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;flex-wrap:wrap;padding:11px 22px;border-top:1px solid var(--line);color:var(--muted)}
+.candidate-settings label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);cursor:pointer;min-height:24px}
+.candidate-settings input{accent-color:var(--gold);width:16px;height:16px;margin:0;cursor:pointer}
+.candidate-settings small{font-size:10px;line-height:1.6}
+.best-fit-mark{position:absolute;left:2px;top:0;color:#9cceff;font-size:13px;text-shadow:0 1px 3px #000}
+.best-fit-explanation{font-size:11px;line-height:1.6;color:#b5d6f0;margin:0 0 10px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+@media(max-width:760px){.draft-evaluation{padding:0 8px 12px 57px}.candidate-settings{padding:9px 8px;gap:4px}.candidate-settings label{min-height:32px}.candidate-settings small{font-size:10px}.advantage-label{font-size:11px}.advantage-note{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.advantage-fill,.advantage-marker{transition:none}}

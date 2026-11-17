@@ -89,7 +89,8 @@ export class StatisticsCache {
     // An optional reference outage must not disable the draft or its regular scores.
     const referenceResult=reference?.then(pairs=>({pairs,key:referenceKey})).catch(()=>undefined);
     const keys = [...new Set([
-      ...rolePoolEntries(room.state).flatMap(p=>automaticPool({...room.state,roleCatalogue:catalogue},p.team,p.role).map(id=>`${id}:${p.role}`)),
+      // Best fits use the compact reference already loaded above, without full shards.
+      ...rolePoolEntries(room.state).flatMap(p=>automaticPool({...room.state,roleCatalogue:catalogue},p.team,p.role,false).map(id=>`${id}:${p.role}`)),
       ...Object.values(room.state.picks).flat().map(p => `${p.championId}:${p.role}`),
     ])].sort();
     // Keep this hydration's promises even if a larger request evicts LRU entries.

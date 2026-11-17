@@ -47,11 +47,12 @@ it('honours tournament second ban phase red-first and bans cannot duplicate',asy
  let r=await room('tournament');r=await save(r,startDraft(r.state));let s=structuredClone(r.state);s.bans.enemy[0]='58';await fails(()=>save(r,s),'ban order');
  s=structuredClone(r.state);s.bans.ally[0]='58';r=await save(r,s);r=await save(r,advanceDraft(r.state));s=structuredClone(r.state);s.bans.enemy[0]='58';await fails(()=>save(r,s),'Champion already');
 });
-it('automatic candidates preserve explicit choices, fill to five available choices and do not mutate pools',()=>{
+it('popular fallback only fills an empty explicit list and never mutates pools',()=>{
  let s=startDraft(initialState(ids[0],'P','ranked'));s=setRolePool(s,'ally','Top',['103']);const before=structuredClone(s);
- const first=automaticPool(s,'ally','Top');expect(first[0]).toBe('103');expect(first).toHaveLength(5);expect(first.slice(1,4)).toEqual(['164','122','58']);expect(s).toEqual(before);
+ expect(automaticPool(s,'ally','Top')).toEqual(['103']);expect(s).toEqual(before);
+ s=setRolePool(s,'ally','Top',[]);expect(automaticPool(s,'ally','Top')).toHaveLength(5);expect(automaticPool(s,'ally','Top').slice(0,3)).toEqual(['164','122','58']);
  s.bans.enemy[0]='164';s.picks.enemy=[{role:'Mid',championId:'122'}];const next=automaticPool(s,'ally','Top');expect(next).not.toContain('164');expect(next).not.toContain('122');expect(next).toHaveLength(5);
- s=setRolePool(s,'ally','Top',['103','164']);expect(automaticPool(s,'ally','Top').length).toBe(6);
+ s=setRolePool(s,'ally','Top',['103','164']);expect(automaticPool(s,'ally','Top')).toEqual(['103','164']);
 });
 it('keeps real role consent operational while picks are confirmed and step history stays fixed',async()=>{
  let r=await room('ranked');r=(await as<{r:Room}>(ids[1],'select public.join_room($1,$2,$3) r',[r.slug,'a'.repeat(72),'Guest'])).r;

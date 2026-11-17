@@ -1,5 +1,7 @@
 import {rolePool,toggleRoleCandidate} from '../domain/rolePools';
-import {automaticPool} from '../domain/automaticCandidates';
+import {draftCandidates} from '../domain/automaticCandidates';
+import {teamAdvantage} from '../domain/teamScore';
+import TeamAdvantage from '../components/TeamAdvantage';
 import {canPick,canBan} from '../domain/progression';
 import {canSelectPick,canRequestPickMove} from '../domain/pickPermissions';
 import DraftProgress from '../components/DraftProgress';
@@ -28,6 +30,8 @@ type DragPick = { team: Team; role: Role; championId: string };
 export default function DraftPage({ state, uid, host, busy,readOnly=false,claimRole,onSavePool, change, setPicker, onMove,onRoleMove,undoCount,redoCount,onHistory, pendingRoles = new Set() }: Props) {
   const associatedPlayers = new Map(state.players.map(player => [player.role, player]));
   const pairIndex=useMemo(()=>new Map(state.dataset.pairs.map(p=>[pairKey(p),p])),[state.dataset.pairs]);
+  const [showBestFits,setShowBestFits]=useState(()=>{try{return localStorage.getItem('draftroom-show-best-fits')!=='false';}catch{return true;}});
+  const evaluation=useMemo(()=>teamAdvantage(state,pairIndex),[state,pairIndex]);
   const [activeTooltip,setActiveTooltip] = useState<string|null>(null);
   const [dragged, setDragged] = useState<DragPick | null>(null), [over, setOver] = useState<string | null>(null);
   const [roleDrag,setRoleDrag]=useState<Role|null>(null),[roleOver,setRoleOver]=useState<Role|null>(null);
@@ -86,7 +90,12 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false,claimR
       <p className="draft-move-hint" id="pick-move-help" role="status">{readOnly?'Hover champions to inspect scores.':roleDrag ? 'Choose a role. You keep your champion; another player must accept an exchange.' : dragged
         ? `Move ${names[dragged.championId]}: choose another ${dragged.team === 'ally' ? 'allied' : 'opponent'} role. Escape to cancel.`
         : 'Drag your role panel to change roles with your champion. Drag portraits to move champions only. Hover candidates to compare team scores.'}</p>
-      <div className="board-head"><span>ROLE</span><TeamSummary team="ally" state={state}/><TeamSummary team="enemy" state={state}/></div>
+      <div className="board-head"><span>ROLE</span><TeamSummary team="ally" state={state} result={evaluation.ally}/><TeamSummary team="enemy" state={state} result={evaluation.enemy}/></div>
+      <div className="draft-evaluation"><TeamAdvantage result={evaluation} side={state.side}/></div>
+      <div className="candidate-settings">
+       <label title="Add up to three best-scoring fits per role, keeping your candidates. Empty lists start with five popular champions; non-empty lists receive no popularity fillers."><input type="checkbox" checked={showBestFits} onChange={e=>{const enabled=e.target.checked;setShowBestFits(enabled);setActiveTooltip(null);try{localStorage.setItem('draftroom-show-best-fits',String(enabled));}catch{/* Keep the preference in memory if storage is unavailable. */}}}/> Show best fits</label>
+       <small>★ Best fit · ✦ Popular fallback · Suggestions update with picks and bans</small>
+      </div>
       {ROLES.map(role => <div className="board-row" key={role}>
           <button className={`role-label draft-role-handle${roleTarget(role)?' role-drop-target':''}${roleOver===role?' role-drop-over':''}`} aria-label={myRole===role?`Move your ${roleName(role)} role`:`Move to ${roleName(role)} role`}
             title={!myRole&&!associatedPlayers.has(role)?'Take this role and load your candidates':myRole===role?'Drag to change role with your champion':'Drop your role here'}
@@ -103,7 +112,7 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false,claimR
         {(['ally','enemy'] as Team[]).map(team => {
           const player = team === 'ally' ? associatedPlayers.get(role) : undefined;
           const pick = state.picks[team].find(p => p.role === role);
-          const explicit=rolePool(state,team,role),pool=automaticPool(state,team,role);
+          const explicit=rolePool(state,team,role),{pool,bestFits}=draftCandidates(state,team,role,showBestFits,pairIndex);
           const options = candidates(pool,role,team,state,names,pairIndex);
           const reference=fitReference(role,team,state,pairIndex);
           const editable=!readOnly&&canSelectPick(state,uid,host,team,role)&&canPick(state,team,pick?.championId);
@@ -127,7 +136,7 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false,claimR
             </div>
             <div className="draft-options">
               {options.map(option => <DraftChampion key={option.id} id={option.id} role={role} team={team} state={state} result={option}
-                fit={exceptionalFit(option,reference,option.blocked)} selected={option.selected} blocked={option.blocked} busy={busy || pending} pickDisabled={!editable||!!state.draftMode&&!state.openDraft&&option.selected} automatic={!!state.draftMode&&!option.selected&&!explicit.includes(option.id)} toggle={true}
+                fit={exceptionalFit(option,reference,option.blocked)} selected={option.selected} blocked={option.blocked} busy={busy || pending} pickDisabled={!editable||!!state.draftMode&&!state.openDraft&&option.selected} bestFit={bestFits.includes(option.id)} automatic={!!state.draftMode&&!option.selected&&!explicit.includes(option.id)} toggle={true}
                 dragDisabled={!canSelectPick(state,uid,host,team,role)}
                 active={activeTooltip===`${team}:${role}:${option.id}`}
                 onActivate={()=>setActiveTooltip(`${team}:${role}:${option.id}`)}
