@@ -68,9 +68,22 @@ mismatch, malformed synergy response, inconsistent totals, or a missing page for
 a role with more than 100 synergy games still fails the refresh. This is not a
 minimum-games filter: existing low-game observations remain included.
 
-The full November 17 recovery collection is being checked separately; publication
-evidence will be recorded once it completes. Existing rooms keep their pinned
-snapshot; newly created rooms read the latest published pointer.
+The November 17 recovery completed all **865 targets** and published snapshot
+`6565fbabf346e99e6ddfdf89e6d7aabf5fe0efce42e8ddc6b3902c313de4883b`.
+Collection finished at **15:47:55 Europe/Zurich**; publication was verified at
+**15:54:42**. The snapshot is ready, non-fictional, and has **865 shards**,
+**781,968 pairs** (430,587 Against / 351,381 Synergy), calibration k=2,510.048,
+and **864 role metadata entries**. Milio Jungle's absent Build metadata is not
+invented. The two registered accounts and two profiles remain present.
+
+The actual post-publication scheduled check returns `allowed=false, due=false`
+because the daily target is met: a backup event will not collect again. Complete
+branch CI is green: **60 Python tests, 165 TypeScript/PostgreSQL tests, 50 browser
+scenarios and build**. The real credential audit also passed on GitHub Actions.
+Existing rooms keep their pinned snapshot; newly created rooms read this latest
+published pointer. No application account or schema change was performed.
+
+[Structured publication proof](daily-refresh-recovery-2026-11-17.json).
 
 References:
 - [November 15 delayed run](https://github.com/NicoHelemon/lol_drafter/actions/runs/43714416113)

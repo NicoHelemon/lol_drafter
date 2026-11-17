@@ -1,0 +1,69 @@
+{
+  "checkedAt": "2026-11-17T14:54:42.632181+00:00",
+  "previousSnapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+  "health": {
+    "pairs": 781968,
+    "rooms": 1,
+    "shards": 865,
+    "source": "Lolalytics unofficial: public Build HTML + website build-team JSON",
+    "context": {
+      "tier": "emerald_plus",
+      "unit": "percentage_points",
+      "queue": "ranked_solo_duo",
+      "metric": "delta2",
+      "region": "global",
+      "minGames": 0,
+      "windowDays": 14,
+      "minLanePercent": 0,
+      "minPickPercent": 0
+    },
+    "retired": 1,
+    "coverage": {
+      "vs": 430587,
+      "with": 351381
+    },
+    "ageSeconds": 404.82406,
+    "importedAt": "2026-11-17T14:47:55.388356+00:00",
+    "incomplete": 0,
+    "snapshotId": "6565fbabf346e99e6ddfdf89e6d7aabf5fe0efce42e8ddc6b3902c313de4883b"
+  },
+  "metadata": {
+    "ready": true,
+    "fictional": "false",
+    "k": 2510.0480193943954,
+    "calibration_fitted_at": "2026-11-14T17:27:22.587879+00:00",
+    "role_entries": 864
+  },
+  "completedTargets": 865,
+  "unavailableBuilds": {
+    "902:Jungle": {
+      "bytes": 67327,
+      "fetchedAt": "2026-11-17T14:40:26.988684+00:00",
+      "sha256": "720e658397516a965c60f66aec38f86b8a270e864975159a61611af9b43cdb0d",
+      "status": 404,
+      "unavailableBuildGames": 7,
+      "url": "https://lolalytics.com/lol/milio/build/?lane=jungle&patch=14"
+    }
+  },
+  "nextScheduledCheck": {
+    "allowed": false,
+    "due": false,
+    "delayed": false,
+    "event": "schedule",
+    "utc": "2026-11-17T14:54:41.018511+00:00",
+    "local": "2026-11-17T15:54:41.018511+01:00",
+    "timezone": "Europe/Zurich",
+    "dailyTarget": "2026-11-17T06:00:00+01:00",
+    "importedAt": "2026-11-17T14:47:55.388356+00:00",
+    "snapshotId": "6565fbabf346e99e6ddfdf89e6d7aabf5fe0efce42e8ddc6b3902c313de4883b",
+    "reason": "Current snapshot already meets the daily target; no collection needed"
+  },
+  "accountCounts": {
+    "registered_accounts": 2,
+    "profiles": 2
+  },
+  "branchCiRun": 44105955994,
+  "credentialPreflightRun": 44101739646,
+  "schemaChanges": false,
+  "imageRecognitionChanges": false
+}
