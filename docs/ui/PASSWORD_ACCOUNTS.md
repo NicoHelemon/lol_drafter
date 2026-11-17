@@ -1,5 +1,7 @@
 # Comptes avec pseudo de connexion et mot de passe
 
+> L’accueil, l’ouverture du profil et le nom utilisé en salle sont affinés par la livraison [PROFILE_ENTRY_OBSERVERS.md](PROFILE_ENTRY_OBSERVERS.md) du 17 novembre 2026. Le nom du profil remplace désormais le champ de nom ponctuel pour les comptes connectés.
+
 Demande du 17 novembre 2026 (Europe/Zurich), branche `feat/password-accounts`, migration 019. Cette évolution remplace la connexion habituelle par code de la livraison 018 ; les profils, listes personnelles et règles de salles sont conservés.
 
 ## Identité et parcours
