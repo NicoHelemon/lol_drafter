@@ -1,0 +1,652 @@
+{
+  "dataset_archive_sha256": "2e97bdf32c161629c77436b338dd290fd73e11b99a48933cc87a8e2d9edc9bcf",
+  "image_hashes_match_manifest": true,
+  "images": 20,
+  "uses_all_images_for_exploration": true,
+  "independent_validation": false,
+  "no_llm": true,
+  "no_custom_model_training": true,
+  "pretrained_ocr": "Tesseract English",
+  "reference_source": "existing Data Dragon portraits 16.22.1 and published role catalogue",
+  "summary": {
+    "pending_tp": 21,
+    "pending_fp": 0,
+    "pending_fn": 1,
+    "exact_known_bans": 17,
+    "tp": 135,
+    "fp": 0,
+    "fn": 0,
+    "exact_picks": 20,
+    "ban_tp": 180,
+    "ban_fp": 0,
+    "ban_fn": 4,
+    "empty_bans": 6,
+    "empty_bans_correct": 6,
+    "unscored_bans": 10,
+    "confirmed_roles_correct": 67,
+    "confirmed_roles": 68,
+    "images": 20,
+    "exploratory_all_images": true
+  },
+  "baseline_v1_reassessed_with_corrected_annotations": {
+    "portrait_only_tp": 85,
+    "portrait_only_fp": 21,
+    "portrait_only_fn": 50,
+    "true_positive": 88,
+    "false_positive": 0,
+    "false_negative": 47,
+    "correct_assigned_roles": 80,
+    "annotated_roles": 135,
+    "confirmed_role_correct": 33,
+    "confirmed_role_total": 68,
+    "exact_champion_sets": 6
+  },
+  "runtime_seconds": {
+    "total": 235.552,
+    "median": 9.855,
+    "min": 7.552,
+    "max": 28.465
+  },
+  "per_image": [
+    {
+      "image_id": "draft_001",
+      "sha256": "3d20cef866cb296b8a183f8973f0870e61c0655fb0ce7d82787e2aaeff62e4b9",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 3,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 8,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 2,
+        "empty_bans_correct": 2,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 2,
+        "confirmed_roles": 2
+      },
+      "seconds": 12.119
+    },
+    {
+      "image_id": "draft_002",
+      "sha256": "14885a8e523898c48dd3360850e7503f9e8eea74b448c852bfe17d39ec7b7d40",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        542
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 1,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 7,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 9,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 1,
+        "empty_bans_correct": 1,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 4,
+        "confirmed_roles": 4
+      },
+      "seconds": 11.452
+    },
+    {
+      "image_id": "draft_003",
+      "sha256": "cce3aee54a09b887ab7c8fcf0b3404f8432f1b2af77cbe4714538a3eaa566ead",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 2,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 1,
+        "confirmed_roles": 1
+      },
+      "seconds": 12.804
+    },
+    {
+      "image_id": "draft_004",
+      "sha256": "c3d9f60d103e2bbe0b8eecb409c0a835f25f445dd57eb9c728facd4f0d6f02eb",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 2,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 9,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 1,
+        "empty_bans_correct": 1,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 1,
+        "confirmed_roles": 1
+      },
+      "seconds": 9.582
+    },
+    {
+      "image_id": "draft_005",
+      "sha256": "ff4cafcbad6da4462726a1152efa89ec7b03ff816e56e01c100ee858f9b0c21b",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 0,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 7,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 4,
+        "confirmed_roles": 4
+      },
+      "seconds": 10.043
+    },
+    {
+      "image_id": "draft_006",
+      "sha256": "16d3d9a775eeffffa7164b15fefc2e8cd9995202f8c5a72d1b8bd68ebbb04118",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 2,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 0,
+        "tp": 7,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 8,
+        "ban_fp": 0,
+        "ban_fn": 2,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 3,
+        "confirmed_roles": 3
+      },
+      "seconds": 12.815
+    },
+    {
+      "image_id": "draft_007",
+      "sha256": "dc313828d6777a0b4e6fc8646c4c2f17c278dcc88518e40d1ed7e0302e23fb83",
+      "client_box_scaled": [
+        239.0,
+        113.76,
+        640.0,
+        360.0
+      ],
+      "localization": "template_checked_geometry_and_ban_anchors",
+      "evaluation": {
+        "pending_tp": 1,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 3,
+        "confirmed_roles": 3
+      },
+      "seconds": 27.374
+    },
+    {
+      "image_id": "draft_008",
+      "sha256": "ca37ffd57438b04cccb49326d660a26648478fc643dea202176b8033dd45ba48",
+      "client_box_scaled": [
+        166.0,
+        49.76,
+        640.0,
+        360.0
+      ],
+      "localization": "template_checked_geometry_and_ban_anchors",
+      "evaluation": {
+        "pending_tp": 0,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 10,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 5,
+        "confirmed_roles": 5
+      },
+      "seconds": 28.465
+    },
+    {
+      "image_id": "draft_009",
+      "sha256": "936ed20f1be73100c2f3e749ad14de1e54b517a1565fb7c075d65d0b527ead9b",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 0,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 10,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 5,
+        "confirmed_roles": 5
+      },
+      "seconds": 9.11
+    },
+    {
+      "image_id": "draft_010",
+      "sha256": "d2960de8d0da8ab89a375a35d12388639c8b0cfa67a9455ae147b1f13fd739b1",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 1,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 3,
+        "confirmed_roles": 3
+      },
+      "seconds": 9.263
+    },
+    {
+      "image_id": "draft_011",
+      "sha256": "87864a9575ad705a54c0cc83727f301439f8b07509a1e893507ec88a33ed5111",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 0,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 10,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 5,
+        "confirmed_roles": 5
+      },
+      "seconds": 9.577
+    },
+    {
+      "image_id": "draft_012",
+      "sha256": "7c4a0220647cf58f794711256e1ef106eade2829c54dcfdf15f2a0522faf519d",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 1,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 8,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 4,
+        "confirmed_roles": 4
+      },
+      "seconds": 9.875
+    },
+    {
+      "image_id": "draft_013",
+      "sha256": "da3d95f11862ea6a814164032f6b08d77745f689737c6edfe9e6ebc032a20345",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 3,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 5,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 5,
+        "confirmed_roles_correct": 1,
+        "confirmed_roles": 2
+      },
+      "seconds": 9.835
+    },
+    {
+      "image_id": "draft_014",
+      "sha256": "a2b0def796694c2d77aea32a74bbc29d0d7cdd981720f18f7b8e7a1affcc520c",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 0,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 10,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 5,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 5,
+        "confirmed_roles_correct": 5,
+        "confirmed_roles": 5
+      },
+      "seconds": 10.231
+    },
+    {
+      "image_id": "draft_015",
+      "sha256": "3460e38ad3a363a1999ab03a87d85e2d0e1c9cc93fa8b7b2845aa4a1188ee54d",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 2,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 2,
+        "confirmed_roles": 2
+      },
+      "seconds": 10.483
+    },
+    {
+      "image_id": "draft_016",
+      "sha256": "7dbf88abbbd4d1a2c32979fb2f964ba34ed9173079e100f77e5385de0d867c64",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        542
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 1,
+        "pending_fp": 0,
+        "pending_fn": 1,
+        "exact_known_bans": 1,
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 9,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 1,
+        "empty_bans_correct": 1,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 3,
+        "confirmed_roles": 3
+      },
+      "seconds": 8.993
+    },
+    {
+      "image_id": "draft_017",
+      "sha256": "891ab68632023907d6013d520743dbbdf34722e8e783bb4bfb9d266807ed5114",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 0,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 10,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 5,
+        "confirmed_roles": 5
+      },
+      "seconds": 9.293
+    },
+    {
+      "image_id": "draft_018",
+      "sha256": "87c5822519d6c0886ed3f237a9246bcbba0ab86a577e55ffa1be00ca6d07a503",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        542
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 2,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 1,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 10,
+        "ban_fp": 0,
+        "ban_fn": 0,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 1,
+        "confirmed_roles": 1
+      },
+      "seconds": 7.908
+    },
+    {
+      "image_id": "draft_019",
+      "sha256": "83c43b8451ccb6113273f3f5a712c7dcfd3e3b1362774bbbcd6ac42aa8e3e0dd",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 0,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 0,
+        "tp": 10,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 9,
+        "ban_fp": 0,
+        "ban_fn": 1,
+        "empty_bans": 0,
+        "empty_bans_correct": 0,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 5,
+        "confirmed_roles": 5
+      },
+      "seconds": 7.552
+    },
+    {
+      "image_id": "draft_020",
+      "sha256": "d57d88b99b32a0f7d66d07ba3990db0ce15f2df2cf28b26f5bdc23cc0a310243",
+      "client_box_scaled": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "localization": "full_frame_verified_by_portraits_and_bans",
+      "evaluation": {
+        "pending_tp": 0,
+        "pending_fp": 0,
+        "pending_fn": 0,
+        "exact_known_bans": 0,
+        "tp": 9,
+        "fp": 0,
+        "fn": 0,
+        "exact_picks": 1,
+        "ban_tp": 8,
+        "ban_fp": 0,
+        "ban_fn": 1,
+        "empty_bans": 1,
+        "empty_bans_correct": 1,
+        "unscored_bans": 0,
+        "confirmed_roles_correct": 5,
+        "confirmed_roles": 5
+      },
+      "seconds": 8.778
+    }
+  ]
+}

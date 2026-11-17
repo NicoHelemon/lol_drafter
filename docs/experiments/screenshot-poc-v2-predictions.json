@@ -1,0 +1,5882 @@
+[
+  {
+    "image_id": "draft_001",
+    "sha256": "3d20cef866cb296b8a183f8973f0870e61c0655fb0ce7d82787e2aaeff62e4b9",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Viego",
+        "status": "locked",
+        "similarity": 0.6537,
+        "margin": 0.1543,
+        "best_template": "Viego",
+        "ocr_label": "Viego",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Kai'Sa",
+        "status": "locked",
+        "similarity": 0.7979,
+        "margin": 0.1552,
+        "best_template": "Kai'Sa",
+        "ocr_label": "Kai'Sa",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Kayle",
+        "status": "hover",
+        "similarity": 0.808,
+        "margin": 0.1717,
+        "best_template": "Kayle",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4572,
+        "margin": 0.0022,
+        "best_template": "Katarina",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Alistar",
+        "status": "hover",
+        "similarity": 0.8085,
+        "margin": 0.2011,
+        "best_template": "Alistar",
+        "ocr_label": null,
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Qiyana",
+        "status": "locked",
+        "similarity": 0.7593,
+        "margin": 0.2644,
+        "best_template": "Qiyana",
+        "ocr_label": "Qiyana",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Xayah",
+        "status": "picking",
+        "similarity": 0.7996,
+        "margin": 0.0906,
+        "best_template": "Xayah",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5886,
+        "margin": 0.1045,
+        "best_template": "Ambessa",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.3932,
+        "margin": 0.0003,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.39,
+        "margin": 0.0074,
+        "best_template": "Janna",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Lee Sin",
+        "best_template": "Lee Sin",
+        "similarity": 0.9204,
+        "margin": 0.3666,
+        "alignment": [
+          0,
+          1,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Orianna",
+        "best_template": "Orianna",
+        "similarity": 0.9634,
+        "margin": 0.3198,
+        "alignment": [
+          0,
+          1,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Pyke",
+        "best_template": "Pyke",
+        "similarity": 0.9067,
+        "margin": 0.1994,
+        "alignment": [
+          0,
+          1,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Darius",
+        "best_template": "Darius",
+        "similarity": 0.9432,
+        "margin": 0.2568,
+        "alignment": [
+          0,
+          1,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Master Yi",
+        "best_template": "Master Yi",
+        "similarity": 0.9128,
+        "margin": 0.3327,
+        "alignment": [
+          0,
+          1,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Zaahen",
+        "best_template": "Zaahen",
+        "similarity": 0.9439,
+        "margin": 0.2856,
+        "alignment": [
+          2,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": null,
+        "best_template": "Orianna",
+        "similarity": 0.7461,
+        "margin": 0.0471,
+        "alignment": [
+          2,
+          1,
+          0.85
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Darius",
+        "best_template": "Darius",
+        "similarity": 0.9517,
+        "margin": 0.2682,
+        "alignment": [
+          2,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Orianna",
+        "best_template": "Orianna",
+        "similarity": 0.9629,
+        "margin": 0.317,
+        "alignment": [
+          2,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "best_template": "Orianna",
+        "similarity": 0.7386,
+        "margin": 0.0524,
+        "alignment": [
+          2,
+          1,
+          0.85
+        ],
+        "status": "unresolved"
+      }
+    ],
+    "seconds": 12.119,
+    "evaluation": {
+      "pending_tp": 3,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 8,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 2,
+      "empty_bans_correct": 2,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 2,
+      "confirmed_roles": 2
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_002",
+    "sha256": "14885a8e523898c48dd3360850e7503f9e8eea74b448c852bfe17d39ec7b7d40",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      542
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Lucian",
+        "status": "locked",
+        "similarity": 0.6869,
+        "margin": 0.1441,
+        "best_template": "Lucian",
+        "ocr_label": "Lucian",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Nami",
+        "status": "locked",
+        "similarity": 0.8184,
+        "margin": 0.1455,
+        "best_template": "Nami",
+        "ocr_label": "Nami",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Diana",
+        "status": "locked",
+        "similarity": 0.8272,
+        "margin": 0.2191,
+        "best_template": "Diana",
+        "ocr_label": "Diana",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Yuumi",
+        "status": "locked",
+        "similarity": 0.7646,
+        "margin": 0.2236,
+        "best_template": "Yuumi",
+        "ocr_label": "Yuumi",
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4377,
+        "margin": 0.0118,
+        "best_template": "Mordekaiser",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Jhin",
+        "status": "locked",
+        "similarity": 0.8635,
+        "margin": 0.2031,
+        "best_template": "Jhin",
+        "ocr_label": "Jhin",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Naafiri",
+        "status": "locked",
+        "similarity": 0.7977,
+        "margin": 0.1275,
+        "best_template": "Naafiri",
+        "ocr_label": "Naafiri",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Mel",
+        "status": "locked",
+        "similarity": 0.6654,
+        "margin": 0.0646,
+        "best_template": "Mel",
+        "ocr_label": "Mel",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Swain",
+        "status": "picking",
+        "similarity": 0.8596,
+        "margin": 0.155,
+        "best_template": "Swain",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5178,
+        "margin": 0.0385,
+        "best_template": "Ambessa",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Milio",
+        "best_template": "Milio",
+        "similarity": 0.96,
+        "margin": 0.3032,
+        "alignment": [
+          -4,
+          0,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Zed",
+        "best_template": "Zed",
+        "similarity": 0.972,
+        "margin": 0.3453,
+        "alignment": [
+          -4,
+          0,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": null,
+        "best_template": "Elise",
+        "similarity": 0.6684,
+        "margin": 0.0299,
+        "alignment": [
+          -4,
+          0,
+          0.95
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Caitlyn",
+        "best_template": "Caitlyn",
+        "similarity": 0.982,
+        "margin": 0.4332,
+        "alignment": [
+          -4,
+          0,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Gwen",
+        "best_template": "Gwen",
+        "similarity": 0.9585,
+        "margin": 0.338,
+        "alignment": [
+          -4,
+          0,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Yorick",
+        "best_template": "Yorick",
+        "similarity": 0.9599,
+        "margin": 0.3446,
+        "alignment": [
+          8,
+          0,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Shaco",
+        "best_template": "Shaco",
+        "similarity": 0.9287,
+        "margin": 0.4649,
+        "alignment": [
+          8,
+          0,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Gwen",
+        "best_template": "Gwen",
+        "similarity": 0.9628,
+        "margin": 0.3733,
+        "alignment": [
+          8,
+          0,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Ahri",
+        "best_template": "Ahri",
+        "similarity": 0.9723,
+        "margin": 0.3977,
+        "alignment": [
+          8,
+          0,
+          0.95
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Lulu",
+        "best_template": "Lulu",
+        "similarity": 0.9443,
+        "margin": 0.2679,
+        "alignment": [
+          8,
+          0,
+          0.95
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 11.452,
+    "evaluation": {
+      "pending_tp": 1,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 7,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 9,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 1,
+      "empty_bans_correct": 1,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 4,
+      "confirmed_roles": 4
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_003",
+    "sha256": "cce3aee54a09b887ab7c8fcf0b3404f8432f1b2af77cbe4714538a3eaa566ead",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Ashe",
+        "status": "locked",
+        "similarity": 0.869,
+        "margin": 0.2063,
+        "best_template": "Ashe",
+        "ocr_label": "Ashe",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5694,
+        "margin": 0.0102,
+        "best_template": "Ambessa",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Renata Glasc",
+        "status": "picking",
+        "similarity": 0.719,
+        "margin": 0.1194,
+        "best_template": "Renata Glasc",
+        "ocr_label": null,
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Talon",
+        "status": "hover",
+        "similarity": 0.8649,
+        "margin": 0.2464,
+        "best_template": "Talon",
+        "ocr_label": null,
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5268,
+        "margin": 0.0344,
+        "best_template": "Zed",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Kai'Sa",
+        "status": "locked",
+        "similarity": 0.8852,
+        "margin": 0.2216,
+        "best_template": "Kai'Sa",
+        "ocr_label": "Kai'Sa",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Yone",
+        "status": "locked",
+        "similarity": 0.8586,
+        "margin": 0.2258,
+        "best_template": "Yone",
+        "ocr_label": "Yone",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4346,
+        "margin": 0.0281,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.3704,
+        "margin": 0.0107,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4198,
+        "margin": 0.0144,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Pyke",
+        "best_template": "Pyke",
+        "similarity": 0.9489,
+        "margin": 0.2044,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Ambessa",
+        "best_template": "Ambessa",
+        "similarity": 0.9636,
+        "margin": 0.2109,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Milio",
+        "best_template": "Milio",
+        "similarity": 0.9522,
+        "margin": 0.2843,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Anivia",
+        "best_template": "Anivia",
+        "similarity": 0.9644,
+        "margin": 0.317,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Zed",
+        "best_template": "Zed",
+        "similarity": 0.9509,
+        "margin": 0.274,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Rakan",
+        "best_template": "Rakan",
+        "similarity": 0.9386,
+        "margin": 0.3103,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Irelia",
+        "best_template": "Irelia",
+        "similarity": 0.9421,
+        "margin": 0.2542,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Zaahen",
+        "best_template": "Zaahen",
+        "similarity": 0.9285,
+        "margin": 0.2843,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Caitlyn",
+        "best_template": "Caitlyn",
+        "similarity": 0.9513,
+        "margin": 0.3972,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Akali",
+        "best_template": "Akali",
+        "similarity": 0.9366,
+        "margin": 0.2962,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 12.804,
+    "evaluation": {
+      "pending_tp": 2,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 1,
+      "confirmed_roles": 1
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_004",
+    "sha256": "c3d9f60d103e2bbe0b8eecb409c0a835f25f445dd57eb9c728facd4f0d6f02eb",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Briar",
+        "status": "locked",
+        "similarity": 0.7569,
+        "margin": 0.2394,
+        "best_template": "Briar",
+        "ocr_label": "Briar",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5718,
+        "margin": 0.0128,
+        "best_template": "Bard",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Aurelion Sol",
+        "status": "picking",
+        "similarity": 0.768,
+        "margin": 0.25,
+        "best_template": "Aurelion Sol",
+        "ocr_label": null,
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5851,
+        "margin": 0.0447,
+        "best_template": "Zed",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Vladimir",
+        "status": "hover",
+        "similarity": 0.8265,
+        "margin": 0.1995,
+        "best_template": "Vladimir",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Caitlyn",
+        "status": "locked",
+        "similarity": 0.9068,
+        "margin": 0.1362,
+        "best_template": "Caitlyn",
+        "ocr_label": "Caitlyn",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Qiyana",
+        "status": "locked",
+        "similarity": 0.7631,
+        "margin": 0.2694,
+        "best_template": "Qiyana",
+        "ocr_label": "Qiyana",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.3694,
+        "margin": 0.009,
+        "best_template": "Lux",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.3803,
+        "margin": 0.0308,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.3866,
+        "margin": 0.011,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Lee Sin",
+        "best_template": "Lee Sin",
+        "similarity": 0.9397,
+        "margin": 0.3333,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Ezreal",
+        "best_template": "Ezreal",
+        "similarity": 0.9476,
+        "margin": 0.3274,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Zed",
+        "best_template": "Zed",
+        "similarity": 0.9511,
+        "margin": 0.2889,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": null,
+        "best_template": "Viktor",
+        "similarity": 0.692,
+        "margin": 0.0056,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Rumble",
+        "best_template": "Rumble",
+        "similarity": 0.9308,
+        "margin": 0.3031,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Vi",
+        "best_template": "Vi",
+        "similarity": 0.9257,
+        "margin": 0.2968,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Jayce",
+        "best_template": "Jayce",
+        "similarity": 0.9625,
+        "margin": 0.2332,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Neeko",
+        "best_template": "Neeko",
+        "similarity": 0.9619,
+        "margin": 0.2922,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Shaco",
+        "best_template": "Shaco",
+        "similarity": 0.8976,
+        "margin": 0.3976,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "LeBlanc",
+        "best_template": "LeBlanc",
+        "similarity": 0.9627,
+        "margin": 0.2646,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 9.582,
+    "evaluation": {
+      "pending_tp": 2,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 9,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 1,
+      "empty_bans_correct": 1,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 1,
+      "confirmed_roles": 1
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_005",
+    "sha256": "ff4cafcbad6da4462726a1152efa89ec7b03ff816e56e01c100ee858f9b0c21b",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Vi",
+        "status": "locked",
+        "similarity": 0.7216,
+        "margin": 0.1429,
+        "best_template": "Vi",
+        "ocr_label": "Vi",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Yunara",
+        "status": "locked",
+        "similarity": 0.8562,
+        "margin": 0.2462,
+        "best_template": "Yunara",
+        "ocr_label": "Yunara",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Mordekaiser",
+        "status": "locked",
+        "similarity": 0.8491,
+        "margin": 0.1522,
+        "best_template": "Mordekaiser",
+        "ocr_label": "Mordekaiser",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Syndra",
+        "status": "locked",
+        "similarity": 0.8115,
+        "margin": 0.1279,
+        "best_template": "Syndra",
+        "ocr_label": "Syndra",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5107,
+        "margin": 0.0269,
+        "best_template": "Locke",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Wukong",
+        "status": "locked",
+        "similarity": 0.7823,
+        "margin": 0.1173,
+        "best_template": "Wukong",
+        "ocr_label": "Wukong",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Viego",
+        "status": "locked",
+        "similarity": 0.6683,
+        "margin": 0.1373,
+        "best_template": "Viego",
+        "ocr_label": "Viego",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Hwei",
+        "status": "locked",
+        "similarity": 0.8665,
+        "margin": 0.1712,
+        "best_template": "Hwei",
+        "ocr_label": "Hwei",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5706,
+        "margin": 0.0599,
+        "best_template": "Ambessa",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5732,
+        "margin": 0.0726,
+        "best_template": "Ambessa",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Master Yi",
+        "best_template": "Master Yi",
+        "similarity": 0.9465,
+        "margin": 0.3714,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Ekko",
+        "best_template": "Ekko",
+        "similarity": 0.9487,
+        "margin": 0.5063,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Zaahen",
+        "best_template": "Zaahen",
+        "similarity": 0.9464,
+        "margin": 0.3139,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Kha'Zix",
+        "best_template": "Kha'Zix",
+        "similarity": 0.9687,
+        "margin": 0.5051,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Nasus",
+        "best_template": "Nasus",
+        "similarity": 0.9145,
+        "margin": 0.4199,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Kayle",
+        "best_template": "Kayle",
+        "similarity": 0.9716,
+        "margin": 0.338,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Malphite",
+        "best_template": "Malphite",
+        "similarity": 0.985,
+        "margin": 0.42,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Fizz",
+        "best_template": "Fizz",
+        "similarity": 0.9508,
+        "margin": 0.3721,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Naafiri",
+        "best_template": "Naafiri",
+        "similarity": 0.9731,
+        "margin": 0.3705,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Caitlyn",
+        "best_template": "Caitlyn",
+        "similarity": 0.9688,
+        "margin": 0.3954,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 10.043,
+    "evaluation": {
+      "pending_tp": 0,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 7,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 4,
+      "confirmed_roles": 4
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_006",
+    "sha256": "16d3d9a775eeffffa7164b15fefc2e8cd9995202f8c5a72d1b8bd68ebbb04118",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Talon",
+        "status": "locked",
+        "similarity": 0.9024,
+        "margin": 0.2769,
+        "best_template": "Talon",
+        "ocr_label": "Talon",
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Miss Fortune",
+        "status": "locked",
+        "similarity": 0.9171,
+        "margin": 0.2064,
+        "best_template": "Miss Fortune",
+        "ocr_label": "Miss Fortune",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Udyr",
+        "status": "locked",
+        "similarity": 0.4489,
+        "margin": 0.0421,
+        "best_template": "Udyr",
+        "ocr_label": "Udyr",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Shen",
+        "status": "picking",
+        "similarity": 0.8229,
+        "margin": 0.2192,
+        "best_template": "Shen",
+        "ocr_label": null,
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Nasus",
+        "status": "picking",
+        "similarity": 0.6975,
+        "margin": 0.2077,
+        "best_template": "Nasus",
+        "ocr_label": null,
+        "role": "top",
+        "role_source": "client_text"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Draven",
+        "status": "locked",
+        "similarity": 0.8312,
+        "margin": 0.1712,
+        "best_template": "Draven",
+        "ocr_label": "Draven",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Veigar",
+        "status": "locked",
+        "similarity": 0.7974,
+        "margin": 0.2512,
+        "best_template": "Veigar",
+        "ocr_label": "Veigar",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Teemo",
+        "status": "locked",
+        "similarity": 0.7271,
+        "margin": 0.0352,
+        "best_template": "Teemo",
+        "ocr_label": "Teemo",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Yuumi",
+        "status": "locked",
+        "similarity": 0.8804,
+        "margin": 0.2089,
+        "best_template": "Yuumi",
+        "ocr_label": "Yuumi",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.397,
+        "margin": 0.0523,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Yasuo",
+        "best_template": "Yasuo",
+        "similarity": 0.9704,
+        "margin": 0.4155,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Thresh",
+        "best_template": "Thresh",
+        "similarity": 0.967,
+        "margin": 0.547,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Rammus",
+        "best_template": "Rammus",
+        "similarity": 0.9751,
+        "margin": 0.3798,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": null,
+        "best_template": "Varus",
+        "similarity": 0.6292,
+        "margin": 0.0594,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Garen",
+        "best_template": "Garen",
+        "similarity": 0.9597,
+        "margin": 0.295,
+        "alignment": [
+          0,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": null,
+        "best_template": "Varus",
+        "similarity": 0.6337,
+        "margin": 0.0679,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Zed",
+        "best_template": "Zed",
+        "similarity": 0.9721,
+        "margin": 0.302,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Garen",
+        "best_template": "Garen",
+        "similarity": 0.9596,
+        "margin": 0.2941,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Zoe",
+        "best_template": "Zoe",
+        "similarity": 0.9682,
+        "margin": 0.3509,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Master Yi",
+        "best_template": "Master Yi",
+        "similarity": 0.9669,
+        "margin": 0.377,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 12.815,
+    "evaluation": {
+      "pending_tp": 2,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 0,
+      "tp": 7,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 8,
+      "ban_fp": 0,
+      "ban_fn": 2,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 3,
+      "confirmed_roles": 3
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_007",
+    "sha256": "dc313828d6777a0b4e6fc8646c4c2f17c278dcc88518e40d1ed7e0302e23fb83",
+    "client_box_scaled": [
+      239.0,
+      113.76,
+      640.0,
+      360.0
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Jarvan IV",
+        "status": "locked",
+        "similarity": 0.7588,
+        "margin": 0.1736,
+        "best_template": "Jarvan IV",
+        "ocr_label": "Jarvan IV",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Jinx",
+        "status": "locked",
+        "similarity": 0.8593,
+        "margin": 0.1878,
+        "best_template": "Jinx",
+        "ocr_label": "Jinx",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Lulu",
+        "status": "locked",
+        "similarity": 0.8832,
+        "margin": 0.2013,
+        "best_template": "Lulu",
+        "ocr_label": "Lulu",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5697,
+        "margin": 0.0174,
+        "best_template": "Vayne",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5436,
+        "margin": 0.014,
+        "best_template": "Ryze",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Rek'Sai",
+        "status": "locked",
+        "similarity": 0.8353,
+        "margin": 0.1246,
+        "best_template": "Rek'Sai",
+        "ocr_label": "Rek'Sai",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Senna",
+        "status": "locked",
+        "similarity": 0.8011,
+        "margin": 0.1432,
+        "best_template": "Senna",
+        "ocr_label": "Senna",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Thresh",
+        "status": "picking",
+        "similarity": 0.7964,
+        "margin": 0.1214,
+        "best_template": "Thresh",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5995,
+        "margin": 0.0189,
+        "best_template": "Malphite",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.43,
+        "margin": 0.0316,
+        "best_template": "Master Yi",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Samira",
+        "best_template": "Samira",
+        "similarity": 0.9419,
+        "margin": 0.2789,
+        "alignment": [
+          -1,
+          0,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Talon",
+        "best_template": "Talon",
+        "similarity": 0.8729,
+        "margin": 0.2813,
+        "alignment": [
+          -1,
+          0,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Karthus",
+        "best_template": "Karthus",
+        "similarity": 0.8607,
+        "margin": 0.2993,
+        "alignment": [
+          -1,
+          0,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Akali",
+        "best_template": "Akali",
+        "similarity": 0.8509,
+        "margin": 0.1651,
+        "alignment": [
+          -1,
+          0,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "K'Sante",
+        "best_template": "K'Sante",
+        "similarity": 0.9275,
+        "margin": 0.2199,
+        "alignment": [
+          -1,
+          0,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Talon",
+        "best_template": "Talon",
+        "similarity": 0.8837,
+        "margin": 0.2492,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Draven",
+        "best_template": "Draven",
+        "similarity": 0.8744,
+        "margin": 0.2102,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Jayce",
+        "best_template": "Jayce",
+        "similarity": 0.9012,
+        "margin": 0.2017,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Zed",
+        "best_template": "Zed",
+        "similarity": 0.9311,
+        "margin": 0.2503,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Soraka",
+        "best_template": "Soraka",
+        "similarity": 0.9147,
+        "margin": 0.3,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 27.374,
+    "evaluation": {
+      "pending_tp": 1,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 3,
+      "confirmed_roles": 3
+    },
+    "localization": "template_checked_geometry_and_ban_anchors"
+  },
+  {
+    "image_id": "draft_008",
+    "sha256": "ca37ffd57438b04cccb49326d660a26648478fc643dea202176b8033dd45ba48",
+    "client_box_scaled": [
+      166.0,
+      49.76,
+      640.0,
+      360.0
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Twisted Fate",
+        "status": "locked",
+        "similarity": 0.844,
+        "margin": 0.2098,
+        "best_template": "Twisted Fate",
+        "ocr_label": "Twisted Fate",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Udyr",
+        "status": "locked",
+        "similarity": 0.7715,
+        "margin": 0.1667,
+        "best_template": "Udyr",
+        "ocr_label": "Udyr",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Fiddlesticks",
+        "status": "locked",
+        "similarity": 0.8283,
+        "margin": 0.2128,
+        "best_template": "Fiddlesticks",
+        "ocr_label": "Fiddlesticks",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Quinn",
+        "status": "locked",
+        "similarity": 0.9076,
+        "margin": 0.2311,
+        "best_template": "Quinn",
+        "ocr_label": "Quinn",
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Ornn",
+        "status": "locked",
+        "similarity": 0.7456,
+        "margin": 0.1825,
+        "best_template": "Ornn",
+        "ocr_label": "Ornn",
+        "role": "top",
+        "role_source": "client_text"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Seraphine",
+        "status": "locked",
+        "similarity": 0.7825,
+        "margin": 0.1533,
+        "best_template": "Seraphine",
+        "ocr_label": "Seraphine",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Soraka",
+        "status": "locked",
+        "similarity": 0.802,
+        "margin": 0.1113,
+        "best_template": "Soraka",
+        "ocr_label": "Soraka",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Gangplank",
+        "status": "locked",
+        "similarity": 0.8187,
+        "margin": 0.1294,
+        "best_template": "Gangplank",
+        "ocr_label": "Gangplank",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Zoe",
+        "status": "locked",
+        "similarity": 0.8304,
+        "margin": 0.1588,
+        "best_template": "Zoe",
+        "ocr_label": "Zoe",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Naafiri",
+        "status": "locked",
+        "similarity": 0.8739,
+        "margin": 0.2077,
+        "best_template": "Naafiri",
+        "ocr_label": "Naafiri",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Jinx",
+        "best_template": "Jinx",
+        "similarity": 0.8873,
+        "margin": 0.2136,
+        "alignment": [
+          -1,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Master Yi",
+        "best_template": "Master Yi",
+        "similarity": 0.8561,
+        "margin": 0.2458,
+        "alignment": [
+          -1,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Jax",
+        "best_template": "Jax",
+        "similarity": 0.938,
+        "margin": 0.2198,
+        "alignment": [
+          -1,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Ambessa",
+        "best_template": "Ambessa",
+        "similarity": 0.9469,
+        "margin": 0.1826,
+        "alignment": [
+          -1,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Bard",
+        "best_template": "Bard",
+        "similarity": 0.8856,
+        "margin": 0.3782,
+        "alignment": [
+          -1,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Malphite",
+        "best_template": "Malphite",
+        "similarity": 0.9625,
+        "margin": 0.3321,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Blitzcrank",
+        "best_template": "Blitzcrank",
+        "similarity": 0.9051,
+        "margin": 0.238,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Pyke",
+        "best_template": "Pyke",
+        "similarity": 0.9433,
+        "margin": 0.1864,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Syndra",
+        "best_template": "Syndra",
+        "similarity": 0.879,
+        "margin": 0.2091,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Jayce",
+        "best_template": "Jayce",
+        "similarity": 0.9107,
+        "margin": 0.2043,
+        "alignment": [
+          0,
+          1,
+          0.85
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 28.465,
+    "evaluation": {
+      "pending_tp": 0,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 5,
+      "confirmed_roles": 5
+    },
+    "localization": "template_checked_geometry_and_ban_anchors"
+  },
+  {
+    "image_id": "draft_009",
+    "sha256": "936ed20f1be73100c2f3e749ad14de1e54b517a1565fb7c075d65d0b527ead9b",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Lulu",
+        "status": "locked",
+        "similarity": 0.8372,
+        "margin": 0.165,
+        "best_template": "Lulu",
+        "ocr_label": null,
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Ashe",
+        "status": "locked",
+        "similarity": 0.8776,
+        "margin": 0.2172,
+        "best_template": "Ashe",
+        "ocr_label": null,
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Naafiri",
+        "status": "locked",
+        "similarity": 0.7763,
+        "margin": 0.168,
+        "best_template": "Naafiri",
+        "ocr_label": null,
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Orianna",
+        "status": "locked",
+        "similarity": 0.8594,
+        "margin": 0.2019,
+        "best_template": "Orianna",
+        "ocr_label": null,
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Tryndamere",
+        "status": "locked",
+        "similarity": 0.7924,
+        "margin": 0.1427,
+        "best_template": "Tryndamere",
+        "ocr_label": null,
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Kha'Zix",
+        "status": "locked",
+        "similarity": 0.8964,
+        "margin": 0.4339,
+        "best_template": "Kha'Zix",
+        "ocr_label": null,
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Jhin",
+        "status": "locked",
+        "similarity": 0.8627,
+        "margin": 0.1717,
+        "best_template": "Jhin",
+        "ocr_label": null,
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Vel'Koz",
+        "status": "locked",
+        "similarity": 0.8185,
+        "margin": 0.2218,
+        "best_template": "Vel'Koz",
+        "ocr_label": null,
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Mordekaiser",
+        "status": "locked",
+        "similarity": 0.8522,
+        "margin": 0.1323,
+        "best_template": "Mordekaiser",
+        "ocr_label": null,
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "LeBlanc",
+        "status": "locked",
+        "similarity": 0.8998,
+        "margin": 0.2604,
+        "best_template": "LeBlanc",
+        "ocr_label": null,
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Pyke",
+        "best_template": "Pyke",
+        "similarity": 0.9517,
+        "margin": 0.2046,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Sivir",
+        "best_template": "Sivir",
+        "similarity": 0.9355,
+        "margin": 0.2515,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Evelynn",
+        "best_template": "Evelynn",
+        "similarity": 0.9429,
+        "margin": 0.4118,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Katarina",
+        "best_template": "Katarina",
+        "similarity": 0.9132,
+        "margin": 0.3261,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Irelia",
+        "best_template": "Irelia",
+        "similarity": 0.9111,
+        "margin": 0.2255,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Shaco",
+        "best_template": "Shaco",
+        "similarity": 0.8853,
+        "margin": 0.3715,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Malphite",
+        "best_template": "Malphite",
+        "similarity": 0.9774,
+        "margin": 0.3836,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Illaoi",
+        "best_template": "Illaoi",
+        "similarity": 0.9687,
+        "margin": 0.2282,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Aphelios",
+        "best_template": "Aphelios",
+        "similarity": 0.9578,
+        "margin": 0.2116,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Akali",
+        "best_template": "Akali",
+        "similarity": 0.9381,
+        "margin": 0.2993,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 9.11,
+    "evaluation": {
+      "pending_tp": 0,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 5,
+      "confirmed_roles": 5
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_010",
+    "sha256": "d2960de8d0da8ab89a375a35d12388639c8b0cfa67a9455ae147b1f13fd739b1",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Elise",
+        "status": "locked",
+        "similarity": 0.8936,
+        "margin": 0.2037,
+        "best_template": "Elise",
+        "ocr_label": "Elise",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Kai'Sa",
+        "status": "locked",
+        "similarity": 0.821,
+        "margin": 0.1768,
+        "best_template": "Kai'Sa",
+        "ocr_label": "Kai'Sa",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Camille",
+        "status": "locked",
+        "similarity": 0.8797,
+        "margin": 0.1755,
+        "best_template": "Camille",
+        "ocr_label": "Camille",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4374,
+        "margin": 0.0041,
+        "best_template": "Katarina",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Yone",
+        "status": "hover",
+        "similarity": 0.8664,
+        "margin": 0.2352,
+        "best_template": "Yone",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Gragas",
+        "status": "locked",
+        "similarity": 0.8821,
+        "margin": 0.2355,
+        "best_template": "Gragas",
+        "ocr_label": "Gragas",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Vladimir",
+        "status": "locked",
+        "similarity": 0.8369,
+        "margin": 0.2032,
+        "best_template": "Vladimir",
+        "ocr_label": "Vladimir",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5267,
+        "margin": 0.0589,
+        "best_template": "Malphite",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5261,
+        "margin": 0.0564,
+        "best_template": "Malphite",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4512,
+        "margin": 0.0368,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Nidalee",
+        "best_template": "Nidalee",
+        "similarity": 0.9293,
+        "margin": 0.3949,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Twitch",
+        "best_template": "Twitch",
+        "similarity": 0.9406,
+        "margin": 0.4185,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Rell",
+        "best_template": "Rell",
+        "similarity": 0.9495,
+        "margin": 0.3598,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Fiora",
+        "best_template": "Fiora",
+        "similarity": 0.9538,
+        "margin": 0.3839,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Lissandra",
+        "best_template": "Lissandra",
+        "similarity": 0.9179,
+        "margin": 0.3222,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Master Yi",
+        "best_template": "Master Yi",
+        "similarity": 0.9367,
+        "margin": 0.3498,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Syndra",
+        "best_template": "Syndra",
+        "similarity": 0.9374,
+        "margin": 0.3384,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Alistar",
+        "best_template": "Alistar",
+        "similarity": 0.9321,
+        "margin": 0.467,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Akali",
+        "best_template": "Akali",
+        "similarity": 0.9468,
+        "margin": 0.3141,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Ambessa",
+        "best_template": "Ambessa",
+        "similarity": 0.9707,
+        "margin": 0.219,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 9.263,
+    "evaluation": {
+      "pending_tp": 1,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 3,
+      "confirmed_roles": 3
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_011",
+    "sha256": "87864a9575ad705a54c0cc83727f301439f8b07509a1e893507ec88a33ed5111",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Lulu",
+        "status": "locked",
+        "similarity": 0.8379,
+        "margin": 0.1686,
+        "best_template": "Lulu",
+        "ocr_label": "Lulu",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Elise",
+        "status": "locked",
+        "similarity": 0.894,
+        "margin": 0.2039,
+        "best_template": "Elise",
+        "ocr_label": "Elise",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Tristana",
+        "status": "locked",
+        "similarity": 0.824,
+        "margin": 0.2155,
+        "best_template": "Tristana",
+        "ocr_label": "Tristana",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Ekko",
+        "status": "locked",
+        "similarity": 0.756,
+        "margin": 0.06,
+        "best_template": "Ekko",
+        "ocr_label": "Ekko",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Ambessa",
+        "status": "locked",
+        "similarity": 0.9044,
+        "margin": 0.2182,
+        "best_template": "Ambessa",
+        "ocr_label": null,
+        "role": "top",
+        "role_source": "client_text"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Riven",
+        "status": "locked",
+        "similarity": 0.8025,
+        "margin": 0.2387,
+        "best_template": "Riven",
+        "ocr_label": "Riven",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Zyra",
+        "status": "locked",
+        "similarity": 0.8785,
+        "margin": 0.2205,
+        "best_template": "Zyra",
+        "ocr_label": "Zyra",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Yunara",
+        "status": "locked",
+        "similarity": 0.8635,
+        "margin": 0.2179,
+        "best_template": "Yunara",
+        "ocr_label": "Yunara",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Twisted Fate",
+        "status": "locked",
+        "similarity": 0.8181,
+        "margin": 0.2051,
+        "best_template": "Twisted Fate",
+        "ocr_label": "Twisted Fate",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Nautilus",
+        "status": "locked",
+        "similarity": 0.8382,
+        "margin": 0.3134,
+        "best_template": "Nautilus",
+        "ocr_label": "Nautilus",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Yasuo",
+        "best_template": "Yasuo",
+        "similarity": 0.9384,
+        "margin": 0.3944,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Tryndamere",
+        "best_template": "Tryndamere",
+        "similarity": 0.9258,
+        "margin": 0.1884,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Qiyana",
+        "best_template": "Qiyana",
+        "similarity": 0.918,
+        "margin": 0.382,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Lillia",
+        "best_template": "Lillia",
+        "similarity": 0.9448,
+        "margin": 0.2098,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Nidalee",
+        "best_template": "Nidalee",
+        "similarity": 0.929,
+        "margin": 0.3926,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Ezreal",
+        "best_template": "Ezreal",
+        "similarity": 0.9529,
+        "margin": 0.331,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Rengar",
+        "best_template": "Rengar",
+        "similarity": 0.9338,
+        "margin": 0.2914,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Zoe",
+        "best_template": "Zoe",
+        "similarity": 0.951,
+        "margin": 0.3215,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Urgot",
+        "best_template": "Urgot",
+        "similarity": 0.9674,
+        "margin": 0.2283,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Lissandra",
+        "best_template": "Lissandra",
+        "similarity": 0.9415,
+        "margin": 0.3521,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 9.577,
+    "evaluation": {
+      "pending_tp": 0,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 5,
+      "confirmed_roles": 5
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_012",
+    "sha256": "7c4a0220647cf58f794711256e1ef106eade2829c54dcfdf15f2a0522faf519d",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Ziggs",
+        "status": "locked",
+        "similarity": 0.823,
+        "margin": 0.0942,
+        "best_template": "Ziggs",
+        "ocr_label": "Ziggs",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Syndra",
+        "status": "locked",
+        "similarity": 0.8,
+        "margin": 0.1184,
+        "best_template": "Syndra",
+        "ocr_label": "Syndra",
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Tryndamere",
+        "status": "locked",
+        "similarity": 0.7909,
+        "margin": 0.1389,
+        "best_template": "Tryndamere",
+        "ocr_label": "Tryndamere",
+        "role": "top",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Kha'Zix",
+        "status": "picking",
+        "similarity": 0.8932,
+        "margin": 0.4398,
+        "best_template": "Kha'Zix",
+        "ocr_label": null,
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Rell",
+        "status": "locked",
+        "similarity": 0.667,
+        "margin": 0.1778,
+        "best_template": "Rell",
+        "ocr_label": "Rell",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Ambessa",
+        "status": "locked",
+        "similarity": 0.893,
+        "margin": 0.1896,
+        "best_template": "Ambessa",
+        "ocr_label": "Ambessa",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Viktor",
+        "status": "locked",
+        "similarity": 0.8603,
+        "margin": 0.1366,
+        "best_template": "Viktor",
+        "ocr_label": "Viktor",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Taliyah",
+        "status": "locked",
+        "similarity": 0.6961,
+        "margin": 0.1165,
+        "best_template": "Taliyah",
+        "ocr_label": "Taliyah",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Nautilus",
+        "status": "locked",
+        "similarity": 0.8397,
+        "margin": 0.313,
+        "best_template": "Nautilus",
+        "ocr_label": "Nautilus",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4497,
+        "margin": 0.0357,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Yone",
+        "best_template": "Yone",
+        "similarity": 0.9552,
+        "margin": 0.3288,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Riven",
+        "best_template": "Riven",
+        "similarity": 0.9396,
+        "margin": 0.315,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Jayce",
+        "best_template": "Jayce",
+        "similarity": 0.9416,
+        "margin": 0.2376,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Yasuo",
+        "best_template": "Yasuo",
+        "similarity": 0.9387,
+        "margin": 0.3932,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Kalista",
+        "best_template": "Kalista",
+        "similarity": 0.934,
+        "margin": 0.3159,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Jayce",
+        "best_template": "Jayce",
+        "similarity": 0.9616,
+        "margin": 0.2337,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "LeBlanc",
+        "best_template": "LeBlanc",
+        "similarity": 0.9582,
+        "margin": 0.2506,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Zoe",
+        "best_template": "Zoe",
+        "similarity": 0.9507,
+        "margin": 0.3204,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Gnar",
+        "best_template": "Gnar",
+        "similarity": 0.965,
+        "margin": 0.3233,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Qiyana",
+        "best_template": "Qiyana",
+        "similarity": 0.9399,
+        "margin": 0.3949,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 9.875,
+    "evaluation": {
+      "pending_tp": 1,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 8,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 4,
+      "confirmed_roles": 4
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_013",
+    "sha256": "da3d95f11862ea6a814164032f6b08d77745f689737c6edfe9e6ebc032a20345",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Mel",
+        "status": "locked",
+        "similarity": 0.7818,
+        "margin": 0.1485,
+        "best_template": "Mel",
+        "ocr_label": "Mel",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Poppy",
+        "status": "locked",
+        "similarity": 0.7166,
+        "margin": 0.1409,
+        "best_template": "Poppy",
+        "ocr_label": "Poppy",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Lillia",
+        "status": "picking",
+        "similarity": 0.8335,
+        "margin": 0.216,
+        "best_template": "Lillia",
+        "ocr_label": null,
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Locke",
+        "status": "picking",
+        "similarity": 0.8434,
+        "margin": 0.2257,
+        "best_template": "Locke",
+        "ocr_label": null,
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Master Yi",
+        "status": "hover",
+        "similarity": 0.8813,
+        "margin": 0.2808,
+        "best_template": "Master Yi",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Kalista",
+        "status": "locked",
+        "similarity": 0.7982,
+        "margin": 0.1621,
+        "best_template": "Kalista",
+        "ocr_label": "Kalista",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Renata Glasc",
+        "status": "locked",
+        "similarity": 0.7707,
+        "margin": 0.2018,
+        "best_template": "Renata Glasc",
+        "ocr_label": "Renata Glasc",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Taliyah",
+        "status": "locked",
+        "similarity": 0.6994,
+        "margin": 0.1209,
+        "best_template": "Taliyah",
+        "ocr_label": "Taliyah",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4331,
+        "margin": 0.0292,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4467,
+        "margin": 0.0184,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": null,
+        "best_template": "Ambessa",
+        "similarity": 0.8183,
+        "margin": 0.1891,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "duplicate_conflict"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": null,
+        "best_template": "Ambessa",
+        "similarity": 0.7813,
+        "margin": 0.0904,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": null,
+        "best_template": "Ambessa",
+        "similarity": 0.8209,
+        "margin": 0.1027,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "duplicate_conflict"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": null,
+        "best_template": "Aurelion Sol",
+        "similarity": 0.47,
+        "margin": 0.0066,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": null,
+        "best_template": "Aurelion Sol",
+        "similarity": 0.47,
+        "margin": 0.0066,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "LeBlanc",
+        "best_template": "LeBlanc",
+        "similarity": 0.959,
+        "margin": 0.2527,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Swain",
+        "best_template": "Swain",
+        "similarity": 0.9622,
+        "margin": 0.3003,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Qiyana",
+        "best_template": "Qiyana",
+        "similarity": 0.9399,
+        "margin": 0.3931,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Elise",
+        "best_template": "Elise",
+        "similarity": 0.9466,
+        "margin": 0.2551,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Irelia",
+        "best_template": "Irelia",
+        "similarity": 0.9473,
+        "margin": 0.2594,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 9.835,
+    "evaluation": {
+      "pending_tp": 3,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 5,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 5,
+      "confirmed_roles_correct": 1,
+      "confirmed_roles": 2
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_014",
+    "sha256": "a2b0def796694c2d77aea32a74bbc29d0d7cdd981720f18f7b8e7a1affcc520c",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Yasuo",
+        "status": "locked",
+        "similarity": 0.8026,
+        "margin": 0.2337,
+        "best_template": "Yasuo",
+        "ocr_label": "Yasuo",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Karthus",
+        "status": "locked",
+        "similarity": 0.8844,
+        "margin": 0.1671,
+        "best_template": "Karthus",
+        "ocr_label": "Karthus",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Leona",
+        "status": "locked",
+        "similarity": 0.8042,
+        "margin": 0.1762,
+        "best_template": "Leona",
+        "ocr_label": "Leona",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Yone",
+        "status": "locked",
+        "similarity": 0.8625,
+        "margin": 0.2284,
+        "best_template": "Yone",
+        "ocr_label": null,
+        "role": "top",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Lillia",
+        "status": "locked",
+        "similarity": 0.8341,
+        "margin": 0.2149,
+        "best_template": "Lillia",
+        "ocr_label": "Lillia",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Twitch",
+        "status": "locked",
+        "similarity": 0.8389,
+        "margin": 0.2788,
+        "best_template": "Twitch",
+        "ocr_label": "Twitch",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Alistar",
+        "status": "locked",
+        "similarity": 0.7937,
+        "margin": 0.1752,
+        "best_template": "Alistar",
+        "ocr_label": "Alistar",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Kalista",
+        "status": "locked",
+        "similarity": 0.7976,
+        "margin": 0.1647,
+        "best_template": "Kalista",
+        "ocr_label": "Kalista",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Naafiri",
+        "status": "locked",
+        "similarity": 0.8609,
+        "margin": 0.2291,
+        "best_template": "Naafiri",
+        "ocr_label": "Naafiri",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Fiora",
+        "status": "locked",
+        "similarity": 0.8514,
+        "margin": 0.1806,
+        "best_template": "Fiora",
+        "ocr_label": "Fiora",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": null,
+        "best_template": "Ambessa",
+        "similarity": 0.8185,
+        "margin": 0.1888,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "duplicate_conflict"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": null,
+        "best_template": "Ambessa",
+        "similarity": 0.7807,
+        "margin": 0.09,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": null,
+        "best_template": "Ambessa",
+        "similarity": 0.8205,
+        "margin": 0.1022,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "duplicate_conflict"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": null,
+        "best_template": "Nocturne",
+        "similarity": 0.4204,
+        "margin": 0.0383,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": null,
+        "best_template": "Nocturne",
+        "similarity": 0.4204,
+        "margin": 0.0383,
+        "alignment": [
+          14,
+          -7,
+          0.95
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Graves",
+        "best_template": "Graves",
+        "similarity": 0.9084,
+        "margin": 0.3682,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Qiyana",
+        "best_template": "Qiyana",
+        "similarity": 0.9395,
+        "margin": 0.3947,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Viktor",
+        "best_template": "Viktor",
+        "similarity": 0.9527,
+        "margin": 0.274,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Jayce",
+        "best_template": "Jayce",
+        "similarity": 0.9618,
+        "margin": 0.2344,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Elise",
+        "best_template": "Elise",
+        "similarity": 0.9472,
+        "margin": 0.2547,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 10.231,
+    "evaluation": {
+      "pending_tp": 0,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 5,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 5,
+      "confirmed_roles_correct": 5,
+      "confirmed_roles": 5
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_015",
+    "sha256": "3460e38ad3a363a1999ab03a87d85e2d0e1c9cc93fa8b7b2845aa4a1188ee54d",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Jhin",
+        "status": "locked",
+        "similarity": 0.8427,
+        "margin": 0.1571,
+        "best_template": "Jhin",
+        "ocr_label": "Jhin",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Blitzcrank",
+        "status": "locked",
+        "similarity": 0.8423,
+        "margin": 0.2438,
+        "best_template": "Blitzcrank",
+        "ocr_label": "Blitzcrank",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Kai'Sa",
+        "status": "picking",
+        "similarity": 0.8124,
+        "margin": 0.1712,
+        "best_template": "Kai'Sa",
+        "ocr_label": null,
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5552,
+        "margin": 0.0034,
+        "best_template": "Pyke",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Jarvan IV",
+        "status": "hover",
+        "similarity": 0.7434,
+        "margin": 0.1504,
+        "best_template": "Jarvan IV",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Yuumi",
+        "status": "locked",
+        "similarity": 0.8698,
+        "margin": 0.3077,
+        "best_template": "Yuumi",
+        "ocr_label": "Yuumi",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Sivir",
+        "status": "locked",
+        "similarity": 0.8146,
+        "margin": 0.2115,
+        "best_template": "Sivir",
+        "ocr_label": "Sivir",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "LeBlanc",
+        "status": "locked",
+        "similarity": 0.9006,
+        "margin": 0.2646,
+        "best_template": "LeBlanc",
+        "ocr_label": "LeBlanc",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4243,
+        "margin": 0.0152,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4596,
+        "margin": 0.035,
+        "best_template": "Anivia",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Riven",
+        "best_template": "Riven",
+        "similarity": 0.9398,
+        "margin": 0.3138,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Kled",
+        "best_template": "Kled",
+        "similarity": 0.9261,
+        "margin": 0.3552,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Katarina",
+        "best_template": "Katarina",
+        "similarity": 0.9421,
+        "margin": 0.3391,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Jayce",
+        "best_template": "Jayce",
+        "similarity": 0.942,
+        "margin": 0.2343,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Taric",
+        "best_template": "Taric",
+        "similarity": 0.9311,
+        "margin": 0.2774,
+        "alignment": [
+          1,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Yasuo",
+        "best_template": "Yasuo",
+        "similarity": 0.9457,
+        "margin": 0.3999,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Qiyana",
+        "best_template": "Qiyana",
+        "similarity": 0.9386,
+        "margin": 0.392,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Vladimir",
+        "best_template": "Vladimir",
+        "similarity": 0.9615,
+        "margin": 0.3037,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Elise",
+        "best_template": "Elise",
+        "similarity": 0.9457,
+        "margin": 0.2521,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Fiora",
+        "best_template": "Fiora",
+        "similarity": 0.9689,
+        "margin": 0.383,
+        "alignment": [
+          2,
+          2,
+          0.9
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 10.483,
+    "evaluation": {
+      "pending_tp": 2,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 2,
+      "confirmed_roles": 2
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_016",
+    "sha256": "7dbf88abbbd4d1a2c32979fb2f964ba34ed9173079e100f77e5385de0d867c64",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      542
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Yasuo",
+        "status": "locked",
+        "similarity": 0.7947,
+        "margin": 0.1968,
+        "best_template": "Yasuo",
+        "ocr_label": "Yasuo",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Thresh",
+        "status": "locked",
+        "similarity": 0.8762,
+        "margin": 0.2736,
+        "best_template": "Thresh",
+        "ocr_label": "Thresh",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Cho'Gath",
+        "status": "locked",
+        "similarity": 0.781,
+        "margin": 0.1759,
+        "best_template": "Cho'Gath",
+        "ocr_label": "Cho'Gath",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Syndra",
+        "status": "hover",
+        "similarity": 0.8512,
+        "margin": 0.1934,
+        "best_template": "Syndra",
+        "ocr_label": null,
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5229,
+        "margin": 0.0491,
+        "best_template": "Teemo",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Caitlyn",
+        "status": "locked",
+        "similarity": 0.7915,
+        "margin": 0.0189,
+        "best_template": "Caitlyn",
+        "ocr_label": "Caitlyn",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Talon",
+        "status": "locked",
+        "similarity": 0.6535,
+        "margin": 0.0261,
+        "best_template": "Talon",
+        "ocr_label": "Talon",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.601,
+        "margin": 0.1206,
+        "best_template": "Malphite",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.6334,
+        "margin": 0.0199,
+        "best_template": "Diana",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.4564,
+        "margin": 0.0475,
+        "best_template": "Master Yi",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Katarina",
+        "best_template": "Katarina",
+        "similarity": 0.9399,
+        "margin": 0.3449,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Pyke",
+        "best_template": "Pyke",
+        "similarity": 0.9716,
+        "margin": 0.2102,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Graves",
+        "best_template": "Graves",
+        "similarity": 0.9187,
+        "margin": 0.3736,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Leona",
+        "best_template": "Leona",
+        "similarity": 0.96,
+        "margin": 0.2175,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": null,
+        "best_template": "Orianna",
+        "similarity": 0.7205,
+        "margin": 0.0595,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Nautilus",
+        "best_template": "Nautilus",
+        "similarity": 0.9571,
+        "margin": 0.4446,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Sylas",
+        "best_template": "Sylas",
+        "similarity": 0.967,
+        "margin": 0.3317,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Draven",
+        "best_template": "Draven",
+        "similarity": 0.9356,
+        "margin": 0.2235,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Rengar",
+        "best_template": "Rengar",
+        "similarity": 0.9387,
+        "margin": 0.3419,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Garen",
+        "best_template": "Garen",
+        "similarity": 0.9404,
+        "margin": 0.2665,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 8.993,
+    "evaluation": {
+      "pending_tp": 1,
+      "pending_fp": 0,
+      "pending_fn": 1,
+      "exact_known_bans": 1,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 9,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 1,
+      "empty_bans_correct": 1,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 3,
+      "confirmed_roles": 3
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_017",
+    "sha256": "891ab68632023907d6013d520743dbbdf34722e8e783bb4bfb9d266807ed5114",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Locke",
+        "status": "locked",
+        "similarity": 0.8941,
+        "margin": 0.2737,
+        "best_template": "Locke",
+        "ocr_label": "Locke",
+        "role": "top",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Yunara",
+        "status": "locked",
+        "similarity": 0.8688,
+        "margin": 0.2563,
+        "best_template": "Yunara",
+        "ocr_label": null,
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Lulu",
+        "status": "locked",
+        "similarity": 0.8505,
+        "margin": 0.1755,
+        "best_template": "Lulu",
+        "ocr_label": "Lulu",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Malzahar",
+        "status": "locked",
+        "similarity": 0.8867,
+        "margin": 0.2423,
+        "best_template": "Malzahar",
+        "ocr_label": "Malzahar",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Kha'Zix",
+        "status": "locked",
+        "similarity": 0.4705,
+        "margin": 0.0064,
+        "best_template": "Kha'Zix",
+        "ocr_label": "Kha'Zix",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Vel'Koz",
+        "status": "locked",
+        "similarity": 0.8212,
+        "margin": 0.2267,
+        "best_template": "Vel'Koz",
+        "ocr_label": "Vel'Koz",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Ezreal",
+        "status": "locked",
+        "similarity": 0.9079,
+        "margin": 0.1937,
+        "best_template": "Ezreal",
+        "ocr_label": "Ezreal",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Ryze",
+        "status": "locked",
+        "similarity": 0.9414,
+        "margin": 0.2674,
+        "best_template": "Ryze",
+        "ocr_label": "Ryze",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Lee Sin",
+        "status": "locked",
+        "similarity": 0.8644,
+        "margin": 0.1342,
+        "best_template": "Lee Sin",
+        "ocr_label": "Lee Sin",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Dr. Mundo",
+        "status": "locked",
+        "similarity": 0.7761,
+        "margin": 0.1995,
+        "best_template": "Dr. Mundo",
+        "ocr_label": "Dr. Mundo",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Irelia",
+        "best_template": "Irelia",
+        "similarity": 0.911,
+        "margin": 0.2245,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Qiyana",
+        "best_template": "Qiyana",
+        "similarity": 0.9072,
+        "margin": 0.3269,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Pyke",
+        "best_template": "Pyke",
+        "similarity": 0.9544,
+        "margin": 0.2086,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Zed",
+        "best_template": "Zed",
+        "similarity": 0.953,
+        "margin": 0.2738,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Rengar",
+        "best_template": "Rengar",
+        "similarity": 0.9209,
+        "margin": 0.2968,
+        "alignment": [
+          0,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Riven",
+        "best_template": "Riven",
+        "similarity": 0.9552,
+        "margin": 0.3164,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Akali",
+        "best_template": "Akali",
+        "similarity": 0.9283,
+        "margin": 0.2912,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Bard",
+        "best_template": "Bard",
+        "similarity": 0.9486,
+        "margin": 0.4326,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Malphite",
+        "best_template": "Malphite",
+        "similarity": 0.9806,
+        "margin": 0.4032,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Tristana",
+        "best_template": "Tristana",
+        "similarity": 0.9339,
+        "margin": 0.3627,
+        "alignment": [
+          2,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 9.293,
+    "evaluation": {
+      "pending_tp": 0,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 5,
+      "confirmed_roles": 5
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_018",
+    "sha256": "87c5822519d6c0886ed3f237a9246bcbba0ab86a577e55ffa1be00ca6d07a503",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      542
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Kai'Sa",
+        "status": "locked",
+        "similarity": 0.9081,
+        "margin": 0.2559,
+        "best_template": "Kai'Sa",
+        "ocr_label": "Kai'Sa",
+        "role": "bot",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.6388,
+        "margin": 0.0075,
+        "best_template": "Aphelios",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Taric",
+        "status": "picking",
+        "similarity": 0.8615,
+        "margin": 0.233,
+        "best_template": "Taric",
+        "ocr_label": null,
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Sett",
+        "status": "hover",
+        "similarity": 0.8401,
+        "margin": 0.1897,
+        "best_template": "Sett",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.526,
+        "margin": 0.0135,
+        "best_template": "Zed",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Taliyah",
+        "status": "locked",
+        "similarity": 0.6126,
+        "margin": 0.0205,
+        "best_template": "Taliyah",
+        "ocr_label": "Taliyah",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Rell",
+        "status": "locked",
+        "similarity": 0.644,
+        "margin": 0.0454,
+        "best_template": "Rell",
+        "ocr_label": "Rell",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5995,
+        "margin": 0.0807,
+        "best_template": "Master Yi",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.6014,
+        "margin": 0.0845,
+        "best_template": "Master Yi",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.6005,
+        "margin": 0.0815,
+        "best_template": "Master Yi",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Talon",
+        "best_template": "Talon",
+        "similarity": 0.9231,
+        "margin": 0.3512,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Wukong",
+        "best_template": "Wukong",
+        "similarity": 0.9579,
+        "margin": 0.2935,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Yunara",
+        "best_template": "Yunara",
+        "similarity": 0.9584,
+        "margin": 0.4209,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Aurora",
+        "best_template": "Aurora",
+        "similarity": 0.9556,
+        "margin": 0.1888,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Yasuo",
+        "best_template": "Yasuo",
+        "similarity": 0.9661,
+        "margin": 0.4311,
+        "alignment": [
+          4,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Fiora",
+        "best_template": "Fiora",
+        "similarity": 0.9508,
+        "margin": 0.4039,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Mordekaiser",
+        "best_template": "Mordekaiser",
+        "similarity": 0.9832,
+        "margin": 0.4234,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Draven",
+        "best_template": "Draven",
+        "similarity": 0.9352,
+        "margin": 0.225,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Viktor",
+        "best_template": "Viktor",
+        "similarity": 0.9531,
+        "margin": 0.2527,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Poppy",
+        "best_template": "Poppy",
+        "similarity": 0.9644,
+        "margin": 0.2999,
+        "alignment": [
+          -5,
+          2,
+          0.85
+        ],
+        "status": "recognized"
+      }
+    ],
+    "seconds": 7.908,
+    "evaluation": {
+      "pending_tp": 2,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 1,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 10,
+      "ban_fp": 0,
+      "ban_fn": 0,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 1,
+      "confirmed_roles": 1
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_019",
+    "sha256": "83c43b8451ccb6113273f3f5a712c7dcfd3e3b1362774bbbcd6ac42aa8e3e0dd",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Kog'Maw",
+        "status": "locked",
+        "similarity": 0.7573,
+        "margin": 0.0645,
+        "best_template": "Kog'Maw",
+        "ocr_label": null,
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Xin Zhao",
+        "status": "locked",
+        "similarity": 0.6093,
+        "margin": 0.0637,
+        "best_template": "Xin Zhao",
+        "ocr_label": "Xin Zhao",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Lux",
+        "status": "locked",
+        "similarity": 0.6593,
+        "margin": 0.0086,
+        "best_template": "Lux",
+        "ocr_label": "Lux",
+        "role": "support",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Zed",
+        "status": "locked",
+        "similarity": 0.6845,
+        "margin": 0.0978,
+        "best_template": "Zed",
+        "ocr_label": "Zed",
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Gangplank",
+        "status": "locked",
+        "similarity": 0.7242,
+        "margin": 0.1041,
+        "best_template": "Gangplank",
+        "ocr_label": "Gangplank",
+        "role": "top",
+        "role_source": "client_text"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Vel'Koz",
+        "status": "locked",
+        "similarity": 0.6115,
+        "margin": 0.0177,
+        "best_template": "Vel'Koz",
+        "ocr_label": "Vel'Koz",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Yone",
+        "status": "locked",
+        "similarity": 0.7555,
+        "margin": 0.054,
+        "best_template": "Yone",
+        "ocr_label": "Yone",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Zoe",
+        "status": "locked",
+        "similarity": 0.7238,
+        "margin": 0.0427,
+        "best_template": "Zoe",
+        "ocr_label": "Zoe",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Naafiri",
+        "status": "locked",
+        "similarity": 0.6984,
+        "margin": 0.0113,
+        "best_template": "Naafiri",
+        "ocr_label": "Naafiri",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": "Sion",
+        "status": "locked",
+        "similarity": 0.53,
+        "margin": 0.0078,
+        "best_template": "Sion",
+        "ocr_label": "Sion",
+        "role": "top",
+        "role_source": "popularity_estimate"
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Jayce",
+        "best_template": "Jayce",
+        "similarity": 0.9632,
+        "margin": 0.2606,
+        "alignment": [
+          -7,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Akshan",
+        "best_template": "Akshan",
+        "similarity": 0.9561,
+        "margin": 0.2572,
+        "alignment": [
+          -7,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Riven",
+        "best_template": "Riven",
+        "similarity": 0.9352,
+        "margin": 0.3036,
+        "alignment": [
+          -7,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Yasuo",
+        "best_template": "Yasuo",
+        "similarity": 0.9429,
+        "margin": 0.397,
+        "alignment": [
+          -7,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Bel'Veth",
+        "best_template": "Bel'Veth",
+        "similarity": 0.8437,
+        "margin": 0.3574,
+        "alignment": [
+          -7,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "LeBlanc",
+        "best_template": "LeBlanc",
+        "similarity": 0.9451,
+        "margin": 0.2454,
+        "alignment": [
+          11,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Pyke",
+        "best_template": "Pyke",
+        "similarity": 0.9616,
+        "margin": 0.2047,
+        "alignment": [
+          11,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Riven",
+        "best_template": "Riven",
+        "similarity": 0.9524,
+        "margin": 0.3127,
+        "alignment": [
+          11,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Mel",
+        "best_template": "Mel",
+        "similarity": 0.9305,
+        "margin": 0.2017,
+        "alignment": [
+          11,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "best_template": "Zed",
+        "similarity": 0.6097,
+        "margin": 0.0083,
+        "alignment": [
+          11,
+          -4,
+          0.9
+        ],
+        "status": "unresolved"
+      }
+    ],
+    "seconds": 7.552,
+    "evaluation": {
+      "pending_tp": 0,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 0,
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 9,
+      "ban_fp": 0,
+      "ban_fn": 1,
+      "empty_bans": 0,
+      "empty_bans_correct": 0,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 5,
+      "confirmed_roles": 5
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  },
+  {
+    "image_id": "draft_020",
+    "sha256": "d57d88b99b32a0f7d66d07ba3990db0ce15f2df2cf28b26f5bdc23cc0a310243",
+    "client_box_scaled": [
+      0,
+      0,
+      960,
+      540
+    ],
+    "slots": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Zyra",
+        "status": "locked",
+        "similarity": 0.7982,
+        "margin": 0.1566,
+        "best_template": "Zyra",
+        "ocr_label": "Zyra",
+        "role": "jungle",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Zeri",
+        "status": "locked",
+        "similarity": 0.6963,
+        "margin": 0.1754,
+        "best_template": "Zeri",
+        "ocr_label": "Zeri",
+        "role": "top",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Nautilus",
+        "status": "locked",
+        "similarity": 0.6808,
+        "margin": 0.1714,
+        "best_template": "Nautilus",
+        "ocr_label": "Nautilus",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Locke",
+        "status": "locked",
+        "similarity": 0.7238,
+        "margin": 0.0963,
+        "best_template": "Locke",
+        "ocr_label": "Locke",
+        "role": "mid",
+        "role_source": "client_text"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Kai'Sa",
+        "status": "locked",
+        "similarity": 0.6871,
+        "margin": 0.0303,
+        "best_template": "Kai'Sa",
+        "ocr_label": "Kai'Sa",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": "Jarvan IV",
+        "status": "locked",
+        "similarity": 0.5702,
+        "margin": 0.0013,
+        "best_template": "Jarvan IV",
+        "ocr_label": "Jarvan IV",
+        "role": "jungle",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Vel'Koz",
+        "status": "locked",
+        "similarity": 0.5758,
+        "margin": 0.0054,
+        "best_template": "Vel'Koz",
+        "ocr_label": "Vel'Koz",
+        "role": "support",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Orianna",
+        "status": "locked",
+        "similarity": 0.7205,
+        "margin": 0.0245,
+        "best_template": "Orianna",
+        "ocr_label": "Orianna",
+        "role": "mid",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Viktor",
+        "status": "locked",
+        "similarity": 0.7203,
+        "margin": 0.1271,
+        "best_template": "Viktor",
+        "ocr_label": "Viktor",
+        "role": "bot",
+        "role_source": "popularity_estimate"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "status": "unknown",
+        "similarity": 0.5734,
+        "margin": 0.0065,
+        "best_template": "Ambessa",
+        "ocr_label": null,
+        "role": null,
+        "role_source": null
+      }
+    ],
+    "bans": [
+      {
+        "team": "ally",
+        "slot": 1,
+        "champion": "Rengar",
+        "best_template": "Rengar",
+        "similarity": 0.9164,
+        "margin": 0.3409,
+        "alignment": [
+          -6,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 2,
+        "champion": "Neeko",
+        "best_template": "Neeko",
+        "similarity": 0.9491,
+        "margin": 0.2498,
+        "alignment": [
+          -6,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 3,
+        "champion": "Malphite",
+        "best_template": "Malphite",
+        "similarity": 0.9775,
+        "margin": 0.3959,
+        "alignment": [
+          -6,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 4,
+        "champion": "Syndra",
+        "best_template": "Syndra",
+        "similarity": 0.9356,
+        "margin": 0.333,
+        "alignment": [
+          -6,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "ally",
+        "slot": 5,
+        "champion": "Yunara",
+        "best_template": "Yunara",
+        "similarity": 0.9532,
+        "margin": 0.3647,
+        "alignment": [
+          -6,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 1,
+        "champion": null,
+        "best_template": "Orianna",
+        "similarity": 0.7135,
+        "margin": 0.024,
+        "alignment": [
+          12,
+          -4,
+          0.9
+        ],
+        "status": "unresolved"
+      },
+      {
+        "team": "enemy",
+        "slot": 2,
+        "champion": "Tristana",
+        "best_template": "Tristana",
+        "similarity": 0.9412,
+        "margin": 0.3338,
+        "alignment": [
+          12,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 3,
+        "champion": "Yasuo",
+        "best_template": "Yasuo",
+        "similarity": 0.9559,
+        "margin": 0.4166,
+        "alignment": [
+          12,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 4,
+        "champion": "Pyke",
+        "best_template": "Pyke",
+        "similarity": 0.9569,
+        "margin": 0.1987,
+        "alignment": [
+          12,
+          -4,
+          0.9
+        ],
+        "status": "recognized"
+      },
+      {
+        "team": "enemy",
+        "slot": 5,
+        "champion": null,
+        "best_template": "Maokai",
+        "similarity": 0.612,
+        "margin": 0.0328,
+        "alignment": [
+          12,
+          -4,
+          0.9
+        ],
+        "status": "unresolved"
+      }
+    ],
+    "seconds": 8.778,
+    "evaluation": {
+      "pending_tp": 0,
+      "pending_fp": 0,
+      "pending_fn": 0,
+      "exact_known_bans": 0,
+      "tp": 9,
+      "fp": 0,
+      "fn": 0,
+      "exact_picks": 1,
+      "ban_tp": 8,
+      "ban_fp": 0,
+      "ban_fn": 1,
+      "empty_bans": 1,
+      "empty_bans_correct": 1,
+      "unscored_bans": 0,
+      "confirmed_roles_correct": 5,
+      "confirmed_roles": 5
+    },
+    "localization": "full_frame_verified_by_portraits_and_bans"
+  }
+]

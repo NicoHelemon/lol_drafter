@@ -10,4 +10,12 @@ Tests cover full-universe comparisons, partial thresholds and exact boundaries, 
 
 Screenshot recognition remains a separate offline experiment. No image endpoint or upload UI is included.
 
-Hosted deployment and verification are recorded after completion.
+## Hosted verification
+
+Commit `f9f62832da93921a14056b7a25860294fb044769` was observed on Netlify on 17 November 2026, and main/branch CI are green (157 TypeScript/PostgreSQL, 50 Python, 41 browsers). Migration 022 was applied after a private backup; no existing rooms were reset. The two registered accounts/profiles/pools and all 865 shard fingerprints, snapshots, calibration and catalogue remain unchanged after hosted checks. Test rooms were removed.
+
+Two isolated sessions verified real Sylas Top +0.85, +0.81 over the reference median, with a green outline visible to an observer; the six-other-champion draft becomes Provisional; Camille −0.58 in another composition receives the negative signal. Banning Sylas suppresses its glow and a ban-only change reuses cached reference data. Mobile fits the viewport. Hover caused no extra reference fetch; each context response was under 840 KB uncompressed (about 6,000 pairs at ten picks), instead of complete catalogue shards. No browser calls to Lolalytics. A separate canonical smoke check preserved Renekton +0.97, team +0.40, Camille replacement +0.27 and reload.
+
+The first hosted test stopped at a hover assertion after replacing a tile directly under the pointer; moving the pointer out and back made the expected tooltip appear in the repeated check. No production change was needed.
+
+[Structured proof](evidence/exceptional-fits-production.json), [positive fit](evidence/exceptional-fits-positive.png), [negative fit](evidence/exceptional-fits-negative.png), [mobile](evidence/exceptional-fits-mobile.png).
