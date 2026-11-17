@@ -3,6 +3,7 @@ import {automaticPool} from '../domain/automaticCandidates';
 import {canPick,canBan} from '../domain/progression';
 import {canSelectPick,canRequestPickMove} from '../domain/pickPermissions';
 import DraftProgress from '../components/DraftProgress';
+import {fitReference,exceptionalFit} from '../domain/exceptionalPicks';
 import { useState, useEffect, useMemo, type DragEvent } from 'react';
 import {pairKey} from '../domain/scoring';
 import { ROLES, type State, type Team, type Role } from '../domain/types';
@@ -104,6 +105,7 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false,claimR
           const pick = state.picks[team].find(p => p.role === role);
           const explicit=rolePool(state,team,role),pool=automaticPool(state,team,role);
           const options = candidates(pool,role,team,state,names,pairIndex);
+          const reference=fitReference(role,team,state,pairIndex);
           const editable=!readOnly&&canSelectPick(state,uid,host,team,role)&&canPick(state,team,pick?.championId);
           const pending = blockedRole(team,role), available = canDrop(team,role), roleAvailable=team==='ally'&&roleTarget(role), key = `${team}:${role}`;
           return <section key={team} className={`draft-cell ${team}${player?.id === uid ? ' mine' : ''}${available ? ' drop-available' : ''}${over === key ? ' drop-over' : ''}${pending ? ' transfer-pending' : ''}${state.draftMode&&!state.openDraft&&editable?' current-pick':''}${roleAvailable?' role-drop-target':''}${roleAvailable&&roleOver===role?' role-drop-over':''}`}
@@ -125,7 +127,7 @@ export default function DraftPage({ state, uid, host, busy,readOnly=false,claimR
             </div>
             <div className="draft-options">
               {options.map(option => <DraftChampion key={option.id} id={option.id} role={role} team={team} state={state} result={option}
-                selected={option.selected} blocked={option.blocked} busy={busy || pending} pickDisabled={!editable||!!state.draftMode&&!state.openDraft&&option.selected} automatic={!!state.draftMode&&!option.selected&&!explicit.includes(option.id)} toggle={true}
+                fit={exceptionalFit(option,reference,option.blocked)} selected={option.selected} blocked={option.blocked} busy={busy || pending} pickDisabled={!editable||!!state.draftMode&&!state.openDraft&&option.selected} automatic={!!state.draftMode&&!option.selected&&!explicit.includes(option.id)} toggle={true}
                 dragDisabled={!canSelectPick(state,uid,host,team,role)}
                 active={activeTooltip===`${team}:${role}:${option.id}`}
                 onActivate={()=>setActiveTooltip(`${team}:${role}:${option.id}`)}

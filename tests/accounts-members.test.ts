@@ -85,3 +85,18 @@ it('rejects unconsented pick moves into or out of another occupied role and reta
 it('lets active players select free ally roles and opponents while preserving occupied selections',async()=>{
  let r=await ownedDraft();const s=structuredClone(r.state);s.picks.ally=[{role:'Jungle',championId:'64'}];s.picks.enemy=[{role:'Top',championId:'122'}];r=await save(r,s,ids[2]);expect(r.state.picks.enemy).toEqual(s.picks.enemy);expect(r.state.picks.ally).toEqual(s.picks.ally);
 });
+it('returns compact public reference pairs for the published role catalogue and context without room or account writes',async()=>{
+ const sid='e'.repeat(64),state=initialState(ids[0],'P');const metadata={...state.dataset,pairs:undefined,snapshotId:sid};
+ await db.query('insert into public.statistics_snapshots(id,metadata) values($1,$2)',[sid,JSON.stringify(metadata)]);
+ const target={relation:'vs',candidateChampionId:'58',candidateRole:'Top',otherChampionId:'122',otherRole:'Top',delta2:2,games:3000};
+ await db.query('insert into public.statistics_shards values($1,$2,$3)',[sid,'58:Top',JSON.stringify([target,{...target,otherChampionId:'51'}])]);
+ await db.query('insert into public.statistics_shards values($1,$2,$3)',[sid,'164:Top',JSON.stringify([{...target,candidateChampionId:'164'}])]);
+ await db.query('insert into public.statistics_role_catalogues values($1,$2)',[sid,JSON.stringify({...state.roleCatalogue,entries:[{championId:'58',role:'Top',lanePercent:90,games:30000,pickPercent:5},{championId:'164',role:'Top',lanePercent:1,games:300,pickPercent:.1}]})]);
+ await fails(()=>as(ids[3],'select public.draft_reference_pairs($1,$2::jsonb)',[sid,JSON.stringify([{championId:'122',role:'Top'}])]),'Snapshot unavailable');
+ await db.query('update public.statistics_snapshots set ready=true where id=$1',[sid]);
+ const picks=[{championId:'122',role:'Top'}];const result=(await as<{p:unknown[]}>(ids[3],'select public.draft_reference_pairs($1,$2::jsonb) p',[sid,JSON.stringify([...picks,...picks])])).p;expect(result).toEqual([target]);
+ expect((await as<{p:unknown[]}>(ids[3],'select public.draft_reference_pairs($1,$2::jsonb) p',[sid,'[]'])).p).toEqual([]);
+ for(const bad of [null,{},Array(11).fill(picks[0]),[{championId:'122',role:'Unknown'}],[{championId:122,role:'Top'}]])await fails(()=>as(ids[3],'select public.draft_reference_pairs($1,$2::jsonb)',[sid,JSON.stringify(bad)]),'Invalid reference context');
+ await db.exec('savepoint anon_read;set role anon');await expect(db.query('select public.draft_reference_pairs($1,$2::jsonb)',[sid,'[]'])).rejects.toThrow('permission denied');await db.exec('rollback to anon_read;release anon_read');
+ expect((await db.query<{n:number}>('select count(*)::int n from public.rooms')).rows[0].n).toBe(0);
+});

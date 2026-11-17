@@ -17,7 +17,11 @@ const statistics = new StatisticsCache(async (snapshot, keys) => {
     .select('candidate_key,pairs').eq('snapshot_id', snapshot).in('candidate_key', keys);
   if (error) throw error;
   return data ?? [];
-},{readCatalogue:async(snapshot)=>{
+},{readReference:async(snapshot,picks)=>{
+  if(!supabase)throw Error('Shared reference requires Supabase');
+  const {data,error}=await supabase.rpc('draft_reference_pairs',{snapshot_id:snapshot,context_picks:picks});
+  if(error)throw error;return data;
+},readCatalogue:async(snapshot)=>{
   if(!supabase)throw Error('Shared role catalogue requires Supabase');
   const {data,error}=await supabase.from('statistics_role_catalogues').select('catalogue').eq('snapshot_id',snapshot).maybeSingle();
   if(error)throw error;return data?.catalogue;

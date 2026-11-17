@@ -7,8 +7,10 @@ import { roleName } from '../domain/roles';
 import { RoleIcon } from './RoleIcon';
 import { names, Portrait } from './Champions';
 import {candidateImpact} from '../domain/teamScore';
+import type {ExceptionalFit} from '../domain/exceptionalPicks';
 
-export default function ContributionTooltip({ id, champion, role, team, state, result, anchor }: {
+export default function ContributionTooltip({ id, champion, role, team, state, result, fit, anchor }: {
+  fit?:ExceptionalFit;
   id: string; champion: string; role: Role; team: Team; state: State; result: CandidateScore; anchor: HTMLElement;
 }) {
   const panel = useRef<HTMLDivElement>(null);
@@ -43,6 +45,11 @@ export default function ContributionTooltip({ id, champion, role, team, state, r
   }
   return createPortal(<div id={id} ref={panel} className="contribution-tooltip" role="tooltip" style={position}>
     <div className="contribution-heading"><strong>{names[champion]} <span>· {roleName(role)}</span></strong><div className="individual-score"><small>Individual score</small><b>{scoreLabel(result.value)}</b></div></div>
+    {fit&&<div className={`fit-explanation fit-${fit.kind}`}>
+      <strong>{fit.kind==='positive'?'Excellent fit':'Poor fit'}{fit.provisional?' · Provisional':''}</strong>
+      <span>{fit.kind==='positive'?'An exceptionally favorable':'A particularly unfavorable'} pick for {team==='ally'?'your':'the enemy'} team. {Math.abs(fit.gap).toFixed(2)} {fit.kind==='positive'?'above':'below'} the typical available {roleName(role)} option.</span>
+      {fit.provisional&&<small>Based on {fit.total}/9 other champions. This can change as the draft fills.</small>}
+    </div>}
     <div className="contribution-columns"><span>Ally team</span><span>Enemy team</span></div>
     <div className="contribution-matrix">{ROLES.map(rowRole => <div className="contribution-row" key={rowRole}>{cell(rowRole, 'with')}{cell(rowRole, 'vs')}</div>)}</div>
     <div className="contribution-footer">{result.known}/{result.total} pairs <span>Adjusted values · equal average</span></div>

@@ -5,17 +5,20 @@ import type { Role, Team, State } from '../domain/types';
 import { roleName } from '../domain/roles';
 import { names, Portrait } from './Champions';
 import ContributionTooltip from './ContributionTooltip';
+import type {ExceptionalFit} from '../domain/exceptionalPicks';
 export default function DraftChampion({ id, role, team, state, result, selected, blocked, busy,
-  pickDisabled=false,dragDisabled=false,automatic=false,onPick, pickLabel, toggle = true, onDragStart, onDragEnd, dragging = false, active, onActivate, onDeactivate }: {
+  fit,pickDisabled=false,dragDisabled=false,automatic=false,onPick, pickLabel, toggle = true, onDragStart, onDragEnd, dragging = false, active, onActivate, onDeactivate }: {
   id: string; role: Role; team: Team; state: State; result: CandidateScore;
   selected: boolean; blocked: boolean; busy: boolean; onPick: () => void;
+  fit?:ExceptionalFit;
   active:boolean; onActivate:()=>void; onDeactivate:()=>void;
   pickDisabled?:boolean;dragDisabled?:boolean;automatic?:boolean;pickLabel?: string; toggle?: boolean; onDragStart: (e: DragEvent) => void; onDragEnd: () => void; dragging?: boolean;
 }) {
   const label = scoreLabel(result.value), tooltipId = useId(), anchor = useRef<HTMLDivElement>(null);
   const open = !dragging && active;
   return <div ref={anchor}
-    className={`draft-champion-tile${selected ? ' tile-selected' : ''}${blocked ? ' tile-unavailable' : ''}`}
+    className={`draft-champion-tile${selected ? ' tile-selected' : ''}${blocked ? ' tile-unavailable' : ''}${fit?` fit-${fit.kind}`:''}`}
+    data-fit={fit?.kind}
     data-champion={id} draggable={selected && !busy&&!dragDisabled}
     onDragStart={e => { onDeactivate(); onDragStart(e); }} onDragEnd={onDragEnd}
     onMouseEnter={onActivate} onMouseLeave={onDeactivate}
@@ -31,6 +34,6 @@ export default function DraftChampion({ id, role, team, state, result, selected,
     <span className={`tile-score ${result.value === null ? 'muted' : result.value < 0 ? 'negative' : result.value > 0 ? 'positive' : 'neutral'}`}>
       {label}{result.known < result.total && <span className="partial-score" aria-label="Partial coverage">•</span>}
     </span>
-    {open && anchor.current && <ContributionTooltip id={tooltipId} champion={id} role={role} team={team} state={state} result={result} anchor={anchor.current} />}
+    {open && anchor.current && <ContributionTooltip id={tooltipId} champion={id} role={role} team={team} state={state} result={result} fit={fit} anchor={anchor.current} />}
   </div>;
 }

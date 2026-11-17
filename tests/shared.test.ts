@@ -152,3 +152,20 @@ it('loads automatic candidate statistics even when all role pools are empty',asy
  await cache.hydrate(r);const keys=read.mock.calls.flatMap(call=>call[1] as string[]);
  expect(new Set(keys).size).toBe(25);expect(keys).toContain('164:Top');expect(keys).toContain('412:Support');
 });
+it('loads only current-context reference pairs once, merges without duplicates, and strips local context on writes',async()=>{
+ const r=room();r.state.phase='live';r.state.picks.enemy=[{championId:'122',role:'Top'}];
+ const extra={...pair,candidateChampionId:'103',candidateRole:'Mid' as const};
+ const readReference=vi.fn(async()=>[pair,extra]),read=vi.fn(async(_s:string,keys:string[])=>keys.includes('58:Top')?[{candidate_key:'58:Top',pairs:[pair]}]:[]);
+ const cache=new StatisticsCache(read,{readReference});const [a,b]=await Promise.all([cache.hydrate(r),cache.hydrate(r)]);
+ expect(a.state.dataset.pairs).toHaveLength(2);expect(b.state.referenceKey).toBe(a.state.referenceKey);expect(readReference).toHaveBeenCalledTimes(1);expect(persistedState(a.state).referenceKey).toBeUndefined();
+ r.state.bans.ally[0]='51';await cache.hydrate(r);expect(readReference).toHaveBeenCalledTimes(1);
+ r.state.picks.enemy=[{championId:'122',role:'Mid'}];await cache.hydrate(r);expect(readReference).toHaveBeenCalledTimes(2); // incompatible cached pair is rejected, never used
+ cache.clear();await cache.hydrate(r);expect(readReference).toHaveBeenCalledTimes(3);
+});
+it('keeps normal scores working when optional reference loading fails or returns unrelated pairs, and retries',async()=>{
+ const r=room();r.state.phase='live';r.state.picks.enemy=[{championId:'122',role:'Top'}];
+ const read=vi.fn(async()=>[{candidate_key:'58:Top',pairs:[pair]}]),readReference=vi.fn(async()=>{throw Error('unavailable');});
+ const cache=new StatisticsCache(read,{readReference});let a=await cache.hydrate(r);expect(a.state.referenceKey).toBeUndefined();expect(score('58','Top',a.state).value).toBe(0);
+ readReference.mockImplementation(async()=>[{...pair,otherChampionId:'51'}] as never);a=await cache.hydrate(r);expect(a.state.referenceKey).toBeUndefined();
+ readReference.mockImplementation(async()=>[pair] as never);a=await cache.hydrate(r);expect(a.state.referenceKey).toBeDefined();expect(readReference).toHaveBeenCalledTimes(3);
+});

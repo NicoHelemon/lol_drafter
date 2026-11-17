@@ -4,6 +4,9 @@ import {automaticPool} from '../domain/automaticCandidates';
 import {rolePoolEntries} from '../domain/rolePools';
 import {validateModel} from '../domain/shrinkage';
 import { championIds } from './provider';
+import {referenceContextKey} from '../domain/exceptionalPicks';
+import {pairKey} from '../domain/scoring';
+import type {Pick} from '../domain/types';
 import { importDataset } from './import';
 
 export interface Shard { candidate_key: string; pairs: Pair[] }
@@ -20,13 +23,16 @@ export class StatisticsCache {
   private models=new Map<string,Promise<ShrinkageModel|undefined>>();
   private readCalibration?: (snapshot:string)=>Promise<unknown>;
   private catalogues=new Map<string,Promise<RoleCatalogue|undefined>>();
+  private references=new Map<string,Promise<Pair[]>>();
+  private readReference?: (snapshot:string,picks:Pick[])=>Promise<unknown>;
   private readCatalogue?: (snapshot:string)=>Promise<unknown>;
-  constructor(private read: ReadShards, options: { capacity?: number; ttlMs?: number; now?: () => number; readCalibration?:(snapshot:string)=>Promise<unknown>;readCatalogue?:(snapshot:string)=>Promise<unknown> } = {}) {
+  constructor(private read: ReadShards, options: { capacity?: number; ttlMs?: number; now?: () => number; readCalibration?:(snapshot:string)=>Promise<unknown>;readCatalogue?:(snapshot:string)=>Promise<unknown>;readReference?:(snapshot:string,picks:Pick[])=>Promise<unknown> } = {}) {
     this.capacity = options.capacity ?? 128;
     this.ttlMs = options.ttlMs ?? 30 * 60_000;
     this.now = options.now ?? Date.now;
     this.readCalibration=options.readCalibration;
     this.readCatalogue=options.readCatalogue;
+    this.readReference=options.readReference;
     if (!Number.isInteger(this.capacity) || this.capacity < 1 || !Number.isFinite(this.ttlMs) || this.ttlMs <= 0) throw Error('Invalid cache limits');
   }
 
@@ -35,6 +41,7 @@ export class StatisticsCache {
     this.pending.clear();
     this.models.clear();
     this.catalogues.clear();
+    this.references.clear();
   }
 
   async hydrate(room: Room): Promise<Room> {
@@ -62,6 +69,25 @@ export class StatisticsCache {
       // A missing calibration may be installed later; never pin the absence.
       if(!model)this.models.delete(sid);
     }
+    const context=Object.values(room.state.picks).flat(),referenceKey=referenceContextKey(room.state);
+    let reference:Promise<Pair[]>|undefined;
+    if(this.readReference&&model&&catalogue&&room.state.phase==='live'&&context.length){
+      if(!this.references.has(referenceKey)){
+        const eligible=new Set(catalogue.entries.filter(e=>e.lanePercent>=5).map(e=>`${e.championId}:${e.role}`));
+        const others=new Set(context.map(p=>`${p.championId}:${p.role}`));
+        const request=this.readReference(dataset.snapshotId,context).then(raw=>{
+          if(!Array.isArray(raw)||raw.length>10000)throw Error('Invalid reference pairs');
+          const pairs=importDataset(JSON.stringify({...dataset,pairs:raw}),'json',championIds).pairs;
+          if(pairs.some(p=>!eligible.has(`${p.candidateChampionId}:${p.candidateRole}`)||!others.has(`${p.otherChampionId}:${p.otherRole}`)))throw Error('Unexpected reference pair');
+          return pairs;
+        }).catch(e=>{this.references.delete(referenceKey);throw e;});
+        this.references.set(referenceKey,request);
+        while(this.references.size>8)this.references.delete(this.references.keys().next().value!);
+      }
+      reference=this.references.get(referenceKey)!;
+    }
+    // An optional reference outage must not disable the draft or its regular scores.
+    const referenceResult=reference?.then(pairs=>({pairs,key:referenceKey})).catch(()=>undefined);
     const keys = [...new Set([
       ...rolePoolEntries(room.state).flatMap(p=>automaticPool({...room.state,roleCatalogue:catalogue},p.team,p.role).map(id=>`${id}:${p.role}`)),
       ...Object.values(room.state.picks).flat().map(p => `${p.championId}:${p.role}`),
@@ -107,12 +133,14 @@ export class StatisticsCache {
       }
     }
     const pairs = (await Promise.all(keys.map(key => values.get(key)!))).flat();
-    return { ...room, state: { ...room.state, shrinkage:model,roleCatalogue:catalogue, dataset: { ...dataset, pairs } } };
+    const extra=await referenceResult;
+    const merged=extra?[...new Map([...extra.pairs,...pairs].map(p=>[pairKey(p),p])).values()]:pairs;
+    return { ...room, state: { ...room.state, referenceKey:extra?.key,shrinkage:model,roleCatalogue:catalogue, dataset: { ...dataset, pairs:merged } } };
   }
 }
 
 export function persistedState(state: Room['state']): Room['state'] {
-  const {shrinkage:_,roleCatalogue:__,...stored}=state;
+  const {shrinkage:_,roleCatalogue:__,referenceKey:___,...stored}=state;
   // Loaded pairs are local working data; never send them back in room edits.
   return state.dataset.snapshotId
     ? { ...stored, dataset: { ...state.dataset, pairs: [] } }
