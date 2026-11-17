@@ -1,0 +1,42 @@
+name: Verify published draft features
+on:
+  push:
+    branches: ['verify/best-fits-team-advantage']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Verify the deployed commit and feature assets without changing live data
+        env:
+          EXPECTED_COMMIT: c0b802ab7feca8762f9c851f4a52161f68f2f19b
+        run: |
+          python3 - <<'PY'
+          import json, os, re, time
+          from urllib.request import Request,urlopen
+          base='https://draftroom-lol.netlify.app'
+          def read(path):
+              with urlopen(Request(base+path,headers={'Cache-Control':'no-cache'}),timeout=30) as r:
+                  return r.read().decode()
+          for attempt in range(25):
+              metadata=json.loads(read('/deployment.json?verify='+os.environ['EXPECTED_COMMIT']+'-'+str(attempt)))
+              if metadata.get('commit')==os.environ['EXPECTED_COMMIT']:
+                  break
+              print('Deployment pending; observed commit:',metadata.get('commit'),flush=True)
+              time.sleep(10)
+          else:
+              raise SystemExit('Expected deployment not observed')
+          html=read('/')
+          js_paths=re.findall(r'<script[^>]+src="([^"]+)"',html)
+          css_paths=re.findall(r'<link[^>]+href="([^"]+\.css)"',html)
+          assert js_paths and css_paths
+          js='\n'.join(read(p) for p in js_paths)
+          css='\n'.join(read(p) for p in css_paths)
+          for marker in ['Show best fits','Awaiting team scores','not a win probability','Popular fallback candidate']:
+              assert marker in js, 'Missing published feature: '+marker
+          for marker in ['.team-advantage','.advantage-track','.best-fit-mark']:
+              assert marker in css, 'Missing published styling: '+marker
+          print(json.dumps({'deployment':metadata,'verifiedFeatures':['optional best fits','central team advantage'],'backendWrites':0,'sourceRequests':0}))
+          PY
