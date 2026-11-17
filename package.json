@@ -10,12 +10,17 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "catalogue:update": "node --use-env-proxy scripts/update-catalogue.mjs"
+    "catalogue:update": "node --use-env-proxy scripts/update-catalogue.mjs",
+    "predev": "node scripts/prepare-image-tools.mjs",
+    "prebuild": "node scripts/prepare-image-tools.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.0",
+    "@techstark/opencv-js": "^5.0.0-release.1",
+    "@tesseract.js-data/eng": "^1.0.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.16",

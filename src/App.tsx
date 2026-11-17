@@ -3,6 +3,9 @@ import {readAccount,signOutAccount,saveRoomPool,type Account} from './lib/accoun
 import {startDraft,chooseBan} from './domain/progression';
 import type {DraftMode} from './domain/types';
 import Participants from "./components/Participants";
+import ScreenshotImport from './components/ScreenshotImport';
+import {importRoomScreenshot} from './lib/rooms';
+import type {ScreenshotAdditions} from './domain/screenshot';
 import PickSwapPrompt from "./components/PickSwapPrompt";
 import SwapPrompt from "./components/SwapPrompt";
 import {rolePool} from "./domain/rolePools";
@@ -230,6 +233,14 @@ export default function App() {
       }
     });
   }
+  async function screenshotImport(additions:ScreenshotAdditions,version:number){
+    if(!room||busy)return;
+    if(room.version!==version)throw Error('The room changed. Review the updated suggestions before importing.');
+    setBusy(true);
+    try{setRoom(await importRoomScreenshot(room,additions));setPicker(null);setSwaps([]);setPickSwaps([]);}
+    catch(e){setRoom(await readRoom(room.id));throw Error(errorMessage(e));}
+    finally{setBusy(false);}
+  }
   async function refreshAccount(next:Account){setAccount(next);setUid(next.id);if(next.profile?.display_name)setNickname(next.profile.display_name);}
   async function takeRole(role:Role|null){if(!room||busy)return;await run(async()=>{try{setRoom(await claimRole(room,role));}catch(e){setRoom(await readRoom(room.id));throw e;}});}
   async function handOver(target:string){if(!room||busy)return;const name=room.state.players.find(p=>p.id===target)?.name;if(!name||!confirm(`Make ${name} the host? You will lose host controls.`))return;await run(async()=>{try{setRoom(await transferHost(room,target));}catch(e){setRoom(await readRoom(room.id));throw e;}});}
@@ -418,11 +429,11 @@ export default function App() {
               </button>
             </div>
           </div>
-          <Participants
+          <div className="room-tools"><Participants
             players={state!.players}
             hostId={room.host_id} uid={uid} busy={busy} onTransfer={id=>void handOver(id)} onObserve={()=>void takeRole(null)}
             online={online}
-          />
+          />{host&&state!.phase==='live'&&<ScreenshotImport key={room.id} state={state!} version={room.version} busy={busy} onImport={screenshotImport}/>}</div>
           {readOnly&&<p className="observer-notice" role="status">You are observing. Take an available role to participate.</p>}
           {state!.phase === "setup" ? (
             <SetupPage

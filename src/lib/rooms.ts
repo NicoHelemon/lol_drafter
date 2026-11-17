@@ -1,4 +1,5 @@
 import {trackDraft,controlLocalDraft,type DraftControl} from '../domain/draftHistory';
+import {importLocalScreenshot,type ScreenshotAdditions} from '../domain/screenshot';
 import { RoomExpiredError } from "./errors";
 import {validateGuidedTransition} from '../domain/progression';
 import {exchangeLiveRoles,makeRoleSwap,matchesRoleSwap} from '../domain/roleSwaps';
@@ -160,6 +161,12 @@ export async function saveRoom(room: Room, next: State): Promise<Room> {
   return hydrated(data);
 }
 export const clearDraft=(room:Room)=>controlDraft(room,'clear');
+export async function importRoomScreenshot(room:Room,additions:ScreenshotAdditions):Promise<Room>{
+ if(room.host_id!==await identity())throw Error('Only the host can import screenshots');
+ if(!supabase){const current=await readRoom(room.id);if(current.version!==room.version)throw Error('Conflict: room updated. Review the screenshot again.');const next=importLocalScreenshot(room,additions);localStorage.setItem('draftroom-demo',JSON.stringify(next));return next;}
+ const {data,error}=await supabase.rpc('import_draft_screenshot',{room_id:room.id,expected_version:room.version,additions});
+ if(error)throw error;if(!data)throw new RoomExpiredError();return hydrated(data);
+}
 export async function controlDraft(room:Room,action:DraftControl):Promise<Room>{
  if(room.host_id!==await identity())throw Error('Only the host can control draft history');
  if(!supabase){

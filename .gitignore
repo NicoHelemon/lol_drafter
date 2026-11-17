@@ -12,3 +12,10 @@ __pycache__/
 statistics-cache/
 
 work/
+
+public/image-tools/worker.min.js*
+public/image-tools/core/
+public/image-tools/eng.traineddata.gz
+public/image-tools/TESSERACT_LICENSE
+public/image-tools/TESSERACT_JS_LICENSE
+public/image-tools/OPENCV_LICENSE
