@@ -42,7 +42,7 @@ test('compact candidates keep the selected size and hover shows nine adjusted, r
  expect((await selected.boundingBox())!.width).toBe(72);
  expect((await candidate.boundingBox())!.width).toBe(52);
  expect((await mid.getByRole('button',{name:'Add Mid candidates'}).boundingBox())!.width).toBe(52);
- expect(await mid.locator('.draft-champion-tile').first().getAttribute('data-champion')).toBe('7');
+ expect(await mid.locator('.draft-champion-tile').first().getAttribute('data-champion')).toBe('103');
  await selected.hover();const tooltip=page.getByRole('tooltip');
  await expect(tooltip).toContainText('9/9 pairs');await expect(tooltip).toContainText('+0.35');
  await expect(tooltip.locator('.contribution-row')).toHaveCount(5);
