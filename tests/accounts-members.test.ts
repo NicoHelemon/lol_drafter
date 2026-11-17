@@ -32,7 +32,7 @@ it('loads personal role pools over room preparation, with no silent profile writ
 });
 it('changes role with the champion and imports the new role preferences, even an empty list',async()=>{
  await profile(ids[0],{...emptyPools(),Top:['58'],Mid:['103']});let r=await claim(await room(),'Top');r=await save(r,startDraft(r.state));r=await control(r,'open');let s=structuredClone(r.state);s.picks.ally=[{role:'Top',championId:'58'}];r=await save(r,s);
- r=(await as<{r:Room}>(ids[0],'select public.move_live_role($1,$2,$3) r',[r.id,'Mid',r.version])).r;expect(r.state.players[0].pool).toEqual(['103']);expect(r.state.picks.ally).toEqual([{role:'Mid',championId:'58'}]);
+ r=(await as<{r:Room}>(ids[0],'select public.move_live_role($1,$2,$3) r',[r.id,'Mid',r.version])).r;expect(r.state.players[0].pool).toEqual(['103']);expect(r.state.rolePools?.ally?.Top).toEqual([]);expect(r.state.picks.ally).toEqual([{role:'Mid',championId:'58'}]);
  r=(await as<{r:Room}>(ids[0],'select public.move_live_role($1,$2,$3) r',[r.id,'Support',r.version])).r;expect(r.state.players[0].pool).toEqual([]);expect(r.state.picks.ally[0].championId).toBe('58');
 });
 it('loads both role-specific profiles only after a consented live exchange',async()=>{
@@ -54,4 +54,15 @@ it('blocks sign-in within room membership and preserves registered profiles when
  await profile(ids[0],{...emptyPools(),Top:['58']});expect((await as<{ok:boolean}>(ids[0],'select public.account_login_allowed() ok')).ok).toBe(true);const r=await room();expect((await as<{ok:boolean}>(ids[0],'select public.account_login_allowed() ok')).ok).toBe(false);
  await db.exec('delete from public.rooms');expect((await as<{n:number}>(ids[0],'select count(*)::int n from public.user_profiles')).n).toBe(1);expect((await as<{ok:boolean}>(ids[0],'select public.account_login_allowed() ok')).ok).toBe(true);
  await fails(()=>as(ids[0],'update public.account_features set email_login_ready=true'),'permission denied');expect((await as<{email_login_ready:boolean}>(ids[0],'select email_login_ready from public.account_features')).email_login_ready).toBe(false);expect(r.id).toBeTruthy();
+});
+
+it('clears each vacated role in setup, reloads the target personal pool and never changes saved preferences',async()=>{
+ await profile(ids[0],{...emptyPools(),Mid:['103','84'],ADC:['222']});let r=await room();r=await claim(r,'Mid');expect(r.state.players[0].pool).toEqual(['103','84']);r=await claim(r,'ADC');expect(r.state.rolePools?.ally?.Mid).toEqual([]);expect(r.state.players[0].pool).toEqual(['222']);r=await claim(r,'Mid');expect(r.state.rolePools?.ally?.ADC).toEqual([]);expect(r.state.players[0].pool).toEqual(['103','84']);r=await claim(r,null);expect(r.state.rolePools?.ally?.Mid).toEqual([]);
+ const saved=(await as<{role_pools:unknown;version:number}>(ids[0],'select role_pools,version from public.user_profiles'));expect(saved.role_pools).toMatchObject({Mid:['103','84'],ADC:['222']});expect(saved.version).toBe(1);
+});
+it('clears explicit candidates after live movement and observing while selected champions follow the existing rules',async()=>{
+ await profile(ids[0],{...emptyPools(),Mid:['103'],ADC:['222']});let r=await claim(await room(),'Mid');r=await save(r,startDraft(r.state));r=await control(r,'open');const state=structuredClone(r.state);state.picks.ally=[{role:'Mid',championId:'103'}];r=await save(r,state);r=await claim(r,'ADC');expect(r.state.rolePools?.ally?.Mid).toEqual([]);expect(r.state.players[0].pool).toEqual(['222']);expect(r.state.picks.ally).toEqual([{role:'ADC',championId:'103'}]);r=await claim(r,null);expect(r.state.rolePools?.ally?.ADC).toEqual([]);expect(r.state.picks.ally).toEqual([{role:'ADC',championId:'103'}]);
+});
+it('clears a departing member pool from the role when they quit the room, preserving their profile',async()=>{
+ await profile(ids[0],{...emptyPools(),Mid:['103']});let r=await room();r=await join(r,ids[2]);r=await claim(r,'Mid');await as(ids[0],'select public.leave_room($1)',[r.id]);const remaining=(await db.query<Room>('select * from public.rooms where id=$1',[r.id])).rows[0];expect(remaining.state.rolePools?.ally?.Mid).toEqual([]);expect((await as<{version:number}>(ids[0],'select version from public.user_profiles')).version).toBe(1);
 });

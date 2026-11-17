@@ -73,3 +73,7 @@ it('domain candidates can be prepared independently in both teams and selected w
  s=toggleRoleCandidate(s,'enemy','Mid','84');s=toggleRoleCandidate(s,'enemy','Mid','84');expect(s.picks.enemy).toEqual([]);expect(rolePool(s,'enemy','Mid')).toEqual(['103','84']);
  const next=structuredClone(s);next.players[0].role='Mid';expect(rolePool(reconcileRolePools(s,next),'ally','Mid')).toEqual([]);
 });
+
+it('clears a vacated pool in the browser model without changing other prepared candidates',()=>{
+ const before=initialState('p','P');before.players[0].role='Mid';before.players[0].pool=['103','84'];before.rolePools={ally:{Top:['58']},enemy:{Mid:['7']}};const next=structuredClone(before);next.players[0].role='ADC';const result=reconcileRolePools(before,next);expect(rolePool(result,'ally','Mid')).toEqual([]);expect(rolePool(result,'ally','Top')).toEqual(['58']);expect(rolePool(result,'enemy','Mid')).toEqual(['7']);expect(before.players[0].pool).toEqual(['103','84']);
+});

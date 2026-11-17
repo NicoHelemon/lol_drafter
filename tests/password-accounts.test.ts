@@ -11,6 +11,7 @@ beforeAll(async()=>{db=new PGlite();await db.exec("create role anon;create role 
  for(const f of readdirSync('supabase/migrations').filter(f=>f<'202611170019').sort())await db.exec(readFileSync('supabase/migrations/'+f,'utf8'));
  await db.query('insert into public.user_profiles(user_id,display_name,role_pools) values($1,$2,$3)',[ids[0],'Room nickname',{Top:['58'],Mid:['103'],Jungle:[],ADC:[],Support:[]}]);
  await db.exec(readFileSync('supabase/migrations/202611170019_password_accounts.sql','utf8'));
+ const before=(await db.query('select * from public.user_profiles order by user_id')).rows;await db.exec(readFileSync('supabase/migrations/202611170020_profile_onboarding_vacated_pools.sql','utf8'));const after=(await db.query<{onboarding_complete:boolean}>('select * from public.user_profiles order by user_id')).rows;expect(after.map(({onboarding_complete,...row})=>{expect(onboarding_complete).toBe(true);return row;})).toEqual(before);
 },30000);
 afterAll(()=>db.close());beforeEach(()=>db.exec('begin'));afterEach(()=>db.exec('rollback'));
 it('preserves existing identity, display name and all pools while adding a separate private login',async()=>{
@@ -57,4 +58,10 @@ it('limits requests on the server and expires old limit rows without touching pr
 it('keeps account credential changes outside rooms',async()=>{
  const state=initialState(ids[1],'Room display name','ranked');await own(ids[1],'select public.create_room($1,$2)',[state,'a'.repeat(72)]);
  await expect(own(ids[1],'select public.set_my_login_name($1)',['my_login'])).rejects.toThrow('Quit your room');
+});
+
+it('requires initial pool setup only for new accounts and marks it complete on the first explicit profile save',async()=>{
+ await db.query('insert into auth.users(id,email,encrypted_password,raw_user_meta_data) values($1,$2,$3,$4)',[ids[4],'new@example.test','auth-managed-hash',{login_name:'new_login',display_name:'New room name'}]);await db.query('update auth.users set email_confirmed_at=now() where id=$1',[ids[4]]);
+ const initial=(await own<{onboarding_complete:boolean;version:number}>(ids[4],'select * from public.user_profiles'))[0];expect(initial.onboarding_complete).toBe(false);expect(initial.version).toBe(1);
+ const saved=(await own<{profile:{onboarding_complete:boolean;version:number;role_pools:unknown}}>(ids[4],'select public.save_my_profile($1,$2,$3) profile',['New room name',{Top:[],Jungle:[],Mid:['103'],ADC:[],Support:[]},1]))[0].profile;expect(saved.onboarding_complete).toBe(true);expect(saved.version).toBe(2);expect(saved.role_pools).toMatchObject({Mid:['103'],Top:[]});
 });

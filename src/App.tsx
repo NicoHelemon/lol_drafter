@@ -82,7 +82,7 @@ export default function App() {
   useEffect(() => {
     void run(async () => {
       setUid(await identity());
-      const signed=await readAccount();setAccount(signed);if(signed?.profile?.display_name)setNickname(signed.profile.display_name);
+      const signed=await readAccount();setAccount(signed);if(signed?.profile?.display_name)setNickname(signed.profile.display_name);if(signed?.profile?.onboarding_complete===false)setAccountOpen(true);
       const saved = localStorage.getItem("draftroom-current");
       const id = inviteRoom ?? saved;
       if (id) {
@@ -305,6 +305,8 @@ export default function App() {
     room && invite
       ? `${location.origin}/rooms/${room.slug}/setup#${invite}`
       : "";
+  const entryName=account?account.profile?.display_name??'':nickname;
+  const needsPoolSetup=account?.profile?.onboarding_complete===false;
   return (
     <div className="app">
       <header>
@@ -323,10 +325,10 @@ export default function App() {
       {!room ? (
         <main className="welcome">
           <h1>Draftroom</h1>
-          <div className="account-home">{account?<><span>Signed in as <b>{account.profile?.display_name||account.email}</b></span><button title="Manage your private login, password, room display name and champion pools" disabled={busy} onClick={()=>setAccountOpen(true)}>My account</button>{(!account.loginName||!account.hasPassword)&&<span className="account-setup-hint">Open My account to set your login name and password. Your champion lists stay.</span>}<button title="Sign out before joining a room" disabled={busy} onClick={()=>void run(async()=>{await signOutAccount();setAccount(null);setUid(await identity());setNickname('');})}>Sign out</button></>:<button title="Optional account to keep your name and champion pools across visits" disabled={busy} onClick={()=>setAccountOpen(true)}>Sign in / Create account</button>}</div>
+          <div className="account-home">{account?<><span>Signed in as <b>{account.profile?.display_name||account.email}</b></span><button title="Manage your display name, champion pools and account settings" disabled={busy} onClick={()=>setAccountOpen(true)}>My profile</button>{needsPoolSetup&&<span className="account-setup-hint">Open My profile to set up your champion pools.</span>}{(!account.loginName||!account.hasPassword)&&<span className="account-setup-hint">Open My profile to set your login name and password. Your champion lists stay.</span>}<button title="Sign out before joining a room" disabled={busy} onClick={()=>void run(async()=>{await signOutAccount();setAccount(null);setUid(await identity());setNickname('');})}>Sign out</button></>:<button title="Optional account to keep your name and champion pools across visits" disabled={busy} onClick={()=>setAccountOpen(true)}>Sign in</button>}</div>
           <section className="card entry">
             <h2>{inviteRoom ? "Join room" : "Create room"}</h2>
-            <label>
+            {!account&&<label>
               Display name
               <input
                 maxLength={32}
@@ -334,20 +336,20 @@ export default function App() {
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="Your name"
               />
-            </label>
+            </label>}
 
             {!inviteRoom&&<div className="draft-mode-choice" role="group" aria-label="Draft mode">{(['ranked','tournament'] as DraftMode[]).map(mode=><button type="button" key={mode} aria-pressed={draftMode===mode} onClick={()=>setDraftMode(mode)}>{mode==='ranked'?'Ranked draft':'Tournament draft'}</button>)}</div>}
             <button
               className="primary"
-              disabled={busy || !nickname.trim()}
+              disabled={busy || !entryName.trim() || needsPoolSetup}
               onClick={() =>
                 void run(async () => {
                   if (inviteRoom) {
                     setRoom(
-                      await joinRoom(inviteRoom, invite, nickname.trim()),
+                      await joinRoom(inviteRoom, invite, entryName.trim()),
                     );
                   } else {
-                    const result = await createRoom(nickname.trim(),draftMode);
+                    const result = await createRoom(entryName.trim(),draftMode);
                     setRoom(result.room);
                     setInvite(result.token);
                     if (result.token)
@@ -411,7 +413,6 @@ export default function App() {
                 try{setRoom(await clearDraft(room));setPicker(null);setSwaps([]);setPickSwaps([]);}catch(e){setRoom(await readRoom(room.id));throw e;}
               })}>Clear</button>}
               {host&&state!.phase==='live'&&<button title="Return everyone to preparation after confirmation and clear the current draft" disabled={busy} onClick={()=>void historyAction('lobby')}>Return to lobby</button>}
-              {state!.players.find(p=>p.id===uid)?.role&&<button title="Leave your role and observe; your selected champion stays in its slot" disabled={busy} onClick={()=>void takeRole(null)}>Observe</button>}
               <button title="Leave this room personally; the others can continue" disabled={busy} onClick={() => void exitRoom()}>
                 Quit room
               </button>
@@ -419,7 +420,7 @@ export default function App() {
           </div>
           <Participants
             players={state!.players}
-            hostId={room.host_id} uid={uid} busy={busy} onTransfer={id=>void handOver(id)}
+            hostId={room.host_id} uid={uid} busy={busy} onTransfer={id=>void handOver(id)} onObserve={()=>void takeRole(null)}
             online={online}
           />
           {readOnly&&<p className="observer-notice" role="status">You are observing. Take an available role to participate.</p>}

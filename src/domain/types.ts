@@ -28,4 +28,4 @@ export interface PickSwapRequest {
  from_accepted:boolean; to_accepted:boolean; created_at:string; expires_at:string;
 }
 
-export interface AccountProfile {user_id:string;display_name:string;role_pools:Record<Role,string[]>;version:number;updated_at?:string}
+export interface AccountProfile {onboarding_complete:boolean;user_id:string;display_name:string;role_pools:Record<Role,string[]>;version:number;updated_at?:string}

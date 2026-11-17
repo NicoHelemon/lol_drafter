@@ -18,9 +18,9 @@ export function validatePool(pool:unknown,ids?:Set<string>):asserts pool is stri
 export function reconcileRolePools(before:State,next:State):State{
  const s=structuredClone(next);
  if(s.rolePools===undefined&&before.rolePools)s.rolePools=structuredClone(before.rolePools);
- // Preserve the last pool in a vacated seat. Arriving owners always supersede it.
+ // Clear a vacated seat. Personal pools belong to their owners, not the abandoned role.
  for(const p of before.players)if(p.role&&!s.players.some(n=>n.role===p.role)){
-  s.rolePools??={};s.rolePools.ally??={};s.rolePools.ally[p.role]=[...p.pool];
+  s.rolePools??={};s.rolePools.ally??={};s.rolePools.ally[p.role]=[];
  }
  for(const p of s.players)if(p.role&&s.rolePools?.ally)delete s.rolePools.ally[p.role];
  return s;
