@@ -1,0 +1,1442 @@
+{
+  "scope": "Offline calibration of an exploratory highlight; no site or database writes, no game-outcome validation",
+  "snapshot": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+  "metadata": {
+    "id": "lolalytics-2026-11-14T13:38:21.271117+00:00",
+    "tier": "Emerald+",
+    "patch": "14d",
+    "source": "Lolalytics unofficial: public Build HTML + website build-team JSON",
+    "context": {
+      "tier": "emerald_plus",
+      "unit": "percentage_points",
+      "queue": "ranked_solo_duo",
+      "metric": "delta2",
+      "region": "global",
+      "minGames": 0,
+      "windowDays": 14,
+      "minLanePercent": 0,
+      "minPickPercent": 0
+    },
+    "fictional": false,
+    "importedAt": "2026-11-14T14:07:11.342111+00:00",
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3"
+  },
+  "k": 2510.0480193943954,
+  "pairs": 782306,
+  "simulated_drafts": 11500,
+  "seeds": {
+    "development": 17011,
+    "first_validation": 17012,
+    "uniform_stress": 17013,
+    "score_biased": 17016,
+    "final_validation": 17021,
+    "pool_sampling": 17030
+  },
+  "rule": {
+    "reference": "All available champions passing the existing 5% role-share filter, not the personal pool",
+    "positive": "score>0, score>=role-context q95, score-median >= .5*9/m",
+    "negative": "score<0, score<=role-context q05, score-median <= -.5*9/m",
+    "m": "Other champions actually present, excluding the target role, 1..9",
+    "coverage": "Every currently present contribution must be known for a highlighted candidate; at least 20 eligible reference scores",
+    "partial_label": "Always provisional before m=9",
+    "rounding": "Use unrounded values"
+  },
+  "threshold_grid": {
+    "0.3": {
+      "eligible": 1208230,
+      "positive": 47973,
+      "negative": 49726,
+      "roles": 20000,
+      "positive_roles": 18468,
+      "positive_rate": 0.03970518858164422,
+      "negative_rate": 0.041156071277819624
+    },
+    "0.35": {
+      "eligible": 1208230,
+      "positive": 33744,
+      "negative": 35950,
+      "roles": 20000,
+      "positive_roles": 16076,
+      "positive_rate": 0.027928457330144096,
+      "negative_rate": 0.029754268640904462
+    },
+    "0.4": {
+      "eligible": 1208230,
+      "positive": 22076,
+      "negative": 24304,
+      "roles": 20000,
+      "positive_roles": 12719,
+      "positive_rate": 0.018271355619377105,
+      "negative_rate": 0.020115375383825927
+    },
+    "0.45": {
+      "eligible": 1208230,
+      "positive": 13841,
+      "negative": 15685,
+      "roles": 20000,
+      "positive_roles": 9388,
+      "positive_rate": 0.011455600340994678,
+      "negative_rate": 0.012981799822881406
+    },
+    "0.5": {
+      "eligible": 1208230,
+      "positive": 8296,
+      "negative": 9899,
+      "roles": 20000,
+      "positive_roles": 6322,
+      "positive_rate": 0.006866242354518593,
+      "negative_rate": 0.008192976502818172
+    },
+    "0.55": {
+      "eligible": 1208230,
+      "positive": 4892,
+      "negative": 6131,
+      "roles": 20000,
+      "positive_roles": 4080,
+      "positive_rate": 0.004048897974723356,
+      "negative_rate": 0.005074364980177615
+    },
+    "0.6": {
+      "eligible": 1208230,
+      "positive": 2856,
+      "negative": 3723,
+      "roles": 20000,
+      "positive_roles": 2533,
+      "positive_rate": 0.0023637883515555814,
+      "negative_rate": 0.003081366958277811
+    },
+    "0.65": {
+      "eligible": 1208230,
+      "positive": 1586,
+      "negative": 2274,
+      "roles": 20000,
+      "positive_roles": 1472,
+      "positive_rate": 0.0013126639795403192,
+      "negative_rate": 0.0018820919857974062
+    },
+    "0.7": {
+      "eligible": 1208230,
+      "positive": 902,
+      "negative": 1341,
+      "roles": 20000,
+      "positive_roles": 862,
+      "positive_rate": 0.0007465466012265877,
+      "negative_rate": 0.001109888018009816
+    },
+    "0.75": {
+      "eligible": 1208230,
+      "positive": 515,
+      "negative": 788,
+      "roles": 20000,
+      "positive_roles": 501,
+      "positive_rate": 0.0004262433477069763,
+      "negative_rate": 0.0006521937048409657
+    },
+    "1.0": {
+      "eligible": 1208230,
+      "positive": 32,
+      "negative": 72,
+      "roles": 20000,
+      "positive_roles": 32,
+      "positive_rate": 2.6485023546841246e-05,
+      "negative_rate": 5.959130298039281e-05
+    }
+  },
+  "initial_rule_comparison": {
+    "old_p95_gap050": {
+      "eligible_candidates": 1208230,
+      "positive": 8296,
+      "negative": 9899,
+      "contexts": 20000,
+      "positive_rate": 0.006866242354518593,
+      "negative_rate": 0.008192976502818172
+    },
+    "p95_gap050_sign": {
+      "eligible_candidates": 1208230,
+      "positive": 8296,
+      "negative": 9899,
+      "contexts": 20000,
+      "positive_rate": 0.006866242354518593,
+      "negative_rate": 0.008192976502818172
+    },
+    "p975_gap050": {
+      "eligible_candidates": 1208230,
+      "positive": 7709,
+      "negative": 9094,
+      "contexts": 20000,
+      "positive_rate": 0.0063804077038312245,
+      "negative_rate": 0.0075267126292179465
+    },
+    "p95_gap075": {
+      "eligible_candidates": 1208230,
+      "positive": 515,
+      "negative": 788,
+      "contexts": 20000,
+      "positive_rate": 0.0004262433477069763,
+      "negative_rate": 0.0006521937048409657
+    },
+    "p975_gap075": {
+      "eligible_candidates": 1208230,
+      "positive": 511,
+      "negative": 786,
+      "contexts": 20000,
+      "positive_rate": 0.00042293271976362115,
+      "negative_rate": 0.0006505383908692881
+    },
+    "p95_gap100": {
+      "eligible_candidates": 1208230,
+      "positive": 32,
+      "negative": 72,
+      "contexts": 20000,
+      "positive_rate": 2.6485023546841246e-05,
+      "negative_rate": 5.959130298039281e-05
+    },
+    "p95_robust25_floor050": {
+      "eligible_candidates": 1208230,
+      "positive": 7693,
+      "negative": 9234,
+      "contexts": 20000,
+      "positive_rate": 0.006367165192057804,
+      "negative_rate": 0.0076425846072353774
+    },
+    "p95_robust30_floor050": {
+      "eligible_candidates": 1208230,
+      "positive": 6176,
+      "negative": 7453,
+      "contexts": 20000,
+      "positive_rate": 0.00511160954454036,
+      "negative_rate": 0.006168527515456494
+    },
+    "p975_robust20_floor050": {
+      "eligible_candidates": 1208230,
+      "positive": 7662,
+      "negative": 9052,
+      "contexts": 20000,
+      "positive_rate": 0.006341507825496801,
+      "negative_rate": 0.0074919510358127175
+    }
+  },
+  "partial_policy_comparison": {
+    "1": {
+      "0": {
+        "positive": 67725,
+        "negative": 67602,
+        "positive_available_denominator": 1208358,
+        "positive_later_unavailable": 2785,
+        "positive_still_flagged": 2505,
+        "positive_above_final_median": 49014,
+        "positive_sign_reversed": 19255,
+        "negative_still_flagged": 2939,
+        "positive_retention": 0.03698781838316722
+      },
+      "0.5": {
+        "positive": 9624,
+        "negative": 9626,
+        "positive_available_denominator": 1208358,
+        "positive_later_unavailable": 396,
+        "positive_still_flagged": 865,
+        "positive_above_final_median": 8003,
+        "positive_sign_reversed": 1676,
+        "negative_still_flagged": 1036,
+        "positive_retention": 0.08987946799667498
+      },
+      "1": {
+        "positive": 27,
+        "negative": 88,
+        "positive_available_denominator": 1208358,
+        "positive_later_unavailable": 9,
+        "positive_still_flagged": 16,
+        "positive_above_final_median": 27,
+        "positive_sign_reversed": 0,
+        "negative_still_flagged": 52,
+        "positive_retention": 0.5925925925925926
+      }
+    },
+    "3": {
+      "0": {
+        "positive": 48892,
+        "negative": 49905,
+        "positive_available_denominator": 1208323,
+        "positive_later_unavailable": 1566,
+        "positive_still_flagged": 4076,
+        "positive_above_final_median": 43956,
+        "positive_sign_reversed": 5263,
+        "negative_still_flagged": 4827,
+        "positive_retention": 0.0833674220731408
+      },
+      "0.5": {
+        "positive": 9176,
+        "negative": 9752,
+        "positive_available_denominator": 1208323,
+        "positive_later_unavailable": 297,
+        "positive_still_flagged": 1892,
+        "positive_above_final_median": 8808,
+        "positive_sign_reversed": 393,
+        "negative_still_flagged": 2325,
+        "positive_retention": 0.20619006102877072
+      },
+      "1": {
+        "positive": 373,
+        "negative": 517,
+        "positive_available_denominator": 1208323,
+        "positive_later_unavailable": 13,
+        "positive_still_flagged": 217,
+        "positive_above_final_median": 368,
+        "positive_sign_reversed": 6,
+        "negative_still_flagged": 334,
+        "positive_retention": 0.5817694369973191
+      }
+    },
+    "5": {
+      "0": {
+        "positive": 27978,
+        "negative": 29201,
+        "positive_available_denominator": 1208294,
+        "positive_later_unavailable": 532,
+        "positive_still_flagged": 4896,
+        "positive_above_final_median": 27519,
+        "positive_sign_reversed": 537,
+        "negative_still_flagged": 5876,
+        "positive_retention": 0.17499463864464937
+      },
+      "0.5": {
+        "positive": 8821,
+        "negative": 9779,
+        "positive_available_denominator": 1208294,
+        "positive_later_unavailable": 174,
+        "positive_still_flagged": 2994,
+        "positive_above_final_median": 8762,
+        "positive_sign_reversed": 72,
+        "negative_still_flagged": 3685,
+        "positive_retention": 0.33941729962589273
+      },
+      "1": {
+        "positive": 1598,
+        "negative": 2019,
+        "positive_available_denominator": 1208294,
+        "positive_later_unavailable": 37,
+        "positive_still_flagged": 1009,
+        "positive_above_final_median": 1595,
+        "positive_sign_reversed": 3,
+        "negative_still_flagged": 1329,
+        "positive_retention": 0.6314142678347935
+      }
+    },
+    "6": {
+      "0": {
+        "positive": 20541,
+        "negative": 22092,
+        "positive_available_denominator": 1208278,
+        "positive_later_unavailable": 266,
+        "positive_still_flagged": 5290,
+        "positive_above_final_median": 20451,
+        "positive_sign_reversed": 110,
+        "negative_still_flagged": 6374,
+        "positive_retention": 0.2575337130616815
+      },
+      "0.5": {
+        "positive": 8644,
+        "negative": 9844,
+        "positive_available_denominator": 1208278,
+        "positive_later_unavailable": 126,
+        "positive_still_flagged": 3701,
+        "positive_above_final_median": 8621,
+        "positive_sign_reversed": 27,
+        "negative_still_flagged": 4587,
+        "positive_retention": 0.4281582600647848
+      },
+      "1": {
+        "positive": 2757,
+        "negative": 3452,
+        "positive_available_denominator": 1208278,
+        "positive_later_unavailable": 48,
+        "positive_still_flagged": 1845,
+        "positive_above_final_median": 2751,
+        "positive_sign_reversed": 5,
+        "negative_still_flagged": 2402,
+        "positive_retention": 0.6692056583242655
+      }
+    },
+    "7": {
+      "0": {
+        "positive": 15213,
+        "negative": 16922,
+        "positive_available_denominator": 1208260,
+        "positive_later_unavailable": 142,
+        "positive_still_flagged": 5759,
+        "positive_above_final_median": 15196,
+        "positive_sign_reversed": 19,
+        "negative_still_flagged": 6953,
+        "positive_retention": 0.3785578123972918
+      },
+      "0.5": {
+        "positive": 8652,
+        "negative": 9885,
+        "positive_available_denominator": 1208260,
+        "positive_later_unavailable": 86,
+        "positive_still_flagged": 4587,
+        "positive_above_final_median": 8642,
+        "positive_sign_reversed": 10,
+        "negative_still_flagged": 5555,
+        "positive_retention": 0.5301664355062413
+      },
+      "1": {
+        "positive": 4330,
+        "negative": 5282,
+        "positive_available_denominator": 1208260,
+        "positive_later_unavailable": 52,
+        "positive_still_flagged": 3066,
+        "positive_above_final_median": 4326,
+        "positive_sign_reversed": 3,
+        "negative_still_flagged": 3877,
+        "positive_retention": 0.7080831408775982
+      }
+    },
+    "8": {
+      "0": {
+        "positive": 11192,
+        "negative": 12954,
+        "positive_available_denominator": 1208246,
+        "positive_later_unavailable": 60,
+        "positive_still_flagged": 6386,
+        "positive_above_final_median": 11189,
+        "positive_sign_reversed": 1,
+        "negative_still_flagged": 7761,
+        "positive_retention": 0.5705861329521087
+      },
+      "0.5": {
+        "positive": 8361,
+        "negative": 9947,
+        "positive_available_denominator": 1208246,
+        "positive_later_unavailable": 45,
+        "positive_still_flagged": 5674,
+        "positive_above_final_median": 8359,
+        "positive_sign_reversed": 0,
+        "negative_still_flagged": 6941,
+        "positive_retention": 0.6786269584977873
+      },
+      "1": {
+        "positive": 6127,
+        "negative": 7554,
+        "positive_available_denominator": 1208246,
+        "positive_later_unavailable": 35,
+        "positive_still_flagged": 4736,
+        "positive_above_final_median": 6125,
+        "positive_sign_reversed": 0,
+        "negative_still_flagged": 5975,
+        "positive_retention": 0.7729720907458789
+      }
+    },
+    "9": {
+      "0": {
+        "positive": 8296,
+        "negative": 9899,
+        "positive_available_denominator": 1208230,
+        "positive_later_unavailable": 0,
+        "positive_still_flagged": 8296,
+        "positive_above_final_median": 8296,
+        "positive_sign_reversed": 0,
+        "negative_still_flagged": 9899,
+        "positive_retention": 1.0
+      },
+      "0.5": {
+        "positive": 8296,
+        "negative": 9899,
+        "positive_available_denominator": 1208230,
+        "positive_later_unavailable": 0,
+        "positive_still_flagged": 8296,
+        "positive_above_final_median": 8296,
+        "positive_sign_reversed": 0,
+        "negative_still_flagged": 9899,
+        "positive_retention": 1.0
+      },
+      "1": {
+        "positive": 8296,
+        "negative": 9899,
+        "positive_available_denominator": 1208230,
+        "positive_later_unavailable": 0,
+        "positive_still_flagged": 8296,
+        "positive_above_final_median": 8296,
+        "positive_sign_reversed": 0,
+        "negative_still_flagged": 9899,
+        "positive_retention": 1.0
+      }
+    }
+  },
+  "final_validation": {
+    "seed": 17021,
+    "drafts": 2500,
+    "rule_fixed_before_this_run": true,
+    "rule": "positive score > 0, >= q95; score-median >= .5*9/m, full known coverage. Negative symmetric q05.",
+    "roles": {
+      "Top": {
+        "eligible": 196214,
+        "contexts": 2500,
+        "positive": 1090,
+        "negative": 1065,
+        "positive_role_cases": 803,
+        "negative_role_cases": 790,
+        "positive_max_count": 4,
+        "score_quantiles": [
+          -0.45200660882000643,
+          -0.2905909779404475,
+          -0.001444466006306675,
+          0.28575345838754934,
+          0.45383079473108023
+        ],
+        "partial": {
+          "1": {
+            "positive": 6,
+            "positive_all_at_stage": 7,
+            "later_unavailable": 1,
+            "negative": 9,
+            "positive_retained": 2,
+            "negative_retained": 4,
+            "positive_above_final_median": 6,
+            "positive_sign_reversed": 0
+          },
+          "3": {
+            "positive": 57,
+            "positive_all_at_stage": 60,
+            "later_unavailable": 3,
+            "negative": 47,
+            "positive_retained": 38,
+            "negative_retained": 29,
+            "positive_above_final_median": 57,
+            "positive_sign_reversed": 0
+          },
+          "5": {
+            "positive": 221,
+            "positive_all_at_stage": 227,
+            "later_unavailable": 6,
+            "negative": 192,
+            "positive_retained": 154,
+            "negative_retained": 123,
+            "positive_above_final_median": 221,
+            "positive_sign_reversed": 0
+          },
+          "6": {
+            "positive": 361,
+            "positive_all_at_stage": 368,
+            "later_unavailable": 7,
+            "negative": 340,
+            "positive_retained": 259,
+            "negative_retained": 232,
+            "positive_above_final_median": 361,
+            "positive_sign_reversed": 0
+          },
+          "7": {
+            "positive": 559,
+            "positive_all_at_stage": 565,
+            "later_unavailable": 6,
+            "negative": 543,
+            "positive_retained": 427,
+            "negative_retained": 385,
+            "positive_above_final_median": 559,
+            "positive_sign_reversed": 0
+          },
+          "8": {
+            "positive": 828,
+            "positive_all_at_stage": 834,
+            "later_unavailable": 6,
+            "negative": 782,
+            "positive_retained": 649,
+            "negative_retained": 621,
+            "positive_above_final_median": 828,
+            "positive_sign_reversed": 0
+          },
+          "9": {
+            "positive": 1090,
+            "positive_all_at_stage": 1090,
+            "later_unavailable": 0,
+            "negative": 1065,
+            "positive_retained": 1090,
+            "negative_retained": 1065,
+            "positive_above_final_median": 1090,
+            "positive_sign_reversed": 0
+          }
+        }
+      },
+      "Jungle": {
+        "eligible": 161160,
+        "contexts": 2500,
+        "positive": 1163,
+        "negative": 1287,
+        "positive_role_cases": 881,
+        "negative_role_cases": 940,
+        "positive_max_count": 4,
+        "score_quantiles": [
+          -0.48877593708108796,
+          -0.31669380788566326,
+          -0.0011687605813614282,
+          0.30986356810752014,
+          0.4789019671859761
+        ],
+        "partial": {
+          "1": {
+            "positive": 7,
+            "positive_all_at_stage": 9,
+            "later_unavailable": 2,
+            "negative": 7,
+            "positive_retained": 3,
+            "negative_retained": 2,
+            "positive_above_final_median": 7,
+            "positive_sign_reversed": 0
+          },
+          "3": {
+            "positive": 49,
+            "positive_all_at_stage": 51,
+            "later_unavailable": 2,
+            "negative": 76,
+            "positive_retained": 27,
+            "negative_retained": 45,
+            "positive_above_final_median": 49,
+            "positive_sign_reversed": 0
+          },
+          "5": {
+            "positive": 214,
+            "positive_all_at_stage": 220,
+            "later_unavailable": 6,
+            "negative": 250,
+            "positive_retained": 134,
+            "negative_retained": 178,
+            "positive_above_final_median": 213,
+            "positive_sign_reversed": 1
+          },
+          "6": {
+            "positive": 369,
+            "positive_all_at_stage": 378,
+            "later_unavailable": 9,
+            "negative": 432,
+            "positive_retained": 256,
+            "negative_retained": 310,
+            "positive_above_final_median": 369,
+            "positive_sign_reversed": 0
+          },
+          "7": {
+            "positive": 581,
+            "positive_all_at_stage": 586,
+            "later_unavailable": 5,
+            "negative": 660,
+            "positive_retained": 402,
+            "negative_retained": 485,
+            "positive_above_final_median": 581,
+            "positive_sign_reversed": 1
+          },
+          "8": {
+            "positive": 844,
+            "positive_all_at_stage": 852,
+            "later_unavailable": 8,
+            "negative": 967,
+            "positive_retained": 652,
+            "negative_retained": 756,
+            "positive_above_final_median": 844,
+            "positive_sign_reversed": 0
+          },
+          "9": {
+            "positive": 1163,
+            "positive_all_at_stage": 1163,
+            "later_unavailable": 0,
+            "negative": 1287,
+            "positive_retained": 1163,
+            "negative_retained": 1287,
+            "positive_above_final_median": 1163,
+            "positive_sign_reversed": 0
+          }
+        }
+      },
+      "Mid": {
+        "eligible": 166366,
+        "contexts": 2500,
+        "positive": 1146,
+        "negative": 1166,
+        "positive_role_cases": 867,
+        "negative_role_cases": 875,
+        "positive_max_count": 4,
+        "score_quantiles": [
+          -0.4806031178597891,
+          -0.3071377304015809,
+          -0.004641371850852215,
+          0.2968680026962081,
+          0.4714786748659078
+        ],
+        "partial": {
+          "1": {
+            "positive": 5,
+            "positive_all_at_stage": 6,
+            "later_unavailable": 1,
+            "negative": 0,
+            "positive_retained": 4,
+            "negative_retained": 0,
+            "positive_above_final_median": 5,
+            "positive_sign_reversed": 0
+          },
+          "3": {
+            "positive": 42,
+            "positive_all_at_stage": 44,
+            "later_unavailable": 2,
+            "negative": 29,
+            "positive_retained": 29,
+            "negative_retained": 15,
+            "positive_above_final_median": 42,
+            "positive_sign_reversed": 0
+          },
+          "5": {
+            "positive": 221,
+            "positive_all_at_stage": 226,
+            "later_unavailable": 5,
+            "negative": 200,
+            "positive_retained": 144,
+            "negative_retained": 126,
+            "positive_above_final_median": 221,
+            "positive_sign_reversed": 0
+          },
+          "6": {
+            "positive": 396,
+            "positive_all_at_stage": 406,
+            "later_unavailable": 10,
+            "negative": 372,
+            "positive_retained": 263,
+            "negative_retained": 257,
+            "positive_above_final_median": 396,
+            "positive_sign_reversed": 0
+          },
+          "7": {
+            "positive": 602,
+            "positive_all_at_stage": 609,
+            "later_unavailable": 7,
+            "negative": 569,
+            "positive_retained": 405,
+            "negative_retained": 408,
+            "positive_above_final_median": 602,
+            "positive_sign_reversed": 0
+          },
+          "8": {
+            "positive": 895,
+            "positive_all_at_stage": 901,
+            "later_unavailable": 6,
+            "negative": 858,
+            "positive_retained": 686,
+            "negative_retained": 686,
+            "positive_above_final_median": 895,
+            "positive_sign_reversed": 0
+          },
+          "9": {
+            "positive": 1146,
+            "positive_all_at_stage": 1146,
+            "later_unavailable": 0,
+            "negative": 1166,
+            "positive_retained": 1146,
+            "negative_retained": 1166,
+            "positive_above_final_median": 1146,
+            "positive_sign_reversed": 0
+          }
+        }
+      },
+      "ADC": {
+        "eligible": 97323,
+        "contexts": 2500,
+        "positive": 894,
+        "negative": 1160,
+        "positive_role_cases": 700,
+        "negative_role_cases": 880,
+        "positive_max_count": 3,
+        "score_quantiles": [
+          -0.5364664913128384,
+          -0.3549464510133982,
+          -0.0018854240251973994,
+          0.3282188342755992,
+          0.5050756885166293
+        ],
+        "partial": {
+          "1": {
+            "positive": 0,
+            "positive_all_at_stage": 0,
+            "later_unavailable": 0,
+            "negative": 0,
+            "positive_retained": 0,
+            "negative_retained": 0,
+            "positive_above_final_median": 0,
+            "positive_sign_reversed": 0
+          },
+          "3": {
+            "positive": 26,
+            "positive_all_at_stage": 26,
+            "later_unavailable": 0,
+            "negative": 49,
+            "positive_retained": 18,
+            "negative_retained": 27,
+            "positive_above_final_median": 26,
+            "positive_sign_reversed": 0
+          },
+          "5": {
+            "positive": 171,
+            "positive_all_at_stage": 174,
+            "later_unavailable": 3,
+            "negative": 252,
+            "positive_retained": 107,
+            "negative_retained": 145,
+            "positive_above_final_median": 171,
+            "positive_sign_reversed": 0
+          },
+          "6": {
+            "positive": 278,
+            "positive_all_at_stage": 284,
+            "later_unavailable": 6,
+            "negative": 424,
+            "positive_retained": 183,
+            "negative_retained": 284,
+            "positive_above_final_median": 277,
+            "positive_sign_reversed": 1
+          },
+          "7": {
+            "positive": 463,
+            "positive_all_at_stage": 469,
+            "later_unavailable": 6,
+            "negative": 635,
+            "positive_retained": 319,
+            "negative_retained": 457,
+            "positive_above_final_median": 463,
+            "positive_sign_reversed": 0
+          },
+          "8": {
+            "positive": 645,
+            "positive_all_at_stage": 652,
+            "later_unavailable": 7,
+            "negative": 869,
+            "positive_retained": 517,
+            "negative_retained": 675,
+            "positive_above_final_median": 645,
+            "positive_sign_reversed": 0
+          },
+          "9": {
+            "positive": 894,
+            "positive_all_at_stage": 894,
+            "later_unavailable": 0,
+            "negative": 1160,
+            "positive_retained": 894,
+            "negative_retained": 1160,
+            "positive_above_final_median": 894,
+            "positive_sign_reversed": 0
+          }
+        }
+      },
+      "Support": {
+        "eligible": 133840,
+        "contexts": 2500,
+        "positive": 1074,
+        "negative": 1596,
+        "positive_role_cases": 827,
+        "negative_role_cases": 1085,
+        "positive_max_count": 3,
+        "score_quantiles": [
+          -0.5403293117186454,
+          -0.33952781025720824,
+          -0.004457167489160715,
+          0.31726299960609705,
+          0.49211364777742056
+        ],
+        "partial": {
+          "1": {
+            "positive": 0,
+            "positive_all_at_stage": 0,
+            "later_unavailable": 0,
+            "negative": 31,
+            "positive_retained": 0,
+            "negative_retained": 20,
+            "positive_above_final_median": 0,
+            "positive_sign_reversed": 0
+          },
+          "3": {
+            "positive": 51,
+            "positive_all_at_stage": 53,
+            "later_unavailable": 2,
+            "negative": 139,
+            "positive_retained": 33,
+            "negative_retained": 106,
+            "positive_above_final_median": 51,
+            "positive_sign_reversed": 0
+          },
+          "5": {
+            "positive": 210,
+            "positive_all_at_stage": 214,
+            "later_unavailable": 4,
+            "negative": 424,
+            "positive_retained": 133,
+            "negative_retained": 312,
+            "positive_above_final_median": 209,
+            "positive_sign_reversed": 0
+          },
+          "6": {
+            "positive": 378,
+            "positive_all_at_stage": 387,
+            "later_unavailable": 9,
+            "negative": 620,
+            "positive_retained": 248,
+            "negative_retained": 450,
+            "positive_above_final_median": 377,
+            "positive_sign_reversed": 1
+          },
+          "7": {
+            "positive": 578,
+            "positive_all_at_stage": 585,
+            "later_unavailable": 7,
+            "negative": 906,
+            "positive_retained": 407,
+            "negative_retained": 681,
+            "positive_above_final_median": 577,
+            "positive_sign_reversed": 1
+          },
+          "8": {
+            "positive": 805,
+            "positive_all_at_stage": 807,
+            "later_unavailable": 2,
+            "negative": 1231,
+            "positive_retained": 624,
+            "negative_retained": 996,
+            "positive_above_final_median": 805,
+            "positive_sign_reversed": 0
+          },
+          "9": {
+            "positive": 1074,
+            "positive_all_at_stage": 1074,
+            "later_unavailable": 0,
+            "negative": 1596,
+            "positive_retained": 1074,
+            "negative_retained": 1596,
+            "positive_above_final_median": 1074,
+            "positive_sign_reversed": 0
+          }
+        }
+      }
+    },
+    "overall": {
+      "eligible": 754903,
+      "contexts": 12500,
+      "positive": 5367,
+      "negative": 6274,
+      "positive_role_cases": 4078,
+      "negative_role_cases": 4570
+    }
+  },
+  "visible_pools": {
+    "popular5": {
+      "displayed": 100000,
+      "positive": 1770,
+      "negative": 2354,
+      "contexts": 20000,
+      "positive_role_cases": 1683,
+      "negative_role_cases": 2218,
+      "positive_rate": 0.0177,
+      "positive_role_rate": 0.08415
+    },
+    "personal_weighted5": {
+      "displayed": 100000,
+      "positive": 1358,
+      "negative": 1742,
+      "contexts": 20000,
+      "positive_role_cases": 1306,
+      "negative_role_cases": 1652,
+      "positive_rate": 0.01358,
+      "positive_role_rate": 0.0653
+    },
+    "personal_uniform5": {
+      "displayed": 100000,
+      "positive": 710,
+      "negative": 885,
+      "contexts": 20000,
+      "positive_role_cases": 690,
+      "negative_role_cases": 862,
+      "positive_rate": 0.0071,
+      "positive_role_rate": 0.0345
+    },
+    "personal_weighted10": {
+      "displayed": 200000,
+      "positive": 2577,
+      "negative": 3360,
+      "contexts": 20000,
+      "positive_role_cases": 2392,
+      "negative_role_cases": 3027,
+      "positive_rate": 0.012885,
+      "positive_role_rate": 0.1196
+    }
+  },
+  "sensitivity": {
+    "half_k": [
+      {
+        "role": "Top",
+        "baseline_positive": 1628,
+        "positive_retained": 1620,
+        "positive_above_median": 1628,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 1711,
+        "negative_retained": 1707,
+        "valid_comparisons": 314037,
+        "score_differences_q50_q95_q99": [
+          0.05071707595982128,
+          0.15389154462256774,
+          0.2071344128517493
+        ]
+      },
+      {
+        "role": "Jungle",
+        "baseline_positive": 1667,
+        "positive_retained": 1663,
+        "positive_above_median": 1667,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 2050,
+        "negative_retained": 2045,
+        "valid_comparisons": 258079,
+        "score_differences_q50_q95_q99": [
+          0.05270707212757024,
+          0.1622152679372786,
+          0.21880032529289162
+        ]
+      },
+      {
+        "role": "Mid",
+        "baseline_positive": 1870,
+        "positive_retained": 1864,
+        "positive_above_median": 1870,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 1842,
+        "negative_retained": 1835,
+        "valid_comparisons": 266528,
+        "score_differences_q50_q95_q99": [
+          0.05153067157105367,
+          0.15722398012229832,
+          0.21140528125054753
+        ]
+      },
+      {
+        "role": "ADC",
+        "baseline_positive": 1326,
+        "positive_retained": 1287,
+        "positive_above_median": 1326,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 1819,
+        "negative_retained": 1746,
+        "valid_comparisons": 155521,
+        "score_differences_q50_q95_q99": [
+          0.05005027897106182,
+          0.1639970265649152,
+          0.22678694036523855
+        ]
+      },
+      {
+        "role": "Support",
+        "baseline_positive": 1805,
+        "positive_retained": 1778,
+        "positive_above_median": 1805,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 2477,
+        "negative_retained": 2441,
+        "valid_comparisons": 214065,
+        "score_differences_q50_q95_q99": [
+          0.050144054659560844,
+          0.1557424332254664,
+          0.2115176719843444
+        ]
+      }
+    ],
+    "double_k": [
+      {
+        "role": "Top",
+        "baseline_positive": 1628,
+        "positive_retained": 177,
+        "positive_above_median": 1628,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 1711,
+        "negative_retained": 174,
+        "valid_comparisons": 314037,
+        "score_differences_q50_q95_q99": [
+          0.03790003229844132,
+          0.1220541314528522,
+          0.16760283952186453
+        ]
+      },
+      {
+        "role": "Jungle",
+        "baseline_positive": 1667,
+        "positive_retained": 220,
+        "positive_above_median": 1667,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 2050,
+        "negative_retained": 261,
+        "valid_comparisons": 258079,
+        "score_differences_q50_q95_q99": [
+          0.04214399728738503,
+          0.12979584827808094,
+          0.175904264627424
+        ]
+      },
+      {
+        "role": "Mid",
+        "baseline_positive": 1870,
+        "positive_retained": 256,
+        "positive_above_median": 1870,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 1842,
+        "negative_retained": 269,
+        "valid_comparisons": 266528,
+        "score_differences_q50_q95_q99": [
+          0.03934992062768784,
+          0.12384727715215937,
+          0.16884785387199183
+        ]
+      },
+      {
+        "role": "ADC",
+        "baseline_positive": 1326,
+        "positive_retained": 251,
+        "positive_above_median": 1326,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 1819,
+        "negative_retained": 467,
+        "valid_comparisons": 155521,
+        "score_differences_q50_q95_q99": [
+          0.0416716717518448,
+          0.12970777843005526,
+          0.17752147732354442
+        ]
+      },
+      {
+        "role": "Support",
+        "baseline_positive": 1805,
+        "positive_retained": 361,
+        "positive_above_median": 1805,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 2477,
+        "negative_retained": 661,
+        "valid_comparisons": 214065,
+        "score_differences_q50_q95_q99": [
+          0.040228984649086,
+          0.12680257181693919,
+          0.17418271278446226
+        ]
+      }
+    ],
+    "nov12_same_k": [
+      {
+        "role": "Top",
+        "baseline_positive": 1628,
+        "positive_retained": 1052,
+        "positive_above_median": 1628,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 1711,
+        "negative_retained": 1106,
+        "valid_comparisons": 314009,
+        "score_differences_q50_q95_q99": [
+          0.04232234044420487,
+          0.138454534093116,
+          0.1887692479413619
+        ]
+      },
+      {
+        "role": "Jungle",
+        "baseline_positive": 1667,
+        "positive_retained": 1156,
+        "positive_above_median": 1667,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 2050,
+        "negative_retained": 1429,
+        "valid_comparisons": 258066,
+        "score_differences_q50_q95_q99": [
+          0.04737270227427834,
+          0.1441799481036557,
+          0.1927795236875186
+        ]
+      },
+      {
+        "role": "Mid",
+        "baseline_positive": 1870,
+        "positive_retained": 1248,
+        "positive_above_median": 1870,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 1842,
+        "negative_retained": 1276,
+        "valid_comparisons": 266519,
+        "score_differences_q50_q95_q99": [
+          0.04344018391144495,
+          0.1375051308439274,
+          0.1866207077693715
+        ]
+      },
+      {
+        "role": "ADC",
+        "baseline_positive": 1326,
+        "positive_retained": 911,
+        "positive_above_median": 1326,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 1819,
+        "negative_retained": 1274,
+        "valid_comparisons": 155517,
+        "score_differences_q50_q95_q99": [
+          0.045822791576478616,
+          0.14145096942352287,
+          0.18998013746246514
+        ]
+      },
+      {
+        "role": "Support",
+        "baseline_positive": 1805,
+        "positive_retained": 1247,
+        "positive_above_median": 1805,
+        "positive_sign_reversed": 0,
+        "baseline_negative": 2477,
+        "negative_retained": 1841,
+        "valid_comparisons": 214064,
+        "score_differences_q50_q95_q99": [
+          0.045172484742661195,
+          0.1420302000638428,
+          0.19264443340787868
+        ]
+      }
+    ],
+    "score_biased_compositions": [
+      {
+        "role": "Top",
+        "eligible": 117471,
+        "positive": 584,
+        "negative": 592,
+        "contexts": 1500,
+        "no_positive_fraction": 0.7053333333333334
+      },
+      {
+        "role": "Jungle",
+        "eligible": 96638,
+        "positive": 491,
+        "negative": 773,
+        "contexts": 1500,
+        "no_positive_fraction": 0.7433333333333333
+      },
+      {
+        "role": "Mid",
+        "eligible": 99801,
+        "positive": 577,
+        "negative": 621,
+        "contexts": 1500,
+        "no_positive_fraction": 0.7073333333333334
+      },
+      {
+        "role": "ADC",
+        "eligible": 58131,
+        "positive": 449,
+        "negative": 655,
+        "contexts": 1500,
+        "no_positive_fraction": 0.7566666666666667
+      },
+      {
+        "role": "Support",
+        "eligible": 80163,
+        "positive": 642,
+        "negative": 894,
+        "contexts": 1500,
+        "no_positive_fraction": 0.6826666666666666
+      }
+    ],
+    "formula_parity": {
+      "cases": 600,
+      "max_absolute_error": 2.220446049250313e-16
+    },
+    "archive": {
+      "snapshot": "0551fd06485293f646720494eef5e1a4158aca434145a860ac66028fb5ebf0fb",
+      "pairs": 786704,
+      "all_shard_hashes_verified": true,
+      "overlapping_14_day_windows": true
+    }
+  },
+  "examples": {
+    "common_role_examples": [
+      {
+        "role": "Top",
+        "champion": "Irelia",
+        "score": 0.5997986756026887,
+        "median": 0.04491623952694933,
+        "q95": 0.348706274010484,
+        "gap": 0.5548824360757394,
+        "ally": {
+          "Jungle": "Sylas",
+          "Mid": "Hwei",
+          "ADC": "Miss Fortune",
+          "Support": "Lulu"
+        },
+        "enemy": {
+          "Top": "Rumble",
+          "Jungle": "Kayn",
+          "Mid": "Aurora",
+          "ADC": "Smolder",
+          "Support": "Morgana"
+        }
+      },
+      {
+        "role": "Jungle",
+        "champion": "Lillia",
+        "score": 0.6004314134232246,
+        "median": 0.038446124099385914,
+        "q95": 0.3815168723231906,
+        "gap": 0.5619852893238386,
+        "ally": {
+          "Top": "Fiora",
+          "Mid": "Vladimir",
+          "ADC": "Miss Fortune",
+          "Support": "Seraphine"
+        },
+        "enemy": {
+          "Top": "Olaf",
+          "Jungle": "Cho'Gath",
+          "Mid": "Viktor",
+          "ADC": "Ezreal",
+          "Support": "Brand"
+        }
+      },
+      {
+        "role": "Mid",
+        "champion": "Xerath",
+        "score": 0.5997901080412719,
+        "median": -0.05737706793031806,
+        "q95": 0.30711754917304107,
+        "gap": 0.6571671759715899,
+        "ally": {
+          "Top": "Garen",
+          "Jungle": "Lee Sin",
+          "ADC": "Jhin",
+          "Support": "Senna"
+        },
+        "enemy": {
+          "Top": "Renekton",
+          "Jungle": "Cho'Gath",
+          "Mid": "Syndra",
+          "ADC": "Kai'Sa",
+          "Support": "Alistar"
+        }
+      },
+      {
+        "role": "ADC",
+        "champion": "Jinx",
+        "score": 0.59986434254077,
+        "median": 0.08305169913986504,
+        "q95": 0.4556777481266218,
+        "gap": 0.516812643400905,
+        "ally": {
+          "Top": "Camille",
+          "Jungle": "Taliyah",
+          "Mid": "Ahri",
+          "Support": "Vel'Koz"
+        },
+        "enemy": {
+          "Top": "Nasus",
+          "Jungle": "Kayn",
+          "Mid": "Malzahar",
+          "ADC": "Samira",
+          "Support": "Alistar"
+        }
+      },
+      {
+        "role": "Support",
+        "champion": "Renata Glasc",
+        "score": 0.6000471353530409,
+        "median": 0.05773841768461763,
+        "q95": 0.5084675505630579,
+        "gap": 0.5423087176684233,
+        "ally": {
+          "Top": "Heimerdinger",
+          "Jungle": "Nidalee",
+          "Mid": "Locke",
+          "ADC": "Yunara"
+        },
+        "enemy": {
+          "Top": "Darius",
+          "Jungle": "Cho'Gath",
+          "Mid": "Fizz",
+          "ADC": "Kai'Sa",
+          "Support": "Morgana"
+        }
+      }
+    ],
+    "sylas_malphite_example": {
+      "champion": "Sylas",
+      "role": "Top",
+      "ally": {
+        "Top": "Sylas",
+        "Jungle": "Lee Sin",
+        "Mid": "Orianna",
+        "ADC": "Jinx",
+        "Support": "Thresh"
+      },
+      "enemy": {
+        "Top": "Malphite",
+        "Jungle": "Amumu",
+        "Mid": "Viktor",
+        "ADC": "Jhin",
+        "Support": "Alistar"
+      },
+      "vs_malphite_adjusted": 4.993019893587301,
+      "overall": 0.8536550478944697,
+      "median": 0.03921702806987476,
+      "q95": 0.332043873073701,
+      "gap": 0.8144380198245948,
+      "highlight": true,
+      "known": 9
+    },
+    "edge_cases": {
+      "flat": {
+        "positive": 0,
+        "negative": 0
+      },
+      "all_negative": {
+        "positive": 0,
+        "negative": 2
+      },
+      "all_positive": {
+        "positive": 2,
+        "negative": 0
+      },
+      "one_zero_among_negative": {
+        "positive": 0,
+        "negative": 0
+      }
+    }
+  },
+  "read_only_export": {
+    "snapshotId": "603d12557a32514a5d4ddf8e3c7655b9011d661fac5d67e021eab77b2118f9a3",
+    "shards": 865,
+    "pairs": 782306,
+    "chunks": 44,
+    "seconds": 21.98,
+    "readOnly": true,
+    "sha256": "1820e1e7719b0d289a97b0948398777061fd849d26d9351668b9b06e7d0d8c88"
+  },
+  "offrole_sensitivity": {
+    "Top": {
+      "offrole_available": 301891,
+      "fully_known": 253443,
+      "positive": 0,
+      "negative": 0
+    },
+    "Jungle": {
+      "offrole_available": 357914,
+      "fully_known": 124440,
+      "positive": 0,
+      "negative": 0
+    },
+    "Mid": {
+      "offrole_available": 349450,
+      "fully_known": 284178,
+      "positive": 0,
+      "negative": 0
+    },
+    "ADC": {
+      "offrole_available": 460459,
+      "fully_known": 266819,
+      "positive": 0,
+      "negative": 0
+    },
+    "Support": {
+      "offrole_available": 401908,
+      "fully_known": 302593,
+      "positive": 0,
+      "negative": 0
+    }
+  }
+}
