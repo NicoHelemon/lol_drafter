@@ -1,0 +1,449 @@
+{
+  "experiment": "offline-champion-select-v1",
+  "dataset_archive_sha256": "98e08c725ae762c13e565f209a388503bdf16b3cfbaec3fc1528c79f15901131",
+  "image_hashes_match_manifest": true,
+  "label_usage": "Evaluation only; fixed algorithm developed on 001-005 before evaluating 006-020",
+  "no_frontend_integration": true,
+  "no_llm": true,
+  "no_custom_model_training": true,
+  "ocr_is_pretrained": true,
+  "bans_evaluated": false,
+  "software": {
+    "opencv-python-headless": "5.0.0",
+    "numpy": "2.5.5",
+    "Pillow": "13.0.0",
+    "Tesseract": "5.5.0"
+  },
+  "splits": {
+    "development": {
+      "portrait_only_tp": 19,
+      "portrait_only_fp": 4,
+      "portrait_only_fn": 4,
+      "true_positive": 23,
+      "false_positive": 0,
+      "false_negative": 0,
+      "correct_assigned_roles": 16,
+      "annotated_roles": 16,
+      "confirmed_role_correct": 12,
+      "confirmed_role_total": 12,
+      "exact_champion_sets": 5,
+      "images": 5,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "heldout": {
+      "portrait_only_tp": 66,
+      "portrait_only_fp": 17,
+      "portrait_only_fn": 46,
+      "true_positive": 65,
+      "false_positive": 0,
+      "false_negative": 47,
+      "correct_assigned_roles": 49,
+      "annotated_roles": 94,
+      "confirmed_role_correct": 21,
+      "confirmed_role_total": 56,
+      "exact_champion_sets": 1,
+      "images": 15,
+      "precision": 1.0,
+      "recall": 0.5803571428571429
+    },
+    "all": {
+      "portrait_only_tp": 85,
+      "portrait_only_fp": 21,
+      "portrait_only_fn": 50,
+      "true_positive": 88,
+      "false_positive": 0,
+      "false_negative": 47,
+      "correct_assigned_roles": 65,
+      "annotated_roles": 110,
+      "confirmed_role_correct": 33,
+      "confirmed_role_total": 68,
+      "exact_champion_sets": 6,
+      "images": 20,
+      "precision": 1.0,
+      "recall": 0.6518518518518519
+    }
+  },
+  "per_image": [
+    {
+      "image_id": "draft_001",
+      "sha256": "3d20cef866cb296b8a183f8973f0870e61c0655fb0ce7d82787e2aaeff62e4b9",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 7.396,
+      "evaluation": {
+        "portrait_only_tp": 2,
+        "portrait_only_fp": 0,
+        "portrait_only_fn": 1,
+        "true_positive": 3,
+        "false_positive": 0,
+        "false_negative": 0,
+        "correct_assigned_roles": 2,
+        "annotated_roles": 2,
+        "confirmed_role_correct": 2,
+        "confirmed_role_total": 2,
+        "exact_champion_sets": true
+      }
+    },
+    {
+      "image_id": "draft_002",
+      "sha256": "14885a8e523898c48dd3360850e7503f9e8eea74b448c852bfe17d39ec7b7d40",
+      "localization": "full_frame_fallback",
+      "elapsed_seconds": 8.137,
+      "evaluation": {
+        "portrait_only_tp": 5,
+        "portrait_only_fp": 2,
+        "portrait_only_fn": 2,
+        "true_positive": 7,
+        "false_positive": 0,
+        "false_negative": 0,
+        "correct_assigned_roles": 6,
+        "annotated_roles": 6,
+        "confirmed_role_correct": 4,
+        "confirmed_role_total": 4,
+        "exact_champion_sets": true
+      }
+    },
+    {
+      "image_id": "draft_003",
+      "sha256": "cce3aee54a09b887ab7c8fcf0b3404f8432f1b2af77cbe4714538a3eaa566ead",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 4.65,
+      "evaluation": {
+        "portrait_only_tp": 2,
+        "portrait_only_fp": 1,
+        "portrait_only_fn": 1,
+        "true_positive": 3,
+        "false_positive": 0,
+        "false_negative": 0,
+        "correct_assigned_roles": 2,
+        "annotated_roles": 2,
+        "confirmed_role_correct": 1,
+        "confirmed_role_total": 1,
+        "exact_champion_sets": true
+      }
+    },
+    {
+      "image_id": "draft_004",
+      "sha256": "c3d9f60d103e2bbe0b8eecb409c0a835f25f445dd57eb9c728facd4f0d6f02eb",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 4.27,
+      "evaluation": {
+        "portrait_only_tp": 3,
+        "portrait_only_fp": 1,
+        "portrait_only_fn": 0,
+        "true_positive": 3,
+        "false_positive": 0,
+        "false_negative": 0,
+        "correct_assigned_roles": 2,
+        "annotated_roles": 2,
+        "confirmed_role_correct": 1,
+        "confirmed_role_total": 1,
+        "exact_champion_sets": true
+      }
+    },
+    {
+      "image_id": "draft_005",
+      "sha256": "ff4cafcbad6da4462726a1152efa89ec7b03ff816e56e01c100ee858f9b0c21b",
+      "localization": "full_frame_fallback",
+      "elapsed_seconds": 3.761,
+      "evaluation": {
+        "portrait_only_tp": 7,
+        "portrait_only_fp": 0,
+        "portrait_only_fn": 0,
+        "true_positive": 7,
+        "false_positive": 0,
+        "false_negative": 0,
+        "correct_assigned_roles": 4,
+        "annotated_roles": 4,
+        "confirmed_role_correct": 4,
+        "confirmed_role_total": 4,
+        "exact_champion_sets": true
+      }
+    },
+    {
+      "image_id": "draft_006",
+      "sha256": "16d3d9a775eeffffa7164b15fefc2e8cd9995202f8c5a72d1b8bd68ebbb04118",
+      "localization": "full_frame_fallback",
+      "elapsed_seconds": 6.163,
+      "evaluation": {
+        "portrait_only_tp": 2,
+        "portrait_only_fp": 3,
+        "portrait_only_fn": 5,
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 3,
+        "correct_assigned_roles": 4,
+        "annotated_roles": 7,
+        "confirmed_role_correct": 0,
+        "confirmed_role_total": 3,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_007",
+      "sha256": "dc313828d6777a0b4e6fc8646c4c2f17c278dcc88518e40d1ed7e0302e23fb83",
+      "localization": "full_frame_fallback",
+      "elapsed_seconds": 3.532,
+      "evaluation": {
+        "portrait_only_tp": 0,
+        "portrait_only_fp": 4,
+        "portrait_only_fn": 5,
+        "true_positive": 1,
+        "false_positive": 0,
+        "false_negative": 4,
+        "correct_assigned_roles": 0,
+        "annotated_roles": 3,
+        "confirmed_role_correct": 0,
+        "confirmed_role_total": 3,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_008",
+      "sha256": "ca37ffd57438b04cccb49326d660a26648478fc643dea202176b8033dd45ba48",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 3.395,
+      "evaluation": {
+        "portrait_only_tp": 8,
+        "portrait_only_fp": 1,
+        "portrait_only_fn": 2,
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 6,
+        "correct_assigned_roles": 4,
+        "annotated_roles": 10,
+        "confirmed_role_correct": 0,
+        "confirmed_role_total": 5,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_009",
+      "sha256": "936ed20f1be73100c2f3e749ad14de1e54b517a1565fb7c075d65d0b527ead9b",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 3.518,
+      "evaluation": {
+        "portrait_only_tp": 9,
+        "portrait_only_fp": 0,
+        "portrait_only_fn": 1,
+        "true_positive": 0,
+        "false_positive": 0,
+        "false_negative": 10,
+        "correct_assigned_roles": 0,
+        "annotated_roles": 10,
+        "confirmed_role_correct": 0,
+        "confirmed_role_total": 5,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_010",
+      "sha256": "d2960de8d0da8ab89a375a35d12388639c8b0cfa67a9455ae147b1f13fd739b1",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 3.617,
+      "evaluation": {
+        "portrait_only_tp": 4,
+        "portrait_only_fp": 0,
+        "portrait_only_fn": 1,
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 1,
+        "correct_assigned_roles": 3,
+        "annotated_roles": 3,
+        "confirmed_role_correct": 3,
+        "confirmed_role_total": 3,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_011",
+      "sha256": "87864a9575ad705a54c0cc83727f301439f8b07509a1e893507ec88a33ed5111",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 3.605,
+      "evaluation": {
+        "portrait_only_tp": 8,
+        "portrait_only_fp": 0,
+        "portrait_only_fn": 2,
+        "true_positive": 7,
+        "false_positive": 0,
+        "false_negative": 3,
+        "correct_assigned_roles": 7,
+        "annotated_roles": 10,
+        "confirmed_role_correct": 2,
+        "confirmed_role_total": 5,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_012",
+      "sha256": "7c4a0220647cf58f794711256e1ef106eade2829c54dcfdf15f2a0522faf519d",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 4.357,
+      "evaluation": {
+        "portrait_only_tp": 7,
+        "portrait_only_fp": 1,
+        "portrait_only_fn": 1,
+        "true_positive": 8,
+        "false_positive": 0,
+        "false_negative": 0,
+        "correct_assigned_roles": 5,
+        "annotated_roles": 5,
+        "confirmed_role_correct": 4,
+        "confirmed_role_total": 4,
+        "exact_champion_sets": true
+      }
+    },
+    {
+      "image_id": "draft_013",
+      "sha256": "da3d95f11862ea6a814164032f6b08d77745f689737c6edfe9e6ebc032a20345",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 5.027,
+      "evaluation": {
+        "portrait_only_tp": 2,
+        "portrait_only_fp": 1,
+        "portrait_only_fn": 3,
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 1,
+        "correct_assigned_roles": 3,
+        "annotated_roles": 4,
+        "confirmed_role_correct": 1,
+        "confirmed_role_total": 2,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_014",
+      "sha256": "a2b0def796694c2d77aea32a74bbc29d0d7cdd981720f18f7b8e7a1affcc520c",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 4.121,
+      "evaluation": {
+        "portrait_only_tp": 8,
+        "portrait_only_fp": 0,
+        "portrait_only_fn": 2,
+        "true_positive": 9,
+        "false_positive": 0,
+        "false_negative": 1,
+        "correct_assigned_roles": 7,
+        "annotated_roles": 8,
+        "confirmed_role_correct": 4,
+        "confirmed_role_total": 5,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_015",
+      "sha256": "3460e38ad3a363a1999ab03a87d85e2d0e1c9cc93fa8b7b2845aa4a1188ee54d",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 4.473,
+      "evaluation": {
+        "portrait_only_tp": 4,
+        "portrait_only_fp": 1,
+        "portrait_only_fn": 1,
+        "true_positive": 0,
+        "false_positive": 0,
+        "false_negative": 5,
+        "correct_assigned_roles": 0,
+        "annotated_roles": 5,
+        "confirmed_role_correct": 0,
+        "confirmed_role_total": 2,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_016",
+      "sha256": "7dbf88abbbd4d1a2c32979fb2f964ba34ed9173079e100f77e5385de0d867c64",
+      "localization": "full_frame_fallback",
+      "elapsed_seconds": 4.013,
+      "evaluation": {
+        "portrait_only_tp": 4,
+        "portrait_only_fp": 2,
+        "portrait_only_fn": 1,
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 1,
+        "correct_assigned_roles": 3,
+        "annotated_roles": 4,
+        "confirmed_role_correct": 2,
+        "confirmed_role_total": 3,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_017",
+      "sha256": "891ab68632023907d6013d520743dbbdf34722e8e783bb4bfb9d266807ed5114",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 3.866,
+      "evaluation": {
+        "portrait_only_tp": 2,
+        "portrait_only_fp": 0,
+        "portrait_only_fn": 8,
+        "true_positive": 6,
+        "false_positive": 0,
+        "false_negative": 4,
+        "correct_assigned_roles": 6,
+        "annotated_roles": 10,
+        "confirmed_role_correct": 1,
+        "confirmed_role_total": 5,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_018",
+      "sha256": "87c5822519d6c0886ed3f237a9246bcbba0ab86a577e55ffa1be00ca6d07a503",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 3.419,
+      "evaluation": {
+        "portrait_only_tp": 1,
+        "portrait_only_fp": 1,
+        "portrait_only_fn": 2,
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 1,
+        "correct_assigned_roles": 1,
+        "annotated_roles": 2,
+        "confirmed_role_correct": 1,
+        "confirmed_role_total": 1,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_019",
+      "sha256": "83c43b8451ccb6113273f3f5a712c7dcfd3e3b1362774bbbcd6ac42aa8e3e0dd",
+      "localization": "circle_geometry",
+      "elapsed_seconds": 3.612,
+      "evaluation": {
+        "portrait_only_tp": 3,
+        "portrait_only_fp": 0,
+        "portrait_only_fn": 7,
+        "true_positive": 5,
+        "false_positive": 0,
+        "false_negative": 5,
+        "correct_assigned_roles": 2,
+        "annotated_roles": 7,
+        "confirmed_role_correct": 0,
+        "confirmed_role_total": 5,
+        "exact_champion_sets": false
+      }
+    },
+    {
+      "image_id": "draft_020",
+      "sha256": "d57d88b99b32a0f7d66d07ba3990db0ce15f2df2cf28b26f5bdc23cc0a310243",
+      "localization": "full_frame_fallback",
+      "elapsed_seconds": 3.8,
+      "evaluation": {
+        "portrait_only_tp": 4,
+        "portrait_only_fp": 3,
+        "portrait_only_fn": 5,
+        "true_positive": 7,
+        "false_positive": 0,
+        "false_negative": 2,
+        "correct_assigned_roles": 4,
+        "annotated_roles": 6,
+        "confirmed_role_correct": 3,
+        "confirmed_role_total": 5,
+        "exact_champion_sets": false
+      }
+    }
+  ]
+}
