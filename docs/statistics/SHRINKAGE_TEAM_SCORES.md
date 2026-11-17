@@ -97,6 +97,8 @@ du 13, le premier job démarre quelques secondes après la création du run :
 l'attente principale précède cette création, pas l'attribution de ce runner.
 L'API n'expose pas la raison interne de ce retard.
 
+> Mise à jour du 17 novembre : la fenêtre restrictive décrite ci-dessous a été retirée, car elle annulait les déclenchements tardifs. Voir [la correction du rafraîchissement quotidien](DAILY_REFRESH_RECOVERY.md) pour le comportement actuel.
+
 La définition vise désormais **06:00 Europe/Zurich**, été/hiver automatique.
 Un contrôle initial refuse toute collecte automatique hors de **06:00–08:00**
 et laisse une annotation d'avertissement et un résumé explicites. La fenêtre

@@ -7,7 +7,11 @@ on:
         type: boolean
         default: false
   schedule:
-    - cron: '0 6 * * *'
+    # Avoid top-of-hour load. Later checks catch dropped/failed runs and only
+    # collect if the published snapshot still predates today's daily target.
+    - cron: '7 6 * * *'
+      timezone: Europe/Zurich
+    - cron: '17 9,15 * * *'
       timezone: Europe/Zurich
 permissions:
   contents: read
@@ -20,12 +24,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     outputs:
-      allowed: ${{ steps.window.outputs.allowed }}
+      allowed: ${{ steps.freshness.outputs.allowed }}
     steps:
       - uses: actions/checkout@v4
-      - id: window
-        name: Check Swiss morning window before starting backend work
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: freshness
+        name: Check published freshness before starting backend work
         run: python3 scripts/statistics/schedule.py
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
   validate:
     needs: schedule
     if: needs.schedule.outputs.allowed == 'true'
@@ -79,3 +89,13 @@ jobs:
           STATISTICS_IMPORT_URL: ${{ secrets.STATISTICS_IMPORT_URL }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      - name: Verify the new daily publication
+        run: python3 scripts/statistics/schedule.py --verify
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      - name: Report failed refresh
+        if: failure()
+        run: |
+          echo '::error::Daily statistics refresh failed. A successful collection/publication has not been confirmed; inspect this run.'
+          echo 'Daily refresh failed. The last complete published snapshot remains available unless publication completed before the error. Check the publication logs.' >> "$GITHUB_STEP_SUMMARY"

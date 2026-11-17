@@ -14,15 +14,18 @@ from pipeline import build, verify
 from publish import publish
 from maintenance import health, maintain
 from probe import NoRedirects
-from schedule import require_window
+from schedule import check as freshness_check
 
 
-def validate_refresh(manifest, previous):
+def validate_refresh(manifest, previous, now=None):
     metadata = manifest['metadata']
     captured = datetime.fromisoformat(metadata['importedAt'].replace('Z', '+00:00'))
-    age = (datetime.now(timezone.utc) - captured).total_seconds()
+    now = now or datetime.now(timezone.utc)
+    age = (now - captured).total_seconds()
     if age < -300 or age > 48 * 3600:
         raise ValueError('Daily export must be dated within the last 48 hours')
+    if freshness_check(now=now, previous={'importedAt':metadata['importedAt']})['due']:
+        raise ValueError('Daily export must meet the latest 06:00 Europe/Zurich target; current snapshot preserved')
     if metadata['fictional'] or any(manifest['coverage'].get(r, 0) <= 0 for r in ('vs', 'with')):
         raise ValueError('Fresh real Against and Synergy observations are required')
     if not previous:
@@ -38,7 +41,6 @@ def validate_refresh(manifest, previous):
 
 
 def publish_refresh(directory, previous):
-    require_window()
     manifest = verify(directory)[0]
     validate_refresh(manifest, previous)
     result = publish(directory)
@@ -50,7 +52,6 @@ def publish_refresh(directory, previous):
 
 
 def refresh():
-    require_window()
     mode = os.environ.get('STATISTICS_SOURCE', 'export')
     if mode not in ('export', 'lolalytics'):
         raise ValueError('STATISTICS_SOURCE must be export or lolalytics')

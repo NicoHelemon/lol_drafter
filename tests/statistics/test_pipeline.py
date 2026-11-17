@@ -120,6 +120,16 @@ class PipelineTests(unittest.TestCase):
             self.assertIn('statistics_current', queries[-1])
             self.assertIn('Incomplete snapshot', queries[-1])
 
+    def test_delayed_scheduled_publication_has_no_clock_deadline_but_keeps_integrity_checks(self):
+        with tempfile.TemporaryDirectory() as directory:
+            data = fixture(); data['fictional'] = False
+            manifest = build(data, directory); queries = []
+            with patch.dict('os.environ', {'GITHUB_EVENT_NAME':'schedule'}):
+                publish(Path(directory)/manifest['metadata']['snapshotId'], lambda sql: queries.append(sql) or [])
+            self.assertNotIn('clock_timestamp()', queries[-1])
+            self.assertIn('Incomplete snapshot', queries[-1]); self.assertIn('Calibration conflict', queries[-1])
+            self.assertIn('pg_advisory_xact_lock', queries[-1]); self.assertIn('commit;', queries[-1])
+
     def test_publication_batches_obey_body_limit_and_split_rejected_requests(self):
         import io
         from urllib.error import HTTPError

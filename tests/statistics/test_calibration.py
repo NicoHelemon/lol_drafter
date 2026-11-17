@@ -8,8 +8,6 @@ import unittest
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'scripts/statistics'))
 from calibration import fit, summarize, reusable, context_key
-import schedule
-import refresh
 import publish
 
 NOW=datetime(2026,11,14,5,0,tzinfo=timezone.utc)
@@ -73,27 +71,3 @@ class CalibrationTests(unittest.TestCase):
                 return []
             with self.assertRaises(RuntimeError):publish.publish(directory,unavailable)
             self.assertFalse(any('statistics_current' in q for q in queries))
-
-
-class ScheduleTests(unittest.TestCase):
-    def test_swiss_six_oclock_tracks_winter_summer_and_dst_transitions(self):
-        for date,hour in [('2026-01-14',5),('2026-07-14',4),('2026-03-29',4),('2026-10-25',5)]:
-            now=datetime.fromisoformat(f'{date}T{hour:02}:00:00+00:00')
-            result=schedule.check('schedule',now)
-            self.assertTrue(result['allowed']);self.assertIn('T06:00:00',result['local'])
-            self.assertFalse(schedule.check('schedule',now-timedelta(seconds=1))['allowed'])
-            self.assertTrue(schedule.check('schedule',now+timedelta(hours=2,seconds=-1))['allowed'])
-            self.assertFalse(schedule.check('schedule',now+timedelta(hours=2))['allowed'])
-
-    def test_historical_late_automatic_runs_are_skipped_but_explicit_manual_runs_are_allowed(self):
-        for stamp in ['2026-11-13T14:40:57+00:00','2026-11-14T13:37:59+00:00']:
-            now=datetime.fromisoformat(stamp)
-            self.assertFalse(schedule.check('schedule',now)['allowed'])
-            self.assertTrue(schedule.check('workflow_dispatch',now)['allowed'])
-
-    def test_delayed_refresh_cannot_start_collecting_or_promoting(self):
-        with patch.dict('os.environ',{'GITHUB_EVENT_NAME':'schedule'}),patch.object(schedule,'check',return_value={'allowed':False,'reason':'outside window'}):
-            with patch.object(refresh,'health') as health,self.assertRaisesRegex(ValueError,'outside window'):refresh.refresh()
-            health.assert_not_called()
-            with patch.object(refresh,'publish') as publish,self.assertRaisesRegex(ValueError,'outside window'):refresh.publish_refresh(Path('unused'),None)
-            publish.assert_not_called()

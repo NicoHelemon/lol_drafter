@@ -106,6 +106,14 @@ class RefreshTests(unittest.TestCase):
                 self.assertRaisesRegex(RuntimeError,'health mismatch'):
             refresh.publish_refresh(Path('isolated-test'),None)
 
+    def test_daily_export_from_before_todays_target_is_rejected_before_publication(self):
+        now = datetime.fromisoformat('2026-11-17T14:00:00+00:00')
+        m = manifest(); m['metadata']['importedAt'] = '2026-11-17T04:59:59Z'
+        with self.assertRaisesRegex(ValueError, 'latest 06:00'):
+            refresh.validate_refresh(m, None, now)
+        m['metadata']['importedAt'] = '2026-11-17T05:00:00Z'
+        refresh.validate_refresh(m, None, now)
+
     def test_cleanup_failure_does_not_mask_collection_error(self):
         import collect_lolalytics
         with patch.dict('os.environ',{'STATISTICS_SOURCE':'lolalytics','SUPABASE_ACCESS_TOKEN':'test','SUPABASE_PROJECT_REF':'test'}), \

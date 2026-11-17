@@ -11,7 +11,6 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 from pipeline import encoded, verify
 from calibration import context_key, fit, reusable, summarize
-from schedule import require_window
 
 
 def literal(value):
@@ -32,7 +31,6 @@ def query(sql):
 
 
 def publish(directory, execute=query, max_batch_bytes=900_000, progress=None):
-    require_window()
     manifest, groups = verify(directory)  # No remote changes before full validation.
     metadata = manifest['metadata']
     if metadata['fictional']:
@@ -103,15 +101,10 @@ def publish(directory, execute=query, max_batch_bytes=900_000, progress=None):
             write_batch(batch)
     # Completeness verification AND pointer change in one database transaction.
     # Old current stays valid on any HTTP or SQL failure before/inside this query.
-    require_window()
-    scheduled_sql = 'true' if os.environ.get('GITHUB_EVENT_NAME') == 'schedule' else 'false'
     execute(f"""begin;
       select pg_advisory_xact_lock(765432100);
       select id from public.statistics_snapshots where id={sid} for update;
       do $check$ begin
-        if {scheduled_sql} and ((clock_timestamp() at time zone 'Europe/Zurich')::time < time '06:00'
-          or (clock_timestamp() at time zone 'Europe/Zurich')::time >= time '08:00')
-        then raise exception 'Automatic publication outside Swiss morning window';end if;
         if (select count(*) from public.statistics_shards where snapshot_id={sid}) <> {len(groups)}
           or (select coalesce(sum(jsonb_array_length(pairs)),0) from public.statistics_shards where snapshot_id={sid}) <> {manifest['pairCount']}
         then raise exception 'Incomplete snapshot';end if;
