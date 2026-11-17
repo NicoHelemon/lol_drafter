@@ -39,7 +39,9 @@ it('carries each player, pool and selected champion after consent, preserving en
 });
 it('moves into a free role, exchanging an anonymous selection without changing the opponent column',async()=>{
  let r=await setup();const before=structuredClone(r.state);r=await move(r,'Jungle');
- expect(r.state).toEqual(exchangeLiveRoles(before,'Top','Jungle'));expect(r.state.picks.ally).toContainEqual({championId:'202',role:'Top'});
+ const expected=exchangeLiveRoles(before,'Top','Jungle');
+ // This suite intentionally exercises schema 013; current clearing semantics are covered with all migrations in accounts-members.
+ expected.rolePools!.ally!.Top=[...before.players[0].pool];expect(r.state).toEqual(expected);expect(r.state.picks.ally).toContainEqual({championId:'202',role:'Top'});
  expect(r.state.picks.ally).toContainEqual({championId:'58',role:'Jungle'});expect(await pending(r)).toBeUndefined();
 });
 it('carries an empty selection too and preserves both owners pools',async()=>{

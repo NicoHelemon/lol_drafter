@@ -1,7 +1,6 @@
 import type {Player} from '../domain/types';
-import {roleName} from '../domain/roles';
 export default function Participants({players,hostId,online,uid,busy,onTransfer,onObserve}:{players:Player[];hostId:string;online:string[];uid:string;busy:boolean;onTransfer:(id:string)=>void;onObserve:()=>void}){
- const observing=!players.find(p=>p.id===uid)?.role,chip=(p:Player)=><span className={`participant-chip${p.id===uid?' participant-self':''}`} key={p.id}><i className={online.includes(p.id)?'dot':'dot off'}/><span title={p.name}>{p.name}</span>{p.role&&<small>{roleName(p.role)}</small>}{p.id===hostId&&<b className="host-badge">HOST</b>}{uid===hostId&&p.id!==hostId&&<button className="transfer-host" title={`Transfer hosting to ${p.name}`} aria-label={`Make ${p.name} host`} disabled={busy} onClick={()=>onTransfer(p.id)}>♛</button>}</span>;
+ const observing=!players.find(p=>p.id===uid)?.role,chip=(p:Player)=><span className={`participant-chip${p.id===uid?' participant-self':''}`} key={p.id}><i className={online.includes(p.id)?'dot':'dot off'}/><span title={p.name}>{p.name}</span>{p.id===hostId&&<b className="host-badge">HOST</b>}{uid===hostId&&p.id!==hostId&&<button className="transfer-host" title={`Transfer hosting to ${p.name}`} aria-label={`Make ${p.name} host`} disabled={busy} onClick={()=>onTransfer(p.id)}>♛</button>}</span>;
  return <section className="participants" aria-label="Room participants">
   <div className="participant-count">{players.length}<span>/10 participants</span></div>
   {players.some(p=>p.role)&&<div className="participant-list" aria-label="Players">{players.filter(p=>p.role).map(chip)}</div>}
