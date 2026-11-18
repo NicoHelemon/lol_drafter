@@ -16,6 +16,19 @@ async function room(){const s=initialState(ids[0],'Host','tournament');s.dataset
 const profile=async(uid:string,pools=emptyPools(),version=0)=>(await as<{p:AccountProfile}>(uid,'select public.save_my_profile($1,$2::jsonb,$3) p',['Nico',JSON.stringify(pools),version])).p;
 beforeAll(async()=>{db=new PGlite();await db.exec("create role anon;create role authenticated;create role service_role;create schema auth;create table auth.users(id uuid primary key,is_anonymous boolean default true,email_confirmed_at timestamptz,email text,encrypted_password text,raw_user_meta_data jsonb);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;");for(let i=0;i<ids.length;i++)await db.query('insert into auth.users(id,is_anonymous,email_confirmed_at) values($1,$2,$3)',[ids[i],i>1,i<2?'2026-11-16T00:00:00Z':null]);for(const f of readdirSync('supabase/migrations').sort())await db.exec(readFileSync('supabase/migrations/'+f,'utf8'));},30000);
 afterAll(()=>db.close());beforeEach(()=>db.exec('begin'));afterEach(()=>db.exec('rollback'));
+it('recovers invitations for existing members without changing the room or invalidating older links',async()=>{
+ const r=await room(),before=structuredClone(r);
+ const issued=(await as<{token:string}>(ids[0],'select public.issue_room_invitation($1) token',[r.id])).token;expect(issued).toHaveLength(72);
+ await fails(()=>as(ids[1],'select public.issue_room_invitation($1)',[r.id]),'Access denied');
+ const old=await join(r,ids[1]);expect(old.state.players).toHaveLength(2);
+ const joined=(await as<{r:Room}>(ids[2],'select public.join_room($1,$2,$3) r',[r.slug,issued,'Recovered link'])).r;expect(joined.state.players).toHaveLength(3);
+ const observerToken=(await as<{token:string}>(ids[1],'select public.issue_room_invitation($1) token',[r.id])).token;expect(observerToken).not.toBe(issued);
+ const same=(await db.query<{r:Room}>('select to_jsonb(r) r from public.rooms r where id=$1',[r.id])).rows[0].r;expect(same).toEqual(joined);
+ expect(before.state.picks).toEqual(same.state.picks);expect(before.state.bans).toEqual(same.state.bans);
+ await fails(()=>as(ids[1],'select * from public.room_invites'),'permission');
+ await as(ids[1],'select public.leave_room($1)',[r.id]);await fails(()=>as(ids[1],'select public.issue_room_invitation($1)',[r.id]),'Access denied');
+ await as(ids[0],'select public.leave_room($1)',[r.id]);await as(ids[2],'select public.leave_room($1)',[r.id]);expect((await db.query<{n:number}>('select count(*)::int n from public.room_invites where room_id=$1',[r.id])).rows[0].n).toBe(0);
+});
 it('keeps verified profiles private, versioned and distinct from anonymous identities',async()=>{
  await fails(()=>profile(ids[2]),'verified email');let p=await profile(ids[0],{...emptyPools(),Top:['58','164']});expect(p.version).toBe(1);
  expect((await as<{n:number}>(ids[0],'select count(*)::int n from public.user_profiles')).n).toBe(1);expect((await as<{n:number}>(ids[1],'select count(*)::int n from public.user_profiles')).n).toBe(0);

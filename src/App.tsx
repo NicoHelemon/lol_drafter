@@ -1,5 +1,7 @@
 import AccountPanel from './components/AccountPanel';
 import GuideLink from './components/GuideLink';
+import InvitationButton from './components/InvitationButton';
+import {savedInvitation,rememberInvitation,forgetInvitation} from './lib/invitations';
 import {readAccount,signOutAccount,saveRoomPool,type Account} from './lib/accounts';
 import {startDraft,chooseBan} from './domain/progression';
 import type {DraftMode} from './domain/types';
@@ -79,7 +81,7 @@ export default function App() {
       if(!current.room){setUid(next);if(!session||session.user.is_anonymous)setAccount(null);else if(!current.accountOpen)setTimeout(()=>{void readAccount().then(value=>{setAccount(value);if(value?.profile?.display_name)setNickname(value.profile.display_name);}).catch(e=>setError(errorMessage(e)));},0);}
     });return()=>subscription.unsubscribe();
   },[]);
-  const [invite, setInvite] = useState(() => location.hash.slice(1));
+  const [invite, setInvite] = useState(() => location.pathname.startsWith('/rooms/')?location.hash.slice(1):'');
   const [inviteRoom, setInviteRoom] = useState(
     () => location.pathname.match(/^\/rooms\/([^/]+)/)?.[1] ?? null,
   );
@@ -119,6 +121,11 @@ export default function App() {
       clearInterval(t);
     };
   }, [room?.id]);
+  useEffect(()=>{
+    if(!room||!uid)return;
+    const token=invite||savedInvitation(uid,room.slug);
+    if(token){rememberInvitation(uid,room.slug,token);if(!invite)setInvite(token);}
+  },[room?.id,uid,invite]);
   useEffect(() => {
     setPicker(null);
   }, [room?.state.phase,room?.state.openDraft,room?.state.draftStep,room?.state.players.map(p=>`${p.id}:${p.role}`).join('|')]);
@@ -273,6 +280,7 @@ export default function App() {
     localStorage.removeItem("draftroom-current");
     localStorage.removeItem("draftroom-demo");
     if (room) {
+      forgetInvitation(uid,room.slug);
       localStorage.removeItem(`draftroom-swaps-${room.id}`);
       localStorage.removeItem(`draftroom-pick-swaps-${room.id}`);
     }
@@ -313,10 +321,6 @@ export default function App() {
     void change(s=>record(chooseBan(s,p.team,slot,id),`Ban · ${names[id]}`));
   }
   const pickerPool=picker&&state?picker.kind==='candidates'?rolePool(state,picker.team,picker.role):picker.kind==='bans'?state.bans[picker.team].filter((id):id is string=>!!id):[]:[];
-  const link =
-    room && invite
-      ? `${location.origin}/rooms/${room.slug}/setup#${invite}`
-      : "";
   const entryName=account?account.profile?.display_name??'':nickname;
   const needsPoolSetup=account?.profile?.onboarding_complete===false;
   return (
@@ -394,18 +398,7 @@ export default function App() {
               <h1>{room.name}</h1>
             </div>
             <div className="actions">
-              {link && (
-                <button title="Copy a private link so others can join this room"
-                  onClick={() =>
-                    void run(async () => {
-                      await navigator.clipboard.writeText(link);
-                      setSync("Invitation copied");
-                    })
-                  }
-                >
-                  Copy invitation ↗
-                </button>
-              )}
+              {supabase&&<InvitationButton key={room.id} room={room} uid={uid} token={invite} onToken={setInvite}/>}
               {host && state!.phase === "setup" && (
                 <button
                   className="primary" title="Start the draft for everyone, following the selected pick and ban order"
