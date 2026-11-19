@@ -49,8 +49,8 @@ l'intégration GitHub ; la correction du secret nécessite son propriétaire.
 | Donnée | Règle |
 | --- | --- |
 | Snapshot courant | Toujours protégé, même ancien ou sans salle |
-| Snapshot remplacé | `retired_at` fixé dans la transaction de promotion ; transition d'une heure |
-| Salles sur snapshot retiré | Supprimées après la transition, même avec présence ; elles ne changent jamais de snapshot pendant la draft |
+| Snapshot remplacé | `retired_at` fixé dans la transaction de promotion ; purge après une heure seulement s’il n’est plus référencé par une salle |
+| Salles sur snapshot retiré | Depuis 025, conservées jusqu’à leur expiration ordinaire ; actualisation automatique en préparation, réservée à l’hôte pendant la draft |
 | Toute salle | Expiration après deux heures sans présence d'aucun membre, ou 24 heures après création |
 | Import prêt devenu orphelin | Retiré lors de l'entretien, puis une heure de transition |
 | Publication incomplète | Purge après 24 heures depuis création, sauf référence/pointeur |

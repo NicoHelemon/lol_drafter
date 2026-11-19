@@ -4,7 +4,7 @@ Application de draft League of Legends pour une équipe de cinq joueurs. React +
 
 ## Base de données
 
-Le schéma courant comprend les migrations `202611110001` à `202611170020` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
+Le schéma courant comprend les migrations `202611110001` à `202611190025` dans `supabase/migrations`. Les mises à jour peuvent être appliquées directement via l’API d’administration Supabase avec un jeton d’environnement autorisé ; le jeton ne doit jamais être placé dans le dépôt ou dans le frontend.
 
 La migration **005** interdit les picks sans rôle. La migration **006** ajoute une opération transactionnelle pour enrichir les candidats pendant la draft sans modifier le pick. Ces deux migrations ne suppriment aucune donnée. Sur une installation existante, appliquer uniquement les nouvelles migrations. **Ne pas rejouer 004** : elle réinitialise les salles temporaires.
 
@@ -27,6 +27,8 @@ La migration **018** ajoute les comptes optionnels par code email, les profils p
 La migration **019** sépare le pseudo de connexion privé du nom affiché dans les salles. Les nouvelles inscriptions utilisent email, pseudo de connexion unique et mot de passe (10 caractères minimum), puis confirment leur email. Une petite fonction Supabase `account-password-login` résout le pseudo côté serveur sans exposer les emails. Les comptes existants définissent leurs identifiants sans perdre leurs profils. Voir [les comptes classiques](docs/ui/PASSWORD_ACCOUNTS.md).
 
 La migration **020** ajoute la première configuration des pools aux nouvelles inscriptions, sans réinitialiser les comptes existants, et vide les candidats d’un rôle libéré. La connexion habituelle ramène directement à l’accueil, **My profile** ouvre volontairement les réglages, et la salle utilise le nom du profil pour les comptes connectés. La zone **Observers** du panneau des participants remplace le bouton Observe en haut. Voir [l’accueil et les rôles libérés](docs/ui/PROFILE_ENTRY_OBSERVERS.md).
+
+La migration **025** actualise les données automatiquement dans le lobby et à son retour. Pendant une draft, les données restent stables ; **New data available** propose **Update data** à l’hôte. La bascule est partagée et conserve picks, bans, rôles, candidats et Undo/Redo. La date de collecte est affichée séparément de la calibration. Une nouvelle publication n’expire plus les salles ; leurs snapshots restent protégés jusqu’à l’expiration ordinaire des salles.
 
 **Politique permanente de livraison : aucune rétrocompatibilité des salles n’est requise. Les salles et leurs participants/invitations/demandes temporaires peuvent être supprimés à chaque mise à jour, avec vérification préalable. Cette autorisation ne concerne pas les statistiques, snapshots, modèles, catalogues, comptes ou profils personnels.** Ne pas rejouer une ancienne migration pour ce nettoyage.
 
@@ -63,7 +65,7 @@ Sans variables Supabase, le site fonctionne en démo locale sur un seul navigate
 
 ## Créer Supabase et déployer sur Netlify
 
-1. Créer un projet Supabase neuf. Appliquer les vingt fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611170020`.
+1. Créer un projet Supabase neuf. Appliquer les vingt fichiers de `supabase/migrations` dans l’ordre, de `202611110001` à `202611190025`.
 2. Activer **Authentication → Sign In / Providers → Anonymous Sign-Ins**.
 3. Vérifier que `rooms` appartient à la publication `supabase_realtime` dans **Database → Replication**.
 4. Copier `.env.example` vers `.env.local` pour le développement. Renseigner `VITE_SUPABASE_URL` et la clé publique `VITE_SUPABASE_ANON_KEY` (anon ou publishable). Ne jamais utiliser de clé `service_role` ou secrète dans une variable `VITE_*`.

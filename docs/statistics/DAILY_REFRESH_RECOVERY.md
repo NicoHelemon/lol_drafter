@@ -90,3 +90,11 @@ References:
 - [November 16 delayed run](https://github.com/NicoHelemon/lol_drafter/actions/runs/43875666884)
 - [November 17 delayed run](https://github.com/NicoHelemon/lol_drafter/actions/runs/44100276499)
 - [GitHub schedule behavior and timezones](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)
+
+## Room adoption (migration 025, November 19)
+
+The historical publication proof above is unchanged. Rooms now adopt current data
+in the lobby, including when returning from a draft. Live drafts retain their
+snapshot until their host chooses **Update data**; all participants then hydrate
+the same new snapshot. Publication no longer expires rooms using older data.
+The morning trigger schedule and monitoring are unchanged.

@@ -41,6 +41,7 @@ async function mock(page:Page,{ready=true,legacy=false,signedIn=false}={}){
    else{state.saves++;state.profile={...state.profile,display_name:body.new_name,role_pools:body.new_pools,version:state.profile.version+1,onboarding_complete:true};result=state.profile;}
   }else if(path.endsWith('/rpc/create_room')){state.createdUid=body.initial_state.players[0].id;state.invitationToken=body.invite_token;state.room={id:'33333333-3333-4333-8333-333333333333',slug:'account-room',name:"Room alias's room",host_id:member,version:0,state:body.initial_state};result=state.room;}
   else if(path.endsWith('/rpc/issue_room_invitation')){state.invitationIssues++;result='b'.repeat(72);}
+  else if(path.endsWith('/rpc/refresh_room_statistics'))result=state.room;
   else if(path.endsWith('/rpc/claim_role')){const before=structuredClone(state.room!.state);state.room!.state.players[0].role=body.new_role;if(body.new_role)state.room!.state.players[0].pool=[...state.profile.role_pools[body.new_role as Role]];state.room!.state=reconcileRolePools(before,state.room!.state);state.room!.version++;result=state.room;}
   else if(path.endsWith('/rpc/set_role_candidates')){state.room!.state.players[0].pool=body.champion_ids;state.room!.version++;result=state.room;}
   else if(path.endsWith('/rpc/leave_room')){state.room=null;result=null;}

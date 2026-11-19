@@ -1,6 +1,7 @@
 import AccountPanel from './components/AccountPanel';
 import GuideLink from './components/GuideLink';
 import InvitationButton from './components/InvitationButton';
+import RoomData from './components/RoomData';
 import {savedInvitation,rememberInvitation,forgetInvitation} from './lib/invitations';
 import {readAccount,signOutAccount,saveRoomPool,type Account} from './lib/accounts';
 import {startDraft,chooseBan} from './domain/progression';
@@ -48,6 +49,7 @@ import {
   respondRoleSwap,
   setCandidates,
   clearStatisticsCache,
+  updateRoomStatistics,
   movePick,
   readPickSwaps,
   respondPickSwap,
@@ -259,6 +261,17 @@ export default function App() {
     if(!room||busy)return;
     await run(async()=>{try{setRoom(await controlDraft(room,action));setPicker(null);setSwaps([]);setPickSwaps([]);}catch(e){setRoom(await readRoom(room.id));throw e;}});
   }
+  async function refreshData(){
+    if(!room||busy||room.host_id!==uid)return;
+    await run(async()=>{
+      try{
+        const next=await updateRoomStatistics(room);
+        setRoom(current=>current&&current.id===next.id&&next.version>=current.version?next:current);
+        setPicker(null);
+      }
+      catch(e){setRoom(await readRoom(room.id));throw e;}
+    });
+  }
   useEffect(()=>{
     function shortcut(e:KeyboardEvent){
       if(!room||room.state.phase!=='live'||room.host_id!==uid||busy||picker||e.defaultPrevented||e.isComposing||e.altKey||!e.ctrlKey)return;
@@ -423,6 +436,7 @@ export default function App() {
               </button>
             </div>
           </div>
+          <RoomData key={room.id} room={room} host={host} busy={busy} onUpdate={()=>void refreshData()}/>
           <div className="room-tools"><Participants
             players={state!.players}
             hostId={room.host_id} uid={uid} busy={busy} onTransfer={id=>void handOver(id)} onObserve={()=>void takeRole(null)}

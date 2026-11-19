@@ -33,6 +33,29 @@ const statistics = new StatisticsCache(async (snapshot, keys) => {
   return data?.model;
 }});
 const hydrated = (room: Room) => statistics.hydrate(room);
+async function preparedRoom(room:Room):Promise<Room>{
+ if(supabase&&room.state.phase==='setup'){
+  const {data,error}=await supabase.rpc('refresh_room_statistics',{room_id:room.id});
+  if(error)throw error;
+  if(!data)throw new RoomExpiredError();
+  room=data as Room;
+ }
+ return hydrated(room);
+}
+export async function currentStatistics(){
+ if(!supabase)return null;
+ const {data:current,error}=await supabase.from('statistics_current').select('snapshot_id').maybeSingle();
+ if(error)throw error;if(!current)return null;
+ const {data,error:metadataError}=await supabase.from('statistics_snapshots').select('metadata').eq('id',current.snapshot_id).single();
+ if(metadataError)throw metadataError;
+ return snapshotMetadata(data.metadata);
+}
+export async function updateRoomStatistics(room:Room):Promise<Room>{
+ if(!supabase)return room;
+ const {data,error}=await supabase.rpc('refresh_room_statistics',{room_id:room.id,expected_version:room.version});
+ if(error)throw error;if(!data)throw new RoomExpiredError();
+ return hydrated(data as Room);
+}
 export const clearStatisticsCache = () => statistics.clear();
 let identityPromise: Promise<string> | null = null;
 supabase?.auth.onAuthStateChange(()=>{identityPromise=null;});
@@ -120,7 +143,7 @@ export async function resolveRoom(slug: string): Promise<Room> {
     .maybeSingle();
   if (error) throw error;
   if (!data) throw new RoomExpiredError();
-  return hydrated(data);
+  return preparedRoom(data);
 }
 export async function readRoom(id: string): Promise<Room> {
   if (!supabase) {
@@ -137,7 +160,7 @@ export async function readRoom(id: string): Promise<Room> {
     .maybeSingle();
   if (error) throw error;
   if (!data) throw new RoomExpiredError();
-  return hydrated(data);
+  return preparedRoom(data);
 }
 export async function saveRoom(room: Room, next: State): Promise<Room> {
   next=reconcileRolePools(room.state,next);

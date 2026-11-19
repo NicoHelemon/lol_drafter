@@ -15,7 +15,8 @@ beforeEach(() => {
   vi.stubEnv('VITE_SUPABASE_URL','https://test.supabase.co');
   vi.stubEnv('VITE_SUPABASE_ANON_KEY','public-test-key');
   vi.stubGlobal('window',{ addEventListener:vi.fn(), removeEventListener:vi.fn() });
-  const row = { id:'room',slug:'test-room',host_id:'p',version:0,name:'Test',state:initialState('p','Test') };
+  const state=initialState('p','Test');state.phase='live';
+  const row = { id:'room',slug:'test-room',host_id:'p',version:0,name:'Test',state };
   const read = { select:vi.fn(), eq:vi.fn(), maybeSingle:vi.fn(async () => ({data:row,error:null})) };
   read.select.mockReturnValue(read); read.eq.mockReturnValue(read);
   mocks.client.from.mockReturnValue(read);
