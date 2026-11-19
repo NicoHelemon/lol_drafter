@@ -1,7 +1,7 @@
 # Bidirectional interactions and fixed draft denominators
 
-Local implementation on `feat/bidirectional-fixed-scoring`. No production
-publication is authorized as part of this change.
+Implemented on `feat/bidirectional-fixed-scoring`; publication on `main` was
+authorized on 19 November 2026.
 
 The raw Lolalytics observations and sample counts remain unchanged. Each
 original direction is first adjusted with the existing calibration:
@@ -62,4 +62,5 @@ highlights, empty evidence, unavailable calibration and mobile tooltips.
 Local validation (19 November 2026): 184 unit/database tests, 64 browser scenarios
 and the production build pass. The algebraic property checks include 120 seeded
 partial/full contexts and 720 legal additions/replacements across both teams.
-No source extraction, production database change, push or deployment was made.
+These checks preceded publication. The scoring change requires no source
+extraction or production database migration.
