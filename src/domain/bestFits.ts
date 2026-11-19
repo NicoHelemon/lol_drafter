@@ -10,7 +10,8 @@ export const BEST_FIT_LIMIT=3;
 const names=new Map(champions.map(c=>[c.id,c.name]));
 
 // Compare the whole admissible role catalogue, not just missing pool members.
-// Complete coverage prevents a missing bad interaction from improving a score.
+// Each revealed interaction needs at least one usable direction, as before.
+// Requiring both would unnecessarily exclude candidates under consolidation.
 export function bestFitCandidates(state:State,team:Team,role:Role,index=new Map(state.dataset.pairs.map(p=>[pairKey(p),p]))):string[]{
  if(state.phase!=='live'||!state.draftMode||!state.shrinkage||!state.roleCatalogue
   ||state.dataset.snapshotId&&state.referenceKey!==referenceContextKey(state))return [];

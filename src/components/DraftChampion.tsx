@@ -34,7 +34,7 @@ export default function DraftChampion({ id, role, team, state, result, selected,
       {selected && <span className="picked-mark" aria-hidden="true">✓</span>}
     </button>
     <span className={`tile-score ${result.value === null ? 'muted' : result.value < 0 ? 'negative' : result.value > 0 ? 'positive' : 'neutral'}`}>
-      {label}{result.known < result.total && <span className="partial-score" aria-label="Partial coverage">•</span>}
+      {label}{result.complete < result.total && <span className="partial-score" aria-label="Partial coverage" title="Some interaction directions are missing and contribute zero.">•</span>}
     </span>
     {open && anchor.current && <ContributionTooltip id={tooltipId} champion={id} role={role} team={team} state={state} result={result} fit={fit} bestFit={bestFit} anchor={anchor.current} />}
   </div>;

@@ -20,12 +20,13 @@ export function fitReference(role:Role,team:Team,state:State,index?:Map<string,P
  const values=state.roleCatalogue.entries.filter(e=>e.role===role&&e.lanePercent>=ROLE_SHARE_MIN&&!used.has(e.championId))
   .map(e=>scoreForTeam(e.championId,role,team,state,index)).filter(s=>s.value!==null&&s.known===total&&s.total===total).map(s=>s.value!).sort((a,b)=>a-b);
  if(values.length<20)return;
- return {median:quantile(values,.5),high:quantile(values,.95),low:quantile(values,.05),minimum:.5*9/total,total,count:values.length};
+ // Scores already divide by nine in partial drafts: do not attenuate again.
+ return {median:quantile(values,.5),high:quantile(values,.95),low:quantile(values,.05),minimum:.5,total,count:values.length};
 }
 export function exceptionalFit(result:CandidateScore,reference:FitReference|undefined,blocked=false):ExceptionalFit|undefined {
  if(blocked||!reference||result.value===null||result.known!==reference.total||result.total!==reference.total)return;
  const gap=result.value-reference.median;
  const kind=result.value>0&&result.value>=reference.high&&gap>=reference.minimum?'positive'
   :result.value<0&&result.value<=reference.low&&gap<=-reference.minimum?'negative':undefined;
- return kind?{kind,provisional:reference.total<9,gap,total:reference.total}:undefined;
+ return kind?{kind,provisional:reference.total<9||result.complete<result.total,gap,total:reference.total}:undefined;
 }

@@ -93,7 +93,7 @@ Le script valide les IDs, noms de fichiers et images PNG carrées avant de rempl
 
 ## Statistiques et score
 
-Depuis la décision du 14 novembre 2026, chaque contribution utilise `delta2 × n / (n + k)`, avec un k appris sur le corpus complet et commun à Against/Synergy. Le score reste la moyenne à poids égaux des contributions connues : cinq Against et quatre Synergy au maximum. Le score collectif moyenne les champions sélectionnés calculables ; le survol d’un candidat montre le score collectif après remplacement et sa variation, en recalculant tous les alliés. Les couvertures incomplètes sont signalées. Seules les valeurs ajustées sont affichées, jamais une probabilité de victoire. Une donnée ou une calibration absente produit N/A. Le corpus brut reste intact. Voir [la méthode et les preuves](docs/statistics/SHRINKAGE_TEAM_SCORES.md).
+Sur la branche de scoring bidirectionnel, chaque direction conserve son atténuation `delta2 × n / (n + k)`, avec la calibration existante. Les deux directions sont ensuite consolidées par moyenne pour les synergies et demi-différence pour les matchups. Une direction manquante contribue zéro avant consolidation, sans être signalée comme une observation neutre. Le fit individuel utilise un diviseur fixe de 9 et le score d’équipe un diviseur fixe de 5. Maximiser le fit d’un candidat revient ainsi à maximiser son gain d’avantage pour son équipe, même dans une draft partielle. Best Fit accepte une direction disponible par interaction ; les seuils des picks exceptionnels sont adaptés à cette échelle fixe. Les Delta 2 et les nombres de parties bruts restent intacts. Voir [le modèle et ses propriétés](docs/statistics/BIDIRECTIONAL_SCORING.md). Ce travail local attend l’accord explicite avant tout push ou déploiement.
 
 Les **statistiques de démonstration restent fictives**. Le catalogue de portraits n’ajoute aucune statistique. La collecte réelle tourne dans les scripts backend ; le navigateur et le moteur de scoring ne contactent jamais Lolalytics.
 
@@ -121,7 +121,7 @@ Le pipeline produit des fragments gzip vérifiés, puis le publisher existant pe
 
 Projet communautaire non affilié à Riot Games. Les assets League of Legends appartiennent à Riot Games.
 
-Pour les scores des picks adverses, le contexte est orienté depuis le candidat adverse (ses coéquipiers et ses adversaires). Aucune symétrie ou inversion artificielle d’un score allié n’est supposée. Le candidat lui-même est exclu des paires.
+Pour les scores des picks adverses, le contexte est orienté depuis le candidat adverse (ses coéquipiers et ses adversaires). Les synergies consolidées sont symétriques et les matchups antisymétriques ; les scores des deux équipes restent calculés dans leur propre contexte. Le candidat lui-même est exclu des paires.
 
 Pendant la draft, tous les membres peuvent modifier les candidats des dix cases via `set_role_candidates`, sans changer leurs picks. Cette RPC ne modifie que la liste ciblée et vérifie la version de la salle. En préparation, les pools incarnés restent réservés au propriétaire ou à l’hôte. L’ancienne RPC `add_draft_candidate` reste compatible avec les anciens clients.
 

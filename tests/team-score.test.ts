@@ -27,25 +27,25 @@ it('shrinks both signs continuously, uses pair-specific n, and never manufacture
  expect(()=>validateModel({...DEMO_MODEL,k:-1})).toThrow('calibration');
  expect(pair.delta2).toBe(1.34);
 });
-it('averages adjusted values over known relations, without renormalizing shrinkage factors',()=>{
+it('uses a fixed divisor after per-direction attenuation and consolidation',()=>{
  const s=state();s.picks.ally=[];s.picks.enemy=[{championId:'122',role:'Top'},{championId:'64',role:'Jungle'}];
  s.dataset.pairs=[p('58','Top','122','Top',1.34,'vs',1355),p('58','Top','64','Jungle',-2,'vs',100)];
- expect(scoreForTeam('58','Top','ally',s).value).toBeCloseTo(.3205790665273424,12);
+ expect(scoreForTeam('58','Top','ally',s).value).toBeCloseTo(.3205790665273424/9,12);
 });
-it('averages champion scores equally and uses enemy-specific directional observations',()=>{
+it('divides by five team slots with mirrored consolidated interactions',()=>{
  const s=state();
- expect(scoreForTeam('58','Top','ally',s).value).toBe(1.5);
- expect(scoreForTeam('103','Mid','ally',s).value).toBe(-.5);
- expect(teamScore('ally',s)).toMatchObject({value:.5,picks:2,scored:2,known:4,total:4,provisional:true});
- expect(teamScore('enemy',s)).toMatchObject({value:-1.5,picks:1,scored:1,known:2,total:2});
+ expect(scoreForTeam('58','Top','ally',s).value).toBeCloseTo(3.5/9);
+ expect(scoreForTeam('103','Mid','ally',s).value).toBe(0);
+ expect(teamScore('ally',s)).toMatchObject({value:3.5/45,picks:2,scored:2,known:4,total:4,provisional:true});
+ expect(teamScore('enemy',s)).toMatchObject({value:-1.5/45,picks:1,scored:1,known:2,total:2});
  s.dataset.pairs=s.dataset.pairs.filter(x=>x.candidateChampionId!=='103');
- expect(teamScore('ally',s)).toMatchObject({value:1.5,picks:2,scored:1,known:2,total:4,provisional:true});
+ expect(teamScore('ally',s).value).toBeCloseTo(4/45);expect(teamScore('ally',s)).toMatchObject({picks:2,scored:2,known:4,complete:1,total:4,provisional:true});
 });
-it('candidate preview recomputes all teammates, preserves asymmetry and never mutates the draft',()=>{
+it('candidate preview recomputes both team perspectives without mutating the draft',()=>{
  const s=state(),original=structuredClone(s);
  const impact=candidateImpact('164','Top','ally',s)!;
- // Camille score=(3+1)/2=2. Ahri becomes=(-1+4)/2=1.5. Team=1.75.
- expect(impact.before.value).toBe(.5);expect(impact.after.value).toBe(1.75);expect(impact.change).toBe(1.25);
+ // Consolidated Camille fit=4/9; Ahri fit=1.5/9. Team=(4+1.5)/45.
+ expect(impact.before.value).toBeCloseTo(3.5/45);expect(impact.after.value).toBeCloseTo(5.5/45);expect(impact.change).toBeCloseTo(2/45);expect(impact.advantageChange).toBeCloseTo(1/45);
  expect(s).toEqual(original);
  expect(candidateImpact('58','Top','ally',s)?.change).toBe(0);
  expect(candidateImpact('122','Top','ally',s)).toBeNull();
@@ -55,14 +55,15 @@ it('full teams expose 45 possible directed contributions; missing values stay pr
  const s=state();s.picks.ally=[{championId:'58',role:'Top'},{championId:'64',role:'Jungle'},{championId:'103',role:'Mid'},{championId:'202',role:'ADC'},{championId:'89',role:'Support'}];
  s.picks.enemy=[{championId:'122',role:'Top'},{championId:'56',role:'Jungle'},{championId:'84',role:'Mid'},{championId:'51',role:'ADC'},{championId:'267',role:'Support'}];
  s.dataset.pairs=s.picks.ally.flatMap(c=>[...s.picks.enemy.map(o=>p(c.championId,c.role,o.championId,o.role,2)),...s.picks.ally.filter(o=>o.role!==c.role).map(o=>p(c.championId,c.role,o.championId,o.role,2,'with'))]);
- expect(teamScore('ally',s)).toMatchObject({value:1,picks:5,scored:5,known:45,total:45,provisional:false});
- s.dataset.pairs[0].delta2=null;expect(teamScore('ally',s)).toMatchObject({value:1,known:44,total:45,provisional:true});
+ s.dataset.pairs.push(...s.dataset.pairs.filter(x=>x.relation==='vs').map(x=>({...x,candidateChampionId:x.otherChampionId,candidateRole:x.otherRole,otherChampionId:x.candidateChampionId,otherRole:x.candidateRole,delta2:-x.delta2!})));
+ expect(teamScore('ally',s)).toMatchObject({value:1,picks:5,scored:5,known:45,complete:45,total:45,provisional:false});
+ s.dataset.pairs[0].delta2=null;expect(teamScore('ally',s).value).toBeCloseTo(1-.5/45);expect(teamScore('ally',s)).toMatchObject({known:45,complete:44,total:45,provisional:true});
  delete s.shrinkage;expect(teamScore('ally',s)).toMatchObject({value:null,known:0,total:45,provisional:true});
 });
 
-it('compares independent team scores while preserving unknown and provisional states',()=>{
- const s=state();expect(teamAdvantage(s)).toMatchObject({value:2,provisional:true,ally:{value:.5},enemy:{value:-1.5}});
+it('compares fixed-denominator team scores with zero contributions for missing directions',()=>{
+ const s=state();expect(teamAdvantage(s)).toMatchObject({value:5/45,provisional:true,ally:{value:3.5/45},enemy:{value:-1.5/45}});
  s.dataset.pairs=s.dataset.pairs.filter(p=>p.candidateChampionId!=='122');
- expect(teamAdvantage(s)).toMatchObject({value:null,enemy:{value:null}});
- s.picks={ally:[],enemy:[]};expect(teamAdvantage(s).value).toBeNull();
+ expect(teamAdvantage(s).value).toBeCloseTo(2/45);expect(teamAdvantage(s)).toMatchObject({enemy:{value:0}});
+ s.picks={ally:[],enemy:[]};expect(teamAdvantage(s).value).toBe(0);
 });

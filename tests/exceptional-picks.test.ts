@@ -10,6 +10,7 @@ function fixture(m=9){
  const context=[...s.picks.ally,...s.picks.enemy].slice(0,m);s.picks.ally=s.picks.ally.filter(p=>context.includes(p));s.picks.enemy=s.picks.enemy.filter(p=>context.includes(p));
  s.roleCatalogue!.entries=champions.slice(0,40).map(c=>({championId:c.id,role:'Top',lanePercent:100,games:10000,pickPercent:1}));
  s.dataset.pairs=champions.slice(0,40).flatMap((c,i)=>context.map(o=>({candidateChampionId:c.id,candidateRole:'Top',otherChampionId:o.championId,otherRole:o.role,relation:s.picks.ally.includes(o)?'with':'vs',delta2:(i===0?2:i===1?-2:0),games:625} as Pair)));
+ s.dataset.pairs.push(...s.dataset.pairs.map(p=>({...p,candidateChampionId:p.otherChampionId,candidateRole:p.otherRole,otherChampionId:p.candidateChampionId,otherRole:p.candidateRole,delta2:p.relation==='vs'?-p.delta2!:p.delta2})));
  return s;
 }
 it('compares the full role universe rather than forcing a winner in a personal pool, and pins selected picks independently',()=>{
@@ -21,11 +22,11 @@ it('compares the full role universe rather than forcing a winner in a personal p
  const before=structuredClone(s);const options=candidates([champions[2].id], 'Top','ally',s);expect(exceptionalFit(options[0],ref)).toBeUndefined();expect(s).toEqual(before);
  s.picks.ally.push({role:'Top',championId:champions[2].id});expect(candidates([id],'Top','ally',s)[0].id).toBe(champions[2].id);expect(fitReference('Top','ally',s)?.median).toBe(ref.median);
 });
-it('raises the provisional threshold, respects unrounded boundaries and never highlights blocked or incomplete evidence',()=>{
- const s=fixture(3),id=champions[0].id,ref=fitReference('Top','ally',s)!;expect(ref.minimum).toBe(1.5);
- const score=scoreForTeam(id,'Top','ally',s);expect(score.value).toBe(1);expect(exceptionalFit(score,ref)).toBeUndefined();
- expect(exceptionalFit({...score,value:1.5},ref)).toMatchObject({kind:'positive',provisional:true});expect(exceptionalFit({...score,value:1.4999},ref)).toBeUndefined();
- expect(exceptionalFit({...score,value:1.5},ref,true)).toBeUndefined();expect(exceptionalFit({...score,value:1.5,known:2},ref)).toBeUndefined();
+it('uses a constant threshold on nine-slot scores, respecting unrounded boundaries and missing interactions',()=>{
+ const s=fixture(3),id=champions[0].id,ref=fitReference('Top','ally',s)!;expect(ref.minimum).toBe(.5);
+ const score=scoreForTeam(id,'Top','ally',s);expect(score.value).toBeCloseTo(1/3);expect(exceptionalFit(score,ref)).toBeUndefined();
+ expect(exceptionalFit({...score,value:.5},ref)).toMatchObject({kind:'positive',provisional:true});expect(exceptionalFit({...score,value:.4999},ref)).toBeUndefined();
+ expect(exceptionalFit({...score,value:.5},ref,true)).toBeUndefined();expect(exceptionalFit({...score,value:.5,known:2},ref)).toBeUndefined();
  expect(exceptionalFit({...score,value:null},ref)).toBeUndefined();
 });
 it('requires enough reference data and a matching immutable context, excluding bans and other selected champions',()=>{
@@ -35,7 +36,7 @@ it('requires enough reference data and a matching immutable context, excluding b
  fresh.picks.enemy.pop();expect(fitReference('Top','ally',fresh)).toBeUndefined();
  delete fresh.dataset.snapshotId;delete fresh.shrinkage;expect(fitReference('Top','ally',fresh)).toBeUndefined();
 });
-it('keeps enemy perspective directional and uses the same complete-reference quantile interpolation as the experiment',()=>{
+it('keeps enemy perspective correctly oriented and uses the same complete-reference quantile interpolation as the experiment',()=>{
  const s=fixture();s.picks={ally:s.picks.enemy,enemy:s.picks.ally};
 
  const index=new Map(s.dataset.pairs.map(p=>[pairKey(p),p]));const r=fitReference('Top','enemy',s,index)!;expect(r.count).toBe(40);expect(exceptionalFit(scoreForTeam(champions[0].id,'Top','enemy',s,index),r)?.kind).toBe('positive');

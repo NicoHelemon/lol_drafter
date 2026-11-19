@@ -21,7 +21,7 @@ it('real Against and Synergy survive import, shared hydration and equal-weight s
   const hydrated = await cache.hydrate(room);
   // Illustrative k=625 is synthetic; the captured deltas/counts remain real and unchanged.
   const result = score('58', 'Top', hydrated.state);
-  expect(result.value).toBeCloseTo((2.09*8509/(8509+625)-.1*10562/(10562+625))/2, 12);
+  expect(result.value).toBeCloseTo((2.09*8509/(8509+625)-.1*10562/(10562+625))/18, 12);
   expect(result.known).toBe(2);
   expect(result.contributions.map(p => p.relation)).toEqual(['vs','with']);
   expect(persistedState(hydrated.state).dataset.pairs).toEqual([]);

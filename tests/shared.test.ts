@@ -184,3 +184,15 @@ it('ranks all-role best fits from compact reference pairs without fetching their
  expect(persistedState(hydrated.state).players[0].pool).toEqual(['103']);
  expect(persistedState(hydrated.state).dataset.pairs).toEqual([]);
 });
+
+it('loads reverse directions for reference-only candidates from the selected champion full shard',async()=>{
+ const r=room();r.state.phase='live';r.state.draftMode='ranked';r.state.players[0].role='Mid';r.state.players[0].pool=[];
+ r.state.picks.enemy=[{championId:'122',role:'Top'}];
+ const forward:Pair={relation:'vs',candidateChampionId:'164',candidateRole:'Mid',otherChampionId:'122',otherRole:'Top',delta2:2,games:625};
+ const reverse:Pair={...forward,candidateChampionId:'122',candidateRole:'Top',otherChampionId:'164',otherRole:'Mid',delta2:-6};
+ const read=vi.fn(async(_snapshot:string,keys:string[])=>keys.includes('122:Top')?[{candidate_key:'122:Top',pairs:[reverse]}]:[]);
+ const cache=new StatisticsCache(read,{readReference:async()=>[forward],readCalibration:async()=>DEMO_MODEL,readCatalogue:async()=>({schemaVersion:1,source:'test',capturedAt:'2026-11-19T00:00:00Z',context:{},entries:[{championId:'164',role:'Mid',games:10000,lanePercent:100,pickPercent:10}]})});
+ const loaded=await cache.hydrate(r);expect(loaded.state.dataset.pairs).toContainEqual(reverse);
+ expect(score('164','Mid',loaded.state)).toMatchObject({value:2/9,known:1,complete:1,total:1});
+ expect(loaded.state.dataset.pairs).toContainEqual(forward);expect(forward.delta2).toBe(2);expect(reverse.delta2).toBe(-6);
+});

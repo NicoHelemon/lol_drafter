@@ -21,7 +21,7 @@ test('real source observations use an explicitly illustrative calibration withou
   await page.reload();
   await page.getByRole('button',{name:'Start draft'}).click();
   const tile=page.getByRole('region',{name:'Top ally picks'}).locator('[data-champion="58"] .tile-score');
-  await expect(tile).toContainText('N/A');
+  await expect(tile).toContainText('+0.00');
   for(const [role,team,champion] of [['Top','enemy','Ambessa'],['Jungle','ally','Lee Sin']]){
     await page.getByRole('button',{name:`Add ${role}${team==='enemy'?' enemy':''} candidates`,exact:true}).click();
     await page.getByRole('textbox',{name:'Search champions'}).fill(champion);
@@ -29,13 +29,13 @@ test('real source observations use an explicitly illustrative calibration withou
     await page.getByRole('button',{name:'Close',exact:true}).click();
     await page.getByRole('region',{name:`${role} ${team} picks`,exact:true}).getByRole('button',{name:`Pick ${champion} ${role} ${team}`,exact:true}).click();
   }
-  await expect(tile).toContainText('+0.93');
+  await expect(tile).toContainText('+0.10');
   await tile.locator('..').hover();
   const details=page.getByRole('tooltip');
   await expect(details).toContainText('2/2 pairs');
   await expect(details.getByLabel(/Against Top Ambessa/)).toBeVisible();
   await expect(details.getByLabel(/With Jungle Lee Sin/)).toBeVisible();
-  await expect(details).toContainText('-0.09');
-  await expect(details).toContainText('Adjusted values');
+  await expect(details).toContainText('-0.05');
+  await expect(details).toContainText('Bidirectional values');
   expect(sourceRequests).toEqual([]);
 });

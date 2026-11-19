@@ -122,7 +122,7 @@ test("full-width draft integrates pool candidates, score overlays and disabled p
     top.getByRole("button", { name: "Pick Renekton Top ally", exact: true }),
   ).toBeVisible();
   await expect(top.locator('[data-champion="58"] .tile-score')).toContainText(
-    "N/A",
+    "+0.00",
   );
   await expect(
     page.getByRole("heading", { name: "Recommendations" }),

@@ -57,8 +57,15 @@ it('does not invent best fits for an empty draft, all ties or absent catalogue d
  s.dataset.pairs.forEach(p=>p.delta2=2);expect(bestFitCandidates(s,'ally','Mid')).toEqual([]);
  delete s.roleCatalogue;expect(bestFitCandidates(s,'ally','Mid')).toEqual([]);
 });
-it('optimizes the enemy own directional score, including least-bad fits when all scores are negative',()=>{
+it('optimizes the enemy own consolidated score, including least-bad fits when all scores are negative',()=>{
  const s=fitState();s.picks.ally=s.picks.enemy;s.picks.enemy=[];
  s.dataset.pairs.forEach(p=>p.delta2=-p.delta2!);
  expect(bestFitCandidates(s,'enemy','Mid')).toEqual(['45','99','61']);
+});
+
+it('keeps candidates eligible with either direction, but excludes an interaction absent in both directions',()=>{
+ const s=fitState();const source=s.dataset.pairs.find(p=>p.candidateChampionId==='112')!;s.dataset.pairs=s.dataset.pairs.filter(p=>p!==source);
+ s.dataset.pairs.push({...source,candidateChampionId:source.otherChampionId,candidateRole:source.otherRole,otherChampionId:source.candidateChampionId,otherRole:source.candidateRole,delta2:-source.delta2!});
+ expect(bestFitCandidates(s,'ally','Mid')).toContain('112');
+ s.dataset.pairs=s.dataset.pairs.filter(p=>p.otherChampionId!=='112');expect(bestFitCandidates(s,'ally','Mid')).not.toContain('112');
 });

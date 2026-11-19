@@ -8,8 +8,8 @@ function fixture(ally=-.02,enemy=.16,side:'blue'|'red'='blue'):Room{
  state.picks.ally=[{championId:'58',role:'Top'}];
  state.dataset.pairs.push(...state.roleCatalogue!.entries.map((e):Pair=>({candidateChampionId:e.championId,candidateRole:'Mid',otherChampionId:'58',otherRole:'Top',relation:'with',delta2:0,games:10000})));
  state.dataset.pairs.push(
-  {candidateChampionId:'58',candidateRole:'Top',otherChampionId:'54',otherRole:'Top',relation:'vs',delta2:ally*2,games:625},
-  {candidateChampionId:'54',candidateRole:'Top',otherChampionId:'58',otherRole:'Top',relation:'vs',delta2:enemy*2,games:625});
+  {candidateChampionId:'58',candidateRole:'Top',otherChampionId:'54',otherRole:'Top',relation:'vs',delta2:ally*90,games:625},
+  {candidateChampionId:'54',candidateRole:'Top',otherChampionId:'58',otherRole:'Top',relation:'vs',delta2:enemy*90,games:625});
  return {id:'fits-and-advantage',slug:'fits-and-advantage',name:'Fit check room',host_id:'local-player',version:0,state};
 }
 async function seed(page:Page,room=fixture()){
@@ -61,8 +61,8 @@ for(const c of [
  {a:.3,b:.1,side:'red' as const,text:'Ally advantage · +0.20',color:'red',left:40},
  {a:-.4,b:-.1,side:'blue' as const,text:'Enemy advantage · +0.30',color:'red',left:65},
  {a:.2,b:.2,side:'blue' as const,text:'Even · 0.00',color:'neutral',left:50},
- {a:3,b:0,side:'blue' as const,text:'Ally advantage · +3.00',color:'blue',left:0}
-])test('central advantage: '+c.text+' with ally '+c.a+' and enemy '+c.b,async({page})=>{
+ {a:1,b:-1,side:'blue' as const,text:'Ally advantage · +2.00',color:'blue',left:0}
+])test('central advantage: '+c.text,async({page})=>{
  await seed(page,fixture(c.a,c.b,c.side));const chart=page.getByRole('group',{name:'Team advantage',exact:true});
  await expect(chart).toContainText(c.text);await expect(chart).toContainText('Provisional');
  await expect(chart).toHaveClass(new RegExp('team-advantage '+c.color));
@@ -70,12 +70,19 @@ for(const c of [
  await page.emulateMedia({reducedMotion:'reduce'});await expect(chart.locator('.advantage-marker')).toHaveCSS('transition-duration','0s');
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
-test('an unscored team leaves the advantage unavailable, not falsely even, and observers can use the local preference',async({page})=>{
- const room=fixture();room.state.dataset.pairs=room.state.dataset.pairs.filter(p=>p.candidateChampionId!=='54');
+test('missing calibration leaves the advantage unavailable and observers can use the local preference',async({page})=>{
+ const room=fixture();delete room.state.shrinkage;
  room.host_id='other-host';room.state.players[0].role=null;
  await seed(page,room);
  await expect(page.getByRole('group',{name:'Team advantage',exact:true})).toContainText('Awaiting team scores');
  await expect(page.locator('.advantage-marker')).toHaveCount(0);
  const toggle=page.getByRole('checkbox',{name:'Show best fits',exact:true});await expect(toggle).toBeEnabled();await toggle.uncheck();
  await expect(page.locator('.champion-choice:enabled')).toHaveCount(0);
+});
+
+test('entirely missing interactions contribute zero while scores remain provisional',async({page})=>{
+ const room=fixture();room.state.dataset.pairs=[];await seed(page,room);
+ await expect(page.getByRole('group',{name:'Team advantage',exact:true})).toContainText('Even · 0.00');
+ await expect(page.getByRole('group',{name:'Team advantage',exact:true})).toContainText('Provisional');
+ await expect(page.getByRole('group',{name:'Ally team score',exact:true})).toContainText('0/1 pairs');
 });

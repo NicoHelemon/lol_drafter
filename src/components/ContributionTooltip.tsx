@@ -35,30 +35,35 @@ export default function ContributionTooltip({ id, champion, role, team, state, r
   function cell(rowRole: Role, relation: 'with' | 'vs') {
     const ownRole = relation === 'with' && rowRole === role;
     const pick = ownRole ? undefined : state.picks[relation === 'with' ? team : other].find(p => p.role === rowRole && p.championId !== champion);
-    const value = pick ? result.contributions.find(c => c.relation === relation && c.role === rowRole && c.championId === pick.championId)?.delta2 ?? null : null;
+    const contribution=pick?result.contributions.find(c=>c.relation===relation&&c.role===rowRole&&c.championId===pick.championId):undefined;
+    const value=contribution?.delta2??null;
+    const explanation=contribution?`Adjusted directions: candidate → ${names[pick!.championId]} ${scoreLabel(contribution.forward)}; ${names[pick!.championId]} → candidate ${scoreLabel(contribution.reverse)}. ${contribution.directions<2?'Missing directions contribute zero before combining.':''}`:undefined;
     return <div className={`contribution-cell ${relation}${ownRole ? ' contribution-self' : ''}`}
       aria-label={`${relation === 'with' ? 'With' : 'Against'} ${roleName(rowRole)}${ownRole ? ': candidate role' : pick ? ` ${names[pick.championId]}: ${scoreLabel(value)}` : ': no pick'}`}>
       <RoleIcon role={rowRole} />
       {pick ? <Portrait id={pick.championId} /> : <span className="contribution-empty" aria-hidden="true">{ownRole ? '·' : '—'}</span>}
-      <b className={value === null ? 'muted' : value < 0 ? 'negative' : value > 0 ? 'positive' : 'neutral'}>{pick ? scoreLabel(value) : '—'}</b>
+      <b title={explanation} className={value === null ? 'muted' : value < 0 ? 'negative' : value > 0 ? 'positive' : 'neutral'}>{pick ? scoreLabel(value) : '—'}{contribution?.directions===1&&<span className="partial-score" aria-label="One direction missing">•</span>}</b>
     </div>;
   }
   return createPortal(<div id={id} ref={panel} className="contribution-tooltip" role="tooltip" style={position}>
     <div className="contribution-heading"><strong>{names[champion]} <span>· {roleName(role)}</span></strong><div className="individual-score"><small>Individual score</small><b>{scoreLabel(result.value)}</b></div></div>
-    {bestFit&&<p className="best-fit-explanation">★ Best fit{result.total<9?' · Provisional':''} — one of the three highest adjusted scores for {team==='ally'?'your':'the enemy'} team at this role in the current draft. At least 5,000 role games and all current interactions covered.</p>}
+    {bestFit&&<p className="best-fit-explanation">★ Best fit{result.total<9||result.complete<result.total?' · Provisional':''} — one of the three highest adjusted scores for {team==='ally'?'your':'the enemy'} team at this role in the current draft. At least 5,000 role games and at least one direction available for each current interaction.</p>}
     {fit&&<div className={`fit-explanation fit-${fit.kind}`}>
       <strong>{fit.kind==='positive'?'Excellent fit':'Poor fit'}{fit.provisional?' · Provisional':''}</strong>
       <span>{fit.kind==='positive'?'An exceptionally favorable':'A particularly unfavorable'} pick for {team==='ally'?'your':'the enemy'} team. {Math.abs(fit.gap).toFixed(2)} {fit.kind==='positive'?'above':'below'} the typical available {roleName(role)} option.</span>
       {fit.provisional&&<small>Based on {fit.total}/9 other champions. This can change as the draft fills.</small>}
     </div>}
-    <div className="contribution-columns"><span>Ally team</span><span>Enemy team</span></div>
+    <div className="contribution-columns"><span>{team==='ally'?'Ally team':'Enemy team'}</span><span>{team==='ally'?'Enemy team':'Ally team'}</span></div>
     <div className="contribution-matrix">{ROLES.map(rowRole => <div className="contribution-row" key={rowRole}>{cell(rowRole, 'with')}{cell(rowRole, 'vs')}</div>)}</div>
-    <div className="contribution-footer">{result.known}/{result.total} pairs <span>Adjusted values · equal average</span></div>
+    <div className="contribution-footer">{result.known}/{result.total} pairs · {result.known+result.complete}/{result.total*2} directions <span>Bidirectional values · sum / 9</span></div>
+    {result.complete<result.total&&<small>Missing directions contribute zero; N/A is not an observed neutral interaction.</small>}
+    {result.total===0&&<small>No other champions revealed yet.</small>}
     {impact&&<div className="team-impact" aria-label="Team score preview">
       {selected?<div><span>Current team</span><b>{scoreLabel(impact.after.value)}</b></div>:<>
         <strong className="replacement-caption">{replaced?`${names[replaced.championId]} → ${names[champion]}`:`Add ${names[champion]} · ${roleName(role)}`}</strong>
         <div className="team-comparison"><span>Current team<b>{scoreLabel(impact.before.value)}</b></span><span aria-hidden="true">→</span><span>With {names[champion]}<b>{scoreLabel(impact.after.value)}</b></span></div>
         <div><span>Team score change</span><b className={impact.change===null?'muted':impact.change<0?'negative':impact.change>0?'positive':'neutral'}>{scoreLabel(impact.change)}{impact.change===null?'':impact.change<0?' ↓':impact.change>0?' ↑':' —'}</b></div>
+        <div><span>{team==='ally'?'Ally':'Enemy'} advantage change</span><b className={impact.advantageChange===null?'muted':impact.advantageChange<0?'negative':impact.advantageChange>0?'positive':'neutral'}>{scoreLabel(impact.advantageChange)}</b></div>
       </>}
       <small>{impact.after.provisional?'Provisional · ':''}{impact.after.scored}/{impact.after.picks} picks scored · {impact.after.known}/{impact.after.total} pairs</small>
     </div>}
